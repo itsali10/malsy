@@ -1,0 +1,473 @@
+{
+  "info": {
+    "name": "Learning Platform API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Full API collection for the AI Learning Platform backend"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" },
+    { "key": "user_id", "value": "" },
+    { "key": "schedule_id", "value": "" },
+    { "key": "enrollment_id", "value": "" },
+    { "key": "experiment_id", "value": "" },
+    { "key": "session_id", "value": "" },
+    { "key": "notification_id", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Ali\",\n  \"last_name\": \"Osama\",\n  \"email\": \"ali@gmail.com\",\n  \"password\": \"123456\",\n  \"date_of_birth\": \"2004-01-10\",\n  \"grade_level\": 7,\n  \"phone_number\": \"01063221325\",\n  \"parent_email\": \"mama@gmail.com\",\n  \"parent_phone_number\": \"01063221321\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "  pm.collectionVariables.set('token', json.access_token);",
+                  "  console.log('Token saved automatically');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ali@gmail.com\",\n  \"password\": \"123456\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Get My Profile (me)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/auth/me", "host": ["{{base_url}}"], "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/users/me", "host": ["{{base_url}}"], "path": ["users", "me"] }
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Ali\",\n  \"last_name\": \"Ahmed\",\n  \"grade_level\": 8,\n  \"phone_number\": \"01063221325\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/users/me", "host": ["{{base_url}}"], "path": ["users", "me"] }
+          }
+        },
+        {
+          "name": "List All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/users", "host": ["{{base_url}}"], "path": ["users"] }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/users/{{user_id}}", "host": ["{{base_url}}"], "path": ["users", "{{user_id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subjects",
+      "item": [
+        {
+          "name": "List All Subjects",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/subjects", "host": ["{{base_url}}"], "path": ["subjects"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Schedules",
+      "item": [
+        {
+          "name": "List All Schedules",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/schedules", "host": ["{{base_url}}"], "path": ["schedules"] }
+          }
+        },
+        {
+          "name": "Get Schedule by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/schedules/{{schedule_id}}", "host": ["{{base_url}}"], "path": ["schedules", "{{schedule_id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Enrollments",
+      "item": [
+        {
+          "name": "Get My Enrollments",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/enrollments/me", "host": ["{{base_url}}"], "path": ["enrollments", "me"] }
+          }
+        },
+        {
+          "name": "Enroll in a Schedule",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schedule_id\": \"{{schedule_id}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/enrollments", "host": ["{{base_url}}"], "path": ["enrollments"] }
+          }
+        },
+        {
+          "name": "Drop Enrollment",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/enrollments/{{enrollment_id}}", "host": ["{{base_url}}"], "path": ["enrollments", "{{enrollment_id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Next Session Today",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/dashboard/next-session", "host": ["{{base_url}}"], "path": ["dashboard", "next-session"] }
+          }
+        },
+        {
+          "name": "My Weekly Schedule",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/dashboard/my-week", "host": ["{{base_url}}"], "path": ["dashboard", "my-week"] }
+          }
+        },
+        {
+          "name": "My Subjects",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/dashboard/my-subjects", "host": ["{{base_url}}"], "path": ["dashboard", "my-subjects"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attendance",
+      "item": [
+        {
+          "name": "Get My Attendance",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/attendance/me", "host": ["{{base_url}}"], "path": ["attendance", "me"] }
+          }
+        },
+        {
+          "name": "Get My Attendance by Subject",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/attendance/me/subject/{{subject_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["attendance", "me", "subject", "{{subject_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Record Attendance (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"subject_id\": \"{{subject_id}}\",\n  \"schedule_id\": \"{{schedule_id}}\",\n  \"session_date\": \"2026-05-22\",\n  \"attendance_status\": \"Present\",\n  \"check_in_time\": \"2026-05-22T09:00:00\",\n  \"check_out_time\": \"2026-05-22T10:00:00\",\n  \"notes\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/attendance", "host": ["{{base_url}}"], "path": ["attendance"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quiz (English)",
+      "item": [
+        {
+          "name": "Submit Quiz Attempt",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject_id\": \"{{subject_id}}\",\n  \"content_id\": \"english_g6:unit_01\",\n  \"question_number\": 1,\n  \"submitted_answer\": \"The cat sat on the mat.\",\n  \"is_correct\": true,\n  \"points_earned\": 10,\n  \"phoneme_accuracy_score\": 92.5,\n  \"pronunciation_feedback\": \"Good pronunciation overall.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/quiz/attempts", "host": ["{{base_url}}"], "path": ["quiz", "attempts"] }
+          }
+        },
+        {
+          "name": "Get My Quiz Attempts",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/quiz/attempts/me",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "attempts", "me"],
+              "query": [{ "key": "content_id", "value": "english_g6:unit_01", "disabled": true }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Evaluations",
+      "item": [
+        {
+          "name": "Get My Evaluations",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/evaluations/me", "host": ["{{base_url}}"], "path": ["evaluations", "me"] }
+          }
+        },
+        {
+          "name": "Get Evaluation for Lesson",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/evaluations/me/english_g6:unit_01",
+              "host": ["{{base_url}}"],
+              "path": ["evaluations", "me", "english_g6:unit_01"]
+            }
+          }
+        },
+        {
+          "name": "Create Lesson Evaluation",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject_id\": \"{{subject_id}}\",\n  \"content_id\": \"english_g6:unit_01\",\n  \"grammar_score\": 85.0,\n  \"comprehension_score\": 90.0,\n  \"pronunciation_score\": 88.0,\n  \"overall_score\": 87.7,\n  \"number_of_attempts\": 2,\n  \"feedback\": \"Great work! Keep practicing pronunciation.\",\n  \"lesson_completed\": true,\n  \"completion_date\": \"2026-05-22T10:00:00\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/evaluations", "host": ["{{base_url}}"], "path": ["evaluations"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Labs (Chemistry)",
+      "item": [
+        {
+          "name": "List All Experiments",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/labs/experiments", "host": ["{{base_url}}"], "path": ["labs", "experiments"] }
+          }
+        },
+        {
+          "name": "Get Experiment by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/labs/experiments/{{experiment_id}}", "host": ["{{base_url}}"], "path": ["labs", "experiments", "{{experiment_id}}"] }
+          }
+        },
+        {
+          "name": "Start Lab Session",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"experiment_id\": \"{{experiment_id}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/labs/sessions", "host": ["{{base_url}}"], "path": ["labs", "sessions"] }
+          }
+        },
+        {
+          "name": "Update / Complete Lab Session",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_status\": \"Completed\",\n  \"observation_accuracy\": 88.0,\n  \"procedure_completion\": 95.0,\n  \"safety_compliance\": true,\n  \"expected_result_achieved\": true,\n  \"final_score\": 91,\n  \"number_of_attempts\": 1,\n  \"feedback\": \"Excellent lab performance.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/labs/sessions/{{session_id}}", "host": ["{{base_url}}"], "path": ["labs", "sessions", "{{session_id}}"] }
+          }
+        },
+        {
+          "name": "Get My Lab Sessions",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/labs/sessions/me", "host": ["{{base_url}}"], "path": ["labs", "sessions", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get Parent Notifications",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/notifications/parent?parent_email=mama@gmail.com",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "parent"],
+              "query": [{ "key": "parent_email", "value": "mama@gmail.com" }]
+            }
+          }
+        },
+        {
+          "name": "Send Notification (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"parent_email\": \"mama@gmail.com\",\n  \"notification_type\": \"Grade\",\n  \"subject\": \"English Lesson Completed\",\n  \"message\": \"Your child completed Unit 1 with a score of 87.7%.\",\n  \"related_content_id\": \"english_g6:unit_01\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/notifications", "host": ["{{base_url}}"], "path": ["notifications"] }
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/notifications/{{notification_id}}/read?parent_email=mama@gmail.com",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "{{notification_id}}", "read"],
+              "query": [{ "key": "parent_email", "value": "mama@gmail.com" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "List All Students",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/admin/students", "host": ["{{base_url}}"], "path": ["admin", "students"] }
+          }
+        },
+        {
+          "name": "Get Student Overview",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/admin/students/{{user_id}}/overview", "host": ["{{base_url}}"], "path": ["admin", "students", "{{user_id}}", "overview"] }
+          }
+        },
+        {
+          "name": "Attendance Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/reports/attendance",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "reports", "attendance"],
+              "query": [
+                { "key": "subject_id", "value": "", "disabled": true },
+                { "key": "session_date", "value": "2026-05-22", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Evaluations Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/reports/evaluations",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "reports", "evaluations"],
+              "query": [
+                { "key": "subject_id", "value": "", "disabled": true },
+                { "key": "completed_only", "value": "false", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Labs Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/reports/labs",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "reports", "labs"],
+              "query": [{ "key": "completed_only", "value": "false", "disabled": true }]
+            }
+          }
+        },
+        {
+          "name": "Update Account Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"account_status\": \"Active\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/admin/users/{{user_id}}/status", "host": ["{{base_url}}"], "path": ["admin", "users", "{{user_id}}", "status"] }
+          }
+        }
+      ]
+    }
+  ]
+}

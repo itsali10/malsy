@@ -1,0 +1,104 @@
+{
+  "student_id": "test_student_123",
+  "updated_at": "2026-03-24T18:39:02.782375Z",
+  "totals": {
+    "attempts": 3,
+    "correct": 2,
+    "accuracy": 66.67
+  },
+  "recent_attempts": [
+    {
+      "ts": "2026-03-24T18:23:00.031366Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Why do people build bridges and tunnels?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-03-24T18:30:26.837738Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Why do people build bridges and tunnels?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-03-24T18:39:02.782375Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What is the purpose of building bridges and tunnels?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ],
+  "by_unit": {
+    "english_g6:unit_01": {
+      "attempts": 3,
+      "correct": 2,
+      "accuracy": 66.67
+    }
+  },
+  "by_item": {
+    "english_g6:unit_01:unit_opening": {
+      "attempts": 3,
+      "incorrect": 1,
+      "remediation_used": 0
+    }
+  },
+  "tutor_quality_events": [
+    {
+      "ts": "2026-03-24T18:23:00.031366Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Introduction to the unit is missing",
+          "Explanation of the big question is missing"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 3801,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-03-24T18:30:26.837738Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of the purpose of the unit opening",
+          "Engagement with the big question 'Why do we build bridges and tunnels?'",
+          "Guidance on discussing the big question with a partner",
+          "Instructions on filling out the Big Question Chart",
+          "Encouragement to explore the significance of bridges and tunnels together"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 3029,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-03-24T18:39:02.782375Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Engaging with the big question 'Why do we build bridges and tunnels?'",
+          "Guiding students through discussing the provided picture",
+          "Instructing students to fill out the Big Question Chart",
+          "Encouraging students to explore more about bridges and tunnels through questions and activities"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 2378,
+        "mentions_page_ranges": false
+      }
+    }
+  ]
+}

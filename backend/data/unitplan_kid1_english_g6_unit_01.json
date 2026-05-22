@@ -1,0 +1,164 @@
+{
+  "unit_title": "Unit 1: Bridges and Tunnels",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Opening",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "big question"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Reading: Author's Purpose",
+      "must_cover": true,
+      "keywords": [
+        "fantasy story",
+        "author's purpose",
+        "Elizabeth Cody Kimmel"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Vocabulary: Verbs and Adjectives",
+      "must_cover": true,
+      "keywords": [
+        "isolated",
+        "hazardous",
+        "skeptical",
+        "insist",
+        "labor",
+        "strand",
+        "discouraged",
+        "sapphire",
+        "suspicious",
+        "exquisite",
+        "depart"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "bridges",
+        "tunnels",
+        "daily life",
+        "importance"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "picture",
+        "chart",
+        "diagram"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Vocabulary Exercises",
+      "must_cover": true,
+      "keywords": [
+        "fill-in-the-blank",
+        "matching",
+        "circle the correct answer"
+      ]
+    },
+    {
+      "id": "reading_2",
+      "type": "reading",
+      "title": "Reading: Comprehension",
+      "must_cover": true,
+      "keywords": [
+        "comprehension questions",
+        "story analysis"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar in Use: Future Continuous",
+      "must_cover": true,
+      "keywords": [
+        "future continuous",
+        "future time actions",
+        "sentence correction"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening: Bridges and Tunnels",
+      "must_cover": true,
+      "keywords": [
+        "listening comprehension",
+        "bridge usage",
+        "tunnel usage"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking: Correcting Someone",
+      "must_cover": true,
+      "keywords": [
+        "polite expressions",
+        "correcting mistakes"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Word Study: Prefixes bi- and tri-",
+      "must_cover": true,
+      "keywords": [
+        "prefixes",
+        "bisection",
+        "tricolor",
+        "vocabulary practice"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing Study: Paragraph Breaks",
+      "must_cover": true,
+      "keywords": [
+        "paragraph structure",
+        "organization",
+        "writing practice"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Word Study Exercises",
+      "must_cover": true,
+      "keywords": [
+        "prefix identification",
+        "sentence writing"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Unit Wrap Up",
+      "must_cover": true,
+      "keywords": [
+        "summary",
+        "review"
+      ]
+    }
+  ]
+}

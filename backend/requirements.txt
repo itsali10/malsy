@@ -1,0 +1,18 @@
+fastapi
+uvicorn
+python-dotenv
+pypdf
+chromadb
+langchain
+langchain-openai
+langgraph
+
+# PostgreSQL + async ORM
+sqlalchemy[asyncio]
+asyncpg
+alembic
+
+# Auth
+passlib[bcrypt]
+python-jose[cryptography]
+python-multipart

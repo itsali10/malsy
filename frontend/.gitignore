@@ -1,0 +1,9 @@
+node_modules/
+**/node_modules/
+
+# Temporary scratch/scan scripts
+**/_tmp_*
+
+# Windows system files
+**/desktop.ini
+**/Thumbs.db

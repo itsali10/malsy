@@ -1,0 +1,133 @@
+{
+  "objectives": [
+    "Teach 18 units from english_g6 in order"
+  ],
+  "units": [
+    {
+      "unit_id": "unit_01",
+      "title": "Why do we build bridges and tunnels?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_01"
+    },
+    {
+      "unit_id": "unit_02",
+      "title": "Overcoming Earth's Obstacles",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_02"
+    },
+    {
+      "unit_id": "unit_03",
+      "title": "What is the Earth made of?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_03"
+    },
+    {
+      "unit_id": "unit_04",
+      "title": "The Secret of Vesuvius",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_04"
+    },
+    {
+      "unit_id": "unit_05",
+      "title": "Why do we wear masks?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_05"
+    },
+    {
+      "unit_id": "unit_06",
+      "title": "Uncovering Masks",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_06"
+    },
+    {
+      "unit_id": "unit_07",
+      "title": "Why do we like symmetry?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_07"
+    },
+    {
+      "unit_id": "unit_08",
+      "title": "Snowflake Lia",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_08"
+    },
+    {
+      "unit_id": "unit_09",
+      "title": "How do we use language?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_09"
+    },
+    {
+      "unit_id": "unit_10",
+      "title": "The Whistlers",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_10"
+    },
+    {
+      "unit_id": "unit_11",
+      "title": "Why do we record history?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_11"
+    },
+    {
+      "unit_id": "unit_12",
+      "title": "A Housemaid's Diary",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_12"
+    },
+    {
+      "unit_id": "unit_13",
+      "title": "What makes birds special?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_13"
+    },
+    {
+      "unit_id": "unit_14",
+      "title": "Bird Brains",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_14"
+    },
+    {
+      "unit_id": "unit_15",
+      "title": "What are we afraid of?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_15"
+    },
+    {
+      "unit_id": "unit_16",
+      "title": "Gripped by Fear",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_16"
+    },
+    {
+      "unit_id": "unit_17",
+      "title": "Why are stories important?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_17"
+    },
+    {
+      "unit_id": "unit_18",
+      "title": "Why Stories Matter",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "english_g6:unit_18"
+    }
+  ]
+}

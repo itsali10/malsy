@@ -1,0 +1,30 @@
+# Python virtual environment
+backend/.venv/
+
+# Python cache
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Vector / chroma databases (generated, not source)
+backend/chroma_db/
+backend/chroma_db_backup/
+
+# Large generated/binary data
+backend/data/tts_audio/
+backend/data/books/
+
+# Video output files
+frontend/GradGame/ai-history-video/output/
+frontend/GradGame/videos/
+
+# Environment variables
+.env
+**/.env
+
+# Windows system files
+**/desktop.ini
+**/Thumbs.db
+
+# Node modules
+**/node_modules/

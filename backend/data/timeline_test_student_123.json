@@ -1,0 +1,11 @@
+{
+  "student_id": "test_student_123",
+  "student_start_at": "2026-03-24T18:20:06.909153Z",
+  "taught_units": [
+    {
+      "unit_id": "english_g6:unit_01",
+      "taught_at": "2026-03-24T18:39:02.801998Z",
+      "completed_parts": 2
+    }
+  ]
+}

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard — Malsy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles-dashboard.css">
+    <link rel="stylesheet" href="styles-subject-carousel.css">
+</head>
+<body>
+<script>
+(function () {
+    if (location.protocol === 'file:') {
+        window.addEventListener('DOMContentLoaded', function () {
+            var b = document.createElement('div');
+            b.setAttribute('role', 'alert');
+            b.style.cssText = 'background:#f59e0b;color:#1c1917;padding:12px 16px;text-align:center;font:800 14px/1.4 Nunito,system-ui,sans-serif;border-bottom:3px solid #d97706;z-index:1000;position:relative;';
+            b.innerHTML = 'You are on <strong>file://</strong>. Use a local server instead: <code>npx serve -l 5500 .</code> → ' +
+                '<strong>http://localhost:5500/dashboard.html</strong> so Chrome can load scripts and storage reliably.';
+            document.body.insertBefore(b, document.body.firstChild);
+        });
+    }
+}());
+</script>
+<div class="dashboard-wrapper">
+
+    <!-- ── Header ──────────────────────────────────────────────── -->
+    <header class="site-header">
+
+        <!-- Brand -->
+        <div class="header-brand">
+            🎓 Malsy <span class="brand-dot"></span>
+        </div>
+
+        <!-- Greeting (center) -->
+        <p class="header-greeting" id="headerGreeting">Hi there 👋 Ready to learn?</p>
+
+        <!-- Right cluster: profile chip + streak + logout -->
+        <div class="header-right">
+
+            <!-- Streak pill -->
+            <div class="header-streak" id="headerStreak" title="Learning streak">
+                🔥 <span id="streakCount">0</span> day streak
+            </div>
+
+            <!-- Student identity chip -->
+            <div class="header-profile" id="headerProfile">
+                <div class="hp-avatar">
+                    <img id="headerPhoto" src="" alt="Student photo">
+                    <!-- Camera overlay on hover -->
+                    <button class="hp-avatar-edit" id="settingsBtn" title="Change photo">📷</button>
+                </div>
+                <div class="hp-info">
+                    <span class="hp-name" id="headerName">Loading…</span>
+                    <span class="hp-id">ID&nbsp;<strong id="headerId">—</strong></span>
+                </div>
+            </div>
+
+            <button class="btn-logout" id="logoutBtn">Logout</button>
+        </div>
+    </header>
+
+    <!-- ── Body ────────────────────────────────────────────────── -->
+    <div class="dashboard-body">
+
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar">
+
+            <!-- ── AI Speaking Teacher panel ──────────────────────── -->
+            <div class="ai-teacher-panel" id="aiTeacherPanel">
+
+                <!-- Header bar -->
+                <div class="atp-header">
+                    <span class="atp-dot"></span>
+                    <span class="atp-dot"></span>
+                    <span class="atp-dot"></span>
+                    <span class="atp-title">AI Speaking Teacher</span>
+                </div>
+
+                <!-- Stage: Unity iframe replaces this when uploaded -->
+                <div class="atp-stage" id="atpStage">
+
+                    <!-- Background atmosphere -->
+                    <div class="atp-grid"></div>
+                    <div class="atp-floor-glow"></div>
+
+                    <!-- Teacher figure (CSS illustration) -->
+                    <div class="atp-figure" id="atpFigure">
+
+                        <!-- Shadow on floor -->
+                        <div class="fig-shadow"></div>
+
+                        <!-- Standing body using nested divs -->
+                        <div class="fig-body">
+
+                            <!-- Cap -->
+                            <div class="fig-cap">🎓</div>
+
+                            <!-- Head -->
+                            <div class="fig-head">
+                                <div class="fig-hair"></div>
+                                <div class="fig-face">
+                                    <div class="fig-eyes">
+                                        <div class="fig-eye"></div>
+                                        <div class="fig-eye"></div>
+                                    </div>
+                                    <div class="fig-nose"></div>
+                                    <div class="fig-smile"></div>
+                                </div>
+                            </div>
+
+                            <!-- Neck + collar -->
+                            <div class="fig-neck"></div>
+
+                            <!-- Torso group -->
+                            <div class="fig-torso-group">
+                                <div class="fig-arm fig-arm-l"></div>
+                                <div class="fig-torso">
+                                    <div class="fig-collar-v"></div>
+                                </div>
+                                <div class="fig-arm fig-arm-r"></div>
+                            </div>
+
+                            <!-- Skirt -->
+                            <div class="fig-skirt"></div>
+
+                            <!-- Legs -->
+                            <div class="fig-legs">
+                                <div class="fig-leg">
+                                    <div class="fig-shoe"></div>
+                                </div>
+                                <div class="fig-leg">
+                                    <div class="fig-shoe"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Unity iframe (hidden until enabled) -->
+                        <iframe class="atp-unity-frame" id="atpUnityFrame"
+                                title="Unity Avatar" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <!-- Info strip -->
+                <div class="atp-info">
+                    <p class="atp-name">Prof. Malsy</p>
+                    <div class="atp-speech" id="atpSpeech">
+                        <p id="atpMsg">Hello! I am here to guide you. 👋</p>
+                    </div>
+                </div>
+
+            </div>
+            <!-- ── / AI Speaking Teacher panel ────────────────────── -->
+
+            <!-- Subject progress rings -->
+            <div class="progress-card">
+                <p class="progress-card-title">📈 My Progress</p>
+                <div class="ring-list">
+                    <div class="ring-row">
+                        <div class="ring-icon english">📚</div>
+                        <div class="ring-info">
+                            <p class="ring-label">English</p>
+                            <div class="progress-track">
+                                <div class="progress-fill english" id="englishBar"></div>
+                            </div>
+                        </div>
+                        <span class="ring-pct" id="englishProgress">0%</span>
+                    </div>
+                    <div class="ring-row">
+                        <div class="ring-icon science">🔬</div>
+                        <div class="ring-info">
+                            <p class="ring-label">Science</p>
+                            <div class="progress-track">
+                                <div class="progress-fill science" id="scienceBar"></div>
+                            </div>
+                        </div>
+                        <span class="ring-pct" id="scienceProgress">0%</span>
+                    </div>
+                    <div class="ring-row">
+                        <div class="ring-icon social">🌍</div>
+                        <div class="ring-info">
+                            <p class="ring-label">Social Studies</p>
+                            <div class="progress-track">
+                                <div class="progress-fill social" id="socialBar"></div>
+                            </div>
+                        </div>
+                        <span class="ring-pct" id="socialProgress">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly activity dots -->
+            <div class="activity-card">
+                <p class="activity-card-title">📅 This Week</p>
+                <div class="week-dots" id="weekDots">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- AI Recommendation banner -->
+            <div class="ai-banner" id="aiBanner">
+                <span class="ai-banner-icon">🤖</span>
+                <div class="ai-banner-text">
+                    <h3 id="aiBannerTitle">Getting your personalised plan…</h3>
+                    <p  id="aiBannerBody">Your AI tutor is analysing your progress.</p>
+                </div>
+                <button class="ai-banner-btn" id="aiBannerBtn">Let's Go! →</button>
+            </div>
+
+            <!-- Subjects: swipeable carousel (SubjectCarousel) -->
+            <div class="subject-carousel-wrap">
+                <p class="section-title">
+                    📚 My subjects
+                    <span class="title-pill">Swipe or use arrows</span>
+                </p>
+                <section
+                    class="subject-carousel"
+                    id="subjectCarousel"
+                    aria-roledescription="carousel"
+                    aria-label="Choose a subject"
+                >
+                    <button type="button" class="sc-nav sc-nav--prev" aria-label="Previous subject">←</button>
+                    <div class="sc-viewport" id="scViewport">
+                        <div class="sc-stack" id="scStack" role="list">
+                            <article class="sc-card sc-theme-english" data-subject="english" data-sc-index="0" role="listitem">
+                                <div class="sc-card-inner">
+                                    <div class="sc-hero"><span class="sc-emoji" aria-hidden="true">📚</span></div>
+                                    <div class="sc-body">
+                                        <h3>English</h3>
+                                        <p class="sc-desc">Grammar, vocabulary, reading &amp; writing</p>
+                                        <div class="card-progress-wrap">
+                                            <div class="card-level-row">
+                                                <span class="card-level-label">Progress</span>
+                                                <span class="card-pct english" id="englishCardPct">0%</span>
+                                            </div>
+                                            <div class="card-track">
+                                                <div class="card-fill english" id="englishCardBar"></div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="sc-start">Start learning</button>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="sc-card sc-theme-science" data-subject="science" data-sc-index="1" role="listitem">
+                                <div class="sc-card-inner">
+                                    <div class="sc-hero"><span class="sc-emoji" aria-hidden="true">🔬</span></div>
+                                    <div class="sc-body">
+                                        <h3>Science</h3>
+                                        <p class="sc-desc">Experiments, chemistry lab &amp; scientific thinking</p>
+                                        <div class="card-progress-wrap">
+                                            <div class="card-level-row">
+                                                <span class="card-level-label">Progress</span>
+                                                <span class="card-pct science" id="scienceCardPct">0%</span>
+                                            </div>
+                                            <div class="card-track">
+                                                <div class="card-fill science" id="scienceCardBar"></div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="sc-start">Start learning</button>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="sc-card sc-theme-social" data-subject="socialStudies" data-sc-index="2" role="listitem">
+                                <div class="sc-card-inner">
+                                    <div class="sc-hero"><span class="sc-emoji" aria-hidden="true">🌍</span></div>
+                                    <div class="sc-body">
+                                        <h3>Social Studies</h3>
+                                        <p class="sc-desc">History, geography &amp; cultures of the world</p>
+                                        <div class="card-progress-wrap">
+                                            <div class="card-level-row">
+                                                <span class="card-level-label">Progress</span>
+                                                <span class="card-pct social" id="socialCardPct">0%</span>
+                                            </div>
+                                            <div class="card-track">
+                                                <div class="card-fill social" id="socialCardBar"></div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="sc-start">Start learning</button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                    <button type="button" class="sc-nav sc-nav--next" aria-label="Next subject">→</button>
+                    <div class="sc-dots" role="tablist" aria-label="Subject index">
+                        <button type="button" class="sc-dot is-active" role="tab" aria-selected="true" data-go="0" aria-label="English"></button>
+                        <button type="button" class="sc-dot" role="tab" aria-selected="false" data-go="1" aria-label="Science"></button>
+                        <button type="button" class="sc-dot" role="tab" aria-selected="false" data-go="2" aria-label="Social Studies"></button>
+                    </div>
+                    <p class="sc-hint">Drag the card or swipe on touch · ← → keys when this row is focused</p>
+                </section>
+            </div>
+
+            <!-- Games + Grades -->
+            <div>
+                <p class="section-title">🎯 Quick Access</p>
+                <div class="cards-row">
+                    <div class="action-card" id="historyVideosCard">
+                        <div class="action-card-icon">🏛️</div>
+                        <div class="action-card-text">
+                            <h3>History Videos</h3>
+                            <p>Open your AI history lesson videos and quiz</p>
+                            <div class="action-badges">
+                                <span class="pill-badge grades">Sora Video</span>
+                                <span class="pill-badge grades">Quiz</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-card" id="scienceVideosCard">
+                        <div class="action-card-icon">🪐</div>
+                        <div class="action-card-text">
+                            <h3>Science Videos</h3>
+                            <p>Open your space science videos and levels</p>
+                            <div class="action-badges">
+                                <span class="pill-badge games">Planets</span>
+                                <span class="pill-badge games">Levels</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-card games" id="gamesCard">
+                        <div class="action-card-icon">🎮</div>
+                        <div class="action-card-text">
+                            <h3>Educational Games</h3>
+                            <p>Play and learn at the same time!</p>
+                            <div class="action-badges">
+                                <span class="pill-badge games">Hangman</span>
+                                <span class="pill-badge games">Spelling Bee</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-card grades" id="gradesCard">
+                        <div class="action-card-icon">📊</div>
+                        <div class="action-card-text">
+                            <h3>Grade Report</h3>
+                            <p>Track semester grades &amp; GPA</p>
+                            <div class="action-badges">
+                                <span class="pill-badge grades">2 Semesters</span>
+                                <span class="pill-badge grades">Weighted GPA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day-by-day schedule (filled from core/exam-schedule-config.js) -->
+            <div id="finalExamsSection" class="final-exams-wrap" aria-label="School schedule by day"></div>
+
+            <!-- Achievements -->
+            <div>
+                <p class="section-title">
+                    🏅 My Achievements
+                    <span class="title-pill" id="badgeCount">0 earned</span>
+                </p>
+                <div class="achievements-grid" id="achievementsGrid">
+                    <p class="no-badges">Complete lessons to earn your first badge!</p>
+                </div>
+            </div>
+
+        </main>
+    </div><!-- .dashboard-body -->
+</div><!-- .dashboard-wrapper -->
+
+<!-- ══ Settings Modal ══════════════════════════════════════════ -->
+<div class="settings-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-label="Settings">
+
+    <div class="settings-modal">
+
+        <!-- Header -->
+        <div class="settings-modal-header">
+            <h2>⚙️ Settings</h2>
+            <button class="settings-close" id="settingsClose" aria-label="Close settings">×</button>
+        </div>
+
+        <!-- Body -->
+        <div class="settings-modal-body">
+
+            <p class="settings-section-label">PROFILE PHOTO</p>
+
+            <!-- Photo preview area -->
+            <div class="settings-photo-area">
+                <div class="settings-photo-frame" id="settingsPhotoFrame">
+                    <img id="settingsCurrentPhoto" src="" alt="Current photo">
+                    <div class="settings-photo-shimmer"></div>
+                </div>
+
+                <!-- New photo preview (hidden until a file is chosen) -->
+                <div class="settings-arrow">→</div>
+
+                <div class="settings-photo-frame settings-photo-new hidden" id="newPhotoFrame">
+                    <img id="settingsNewPhoto" src="" alt="New photo preview">
+                    <span class="settings-new-badge">New</span>
+                </div>
+            </div>
+
+            <!-- File input (hidden, triggered by label) -->
+            <input type="file" id="photoFileInput" accept="image/png, image/jpeg, image/gif, image/webp" class="settings-file-input">
+
+            <!-- Upload button (styled label) -->
+            <label for="photoFileInput" class="btn-choose-photo" id="choosePhotoLabel">
+                📁 Choose Photo
+            </label>
+            <p class="settings-hint">Supported: JPG · PNG · GIF · WEBP &nbsp;·&nbsp; Max 5 MB</p>
+
+            <!-- Save / Cancel -->
+            <div class="settings-actions">
+                <button class="btn-save-photo" id="savePhotoBtn" disabled>
+                    ✅ Save Photo
+                </button>
+                <button class="btn-cancel-settings" id="cancelSettingsBtn">
+                    Cancel
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- ══ / Settings Modal ════════════════════════════════════════ -->
+
+<!-- Floating chat button -->
+<button class="chat-fab" id="chatToggleBtn" type="button" aria-label="Open chatbot">💬 Ask Malsy</button>
+
+<!-- Chat popup -->
+<section class="chat-popup hidden" id="chatPopup" aria-live="polite">
+    <div class="chat-header">
+        <h3>🤖 Malsy AI</h3>
+        <button class="chat-close" id="chatCloseBtn" type="button" aria-label="Close">×</button>
+    </div>
+    <p class="chat-subtitle">Ask anything — I'm here to help!</p>
+    <div class="chat-messages" id="chatMessages"></div>
+    <form class="chat-form" id="chatForm">
+        <input type="text" id="chatInput" placeholder="Type a question…" autocomplete="off" required>
+        <button type="submit">Send</button>
+    </form>
+</section>
+
+<!-- Scripts — order matters: dependencies before controllers -->
+<script src="database.js"></script>
+<script src="services/auth-service.js"></script>
+<script src="services/progress-service.js"></script>
+<script src="services/chatbot-service.js"></script>
+<script src="features/achievements.js"></script>
+<script src="core/exam-schedule-config.js"></script>
+<script src="features/subject-carousel.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>

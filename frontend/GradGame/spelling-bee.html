@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Bee - Malsy</title>
+    <link rel="stylesheet" href="styles-spelling.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <button class="btn-back" id="backBtn">← Back</button>
+            <h1>🐝 Spelling Bee</h1>
+            <div class="score-display">
+                <span>Score: <span id="score">0</span></span>
+                <span>Best: <span id="bestScore">0</span></span>
+                <span>Level: <span id="level">1</span></span>
+            </div>
+        </header>
+
+        <main class="game-main">
+            <div class="word-section">
+                <div class="word-audio">
+                    <button class="btn-audio" id="audioBtn">🔊 Listen</button>
+                </div>
+                <div class="word-display" id="wordDisplay"></div>
+                <div class="word-hint" id="wordHint"></div>
+            </div>
+
+            <div class="input-section">
+                <input type="text" id="spellingInput" placeholder="Type the word here..." autocomplete="off" spellcheck="false">
+                <button class="btn-submit" id="submitBtn">Submit</button>
+            </div>
+
+            <div class="progress-section">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p class="progress-text">Words Correct: <span id="correctCount">0</span> / <span id="totalWords">10</span></p>
+            </div>
+
+            <div class="game-controls">
+                <button class="btn-new-game" id="newGameBtn">New Game</button>
+                <button class="btn-hint" id="hintBtn">Get Hint</button>
+            </div>
+
+            <div class="message" id="message"></div>
+        </main>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="spelling-bee.js"></script>
+</body>
+</html>
+

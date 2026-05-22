@@ -1,0 +1,6 @@
+# Optional Coqui TTS (XTTS). Install a CUDA-enabled torch first from https://pytorch.org then:
+#   pip install TTS
+#
+# Piper needs no Python package — only the piper binary + .onnx model (see app/local_tts.py).
+
+TTS>=0.22.0

@@ -1,0 +1,22 @@
+# Netlify Configuration File
+# This helps Netlify serve your site correctly
+
+[build]
+  # No build command needed for static site
+  publish = "."
+
+[[redirects]]
+  # Redirect all routes to index.html for SPA behavior
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+

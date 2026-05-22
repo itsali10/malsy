@@ -1,0 +1,287 @@
+{
+  "exam_id": "8cb456f1f30c442eba1d8677d5086fe8",
+  "student_id": "kid1",
+  "exam_type": "weekly_unit",
+  "course_week": 2,
+  "course_month": null,
+  "unit_ids": [
+    "english_g6:unit_01"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "Why do people build bridges and tunnels?",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "unit_opening",
+        "big_question"
+      ],
+      "choices": [
+        {
+          "id": "A",
+          "text": "To cross rivers and valleys"
+        },
+        {
+          "id": "B",
+          "text": "To fly over obstacles"
+        },
+        {
+          "id": "C",
+          "text": "To avoid using transportation"
+        },
+        {
+          "id": "D",
+          "text": "To confuse travelers"
+        }
+      ],
+      "answer_key": "A"
+    },
+    {
+      "id": "q2",
+      "type": "short_answer",
+      "prompt": "What are some differences between a bridge and a tunnel?",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "discussion_questions"
+      ],
+      "expected_points": [
+        "Bridge is above ground, tunnel is below ground",
+        "Bridge is usually visible, tunnel is hidden"
+      ]
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank",
+      "prompt": "The prefix bi- means \"____\" and tri- means \"____\".",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "vocab"
+      ],
+      "answer_key": [
+        "two",
+        "three"
+      ]
+    },
+    {
+      "id": "q4",
+      "type": "matching",
+      "prompt": "{'left': ['isolated', 'hazardous', 'skeptical', 'insist'], 'right': ['dislike', 'safe', 'doubted', 'demand']}",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "exercises"
+      ],
+      "answer_key": {
+        "left_to_right": {
+          "isolated": "safe",
+          "hazardous": "dangerous",
+          "skeptical": "doubted",
+          "insist": "demand"
+        }
+      }
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "What prevented the villagers from leaving Koi?",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "reading_1"
+      ],
+      "choices": [
+        {
+          "id": "A",
+          "text": "A storm"
+        },
+        {
+          "id": "B",
+          "text": "A flood"
+        },
+        {
+          "id": "C",
+          "text": "A dragon"
+        },
+        {
+          "id": "D",
+          "text": "A giant spider"
+        }
+      ],
+      "answer_key": "B"
+    },
+    {
+      "id": "q6",
+      "type": "short_answer",
+      "prompt": "What was the meaning of the stranger’s gift?",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "reading_1"
+      ],
+      "expected_points": [
+        "To inspire the villagers to build a bridge and tunnel"
+      ]
+    },
+    {
+      "id": "q7",
+      "type": "fill_blank",
+      "prompt": "Many people admire that soccer player for his ____.",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "vocab"
+      ],
+      "answer_key": [
+        "talent"
+      ]
+    },
+    {
+      "id": "q8",
+      "type": "matching",
+      "prompt": "{'left': ['depart', 'discouraged', 'sapphire', 'suspicious'], 'right': ['arrive', 'encouraged', 'precious gem', 'trustful']}",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "exercises"
+      ],
+      "answer_key": {
+        "left_to_right": {
+          "depart": "arrive",
+          "discouraged": "encouraged",
+          "sapphire": "precious gem",
+          "suspicious": "trustful"
+        }
+      }
+    },
+    {
+      "id": "q9",
+      "type": "mcq",
+      "prompt": "What will the villagers be doing by winter?",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "grammar"
+      ],
+      "choices": [
+        {
+          "id": "A",
+          "text": "Walking through the mountain"
+        },
+        {
+          "id": "B",
+          "text": "Finishing the tunnel"
+        },
+        {
+          "id": "C",
+          "text": "Celebrating their graduation"
+        },
+        {
+          "id": "D",
+          "text": "Starting school"
+        }
+      ],
+      "answer_key": "B"
+    },
+    {
+      "id": "q10",
+      "type": "short_answer",
+      "prompt": "What are future continuous forms used for?",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "grammar"
+      ],
+      "expected_points": [
+        "To talk about actions in progress at a future time"
+      ]
+    },
+    {
+      "id": "q11",
+      "type": "fill_blank",
+      "prompt": "The scientists were ____ about the new invention.",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "reading_1"
+      ],
+      "answer_key": [
+        "skeptical"
+      ]
+    },
+    {
+      "id": "q12",
+      "type": "matching",
+      "prompt": "{'left': ['labor', 'hazardous', 'strand', 'admire'], 'right': ['relax', 'safe', 'dislike', 'trust']}",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "exercises"
+      ],
+      "answer_key": {
+        "left_to_right": {
+          "labor": "dislike",
+          "hazardous": "unsafe",
+          "strand": "relax",
+          "admire": "trust"
+        }
+      }
+    },
+    {
+      "id": "q13",
+      "type": "mcq",
+      "prompt": "What will you be doing on Friday?",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "grammar"
+      ],
+      "choices": [
+        {
+          "id": "A",
+          "text": "Studying for an exam"
+        },
+        {
+          "id": "B",
+          "text": "Celebrating a birthday"
+        },
+        {
+          "id": "C",
+          "text": "Going on a trip"
+        },
+        {
+          "id": "D",
+          "text": "Watching a movie"
+        }
+      ],
+      "answer_key": "A"
+    },
+    {
+      "id": "q14",
+      "type": "short_answer",
+      "prompt": "How do bridges and tunnels help people in daily life?",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "listening"
+      ],
+      "expected_points": [
+        "By providing ways to cross rivers and mountains",
+        "By facilitating transportation"
+      ]
+    },
+    {
+      "id": "q15",
+      "type": "fill_blank",
+      "prompt": "The prefix tri- means \"____\".",
+      "source_unit_id": "english_g6:unit_01",
+      "tags": [
+        "vocab"
+      ],
+      "answer_key": [
+        "three"
+      ]
+    }
+  ],
+  "attempts": [],
+  "status": "in_progress",
+  "current_question_index": 0,
+  "created_at": "2026-04-20T17:50:07.808030Z",
+  "finished_at": null,
+  "score": {
+    "total": 0.0,
+    "max": 15.0,
+    "percent": 0.0,
+    "by_unit": {}
+  },
+  "summary": null
+}

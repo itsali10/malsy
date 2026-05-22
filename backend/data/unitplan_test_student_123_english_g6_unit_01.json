@@ -1,0 +1,160 @@
+{
+  "unit_title": "Unit 1: Bridges and Tunnels",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Opening",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "big question"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Reading: Author's Purpose",
+      "must_cover": true,
+      "keywords": [
+        "fantasy story",
+        "imaginary places",
+        "author's purpose"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Vocabulary: Verbs and Adjectives",
+      "must_cover": true,
+      "keywords": [
+        "isolated",
+        "hazardous",
+        "skeptical",
+        "insist",
+        "labor",
+        "sapphire",
+        "discouraged",
+        "suspicious",
+        "exquisite",
+        "depart"
+      ]
+    },
+    {
+      "id": "reading_2",
+      "type": "reading",
+      "title": "Reading: The Earthworm and the Spider",
+      "must_cover": true,
+      "keywords": [
+        "village",
+        "fantasy story",
+        "author",
+        "Koi",
+        "stranger",
+        "bridge",
+        "tunnel"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "bridges",
+        "tunnels",
+        "importance",
+        "daily life"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "pictures",
+        "charts",
+        "diagrams"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Vocabulary: Words in Context",
+      "must_cover": true,
+      "keywords": [
+        "fill-in-the-blank",
+        "circle the correct answer",
+        "match words to opposites"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar in Use: Future Continuous",
+      "must_cover": true,
+      "keywords": [
+        "future continuous",
+        "actions in progress",
+        "future time"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening: Bridges and Tunnels",
+      "must_cover": true,
+      "keywords": [
+        "speakers",
+        "bridges",
+        "tunnels",
+        "daily life"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking: Correcting Someone",
+      "must_cover": true,
+      "keywords": [
+        "polite expressions",
+        "correcting mistakes"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Word Study: Prefixes bi- and tri-",
+      "must_cover": true,
+      "keywords": [
+        "prefixes",
+        "bi-",
+        "tri-",
+        "words",
+        "sentences"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing Study: Paragraph Breaks",
+      "must_cover": true,
+      "keywords": [
+        "paragraphs",
+        "ideas",
+        "organizing writing"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Wrap Up",
+      "must_cover": true,
+      "keywords": [
+        "summary",
+        "conclusion"
+      ]
+    }
+  ]
+}

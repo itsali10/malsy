@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Same as Virtual School home: empty = port 3000 same-origin, else http://127.0.0.1:3000 -->
+    <meta name="virtual-school-api" content="" />
+    <title>Space Adventure: Learn the Planets</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script>
+      (function () {
+        var meta = document.querySelector('meta[name="virtual-school-api"]');
+        var fromMeta = meta && meta.getAttribute('content');
+        var trimmed = fromMeta && String(fromMeta).trim();
+        var origin = trimmed
+          ? trimmed.replace(/\/$/, '')
+          : (String(window.location.port) === '3000' ? '' : 'http://127.0.0.1:3000');
+        window.__GRAD_API_BASE__ = origin;
+        var origFetch = window.fetch.bind(window);
+        window.fetch = function (resource, init) {
+          if (typeof resource === 'string' && resource.indexOf('/api/') === 0) {
+            resource = origin ? origin + resource : resource;
+          }
+          return origFetch(resource, init);
+        };
+        function fixVideoSrc(el) {
+          var s = el.getAttribute('src');
+          if (s && s.indexOf('/api/') === 0 && !/^https?:\/\//i.test(s)) {
+            el.src = origin ? origin + s : s;
+          }
+        }
+        function scanVideos(root) {
+          if (!root) return;
+          root.querySelectorAll && root.querySelectorAll('video[src]').forEach(fixVideoSrc);
+        }
+        window.addEventListener('DOMContentLoaded', function () {
+          var root = document.getElementById('root');
+          scanVideos(root);
+          if (root) {
+            new MutationObserver(function () {
+              scanVideos(root);
+            }).observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ['src'] });
+          }
+        });
+      })();
+    </script>
+    <script type="module" crossorigin src="./assets/index-Dq6OFNer.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-PkOa7ZOx.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

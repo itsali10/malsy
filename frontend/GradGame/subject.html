@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject - Malsy</title>
+    <link rel="stylesheet" href="styles-subject.css">
+    <link rel="stylesheet" href="styles-reading.css">
+</head>
+<body>
+    <div class="subject-container">
+        <header class="subject-header">
+            <button class="btn-back" id="backBtn">← Back to Dashboard</button>
+            <h1 id="subjectTitle">Subject</h1>
+        </header>
+
+        <main class="subject-main" id="subjectContent">
+            <!-- Content will be loaded based on subject -->
+        </main>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="core/learning-config.js"></script>
+    <script src="videos/manifest.js"></script>
+    <script src="services/auth-service.js"></script>
+    <script src="services/progress-service.js"></script>
+    <script src="features/reading-exercise.js"></script>
+    <script src="features/instructor-avatar.js"></script>
+    <script src="subject.js"></script>
+</body>
+</html>
+

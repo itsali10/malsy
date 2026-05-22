@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman - Malsy</title>
+    <link rel="stylesheet" href="styles-hangman.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <button class="btn-back" id="backBtn">← Back</button>
+            <h1>🎯 Hangman</h1>
+            <div class="score-display">
+                <span>Score: <span id="score">0</span></span>
+                <span>Best: <span id="bestScore">0</span></span>
+            </div>
+        </header>
+
+        <main class="game-main">
+            <div class="game-info">
+                <p class="hint" id="hint">Hint: <span id="hintText"></span></p>
+                <p class="category">Category: <span id="category"></span></p>
+            </div>
+
+            <div class="hangman-display">
+                <svg id="hangmanSVG" viewBox="0 0 200 250">
+                    <!-- Gallows -->
+                    <line x1="20" y1="230" x2="180" y2="230" stroke="#333" stroke-width="4"/>
+                    <line x1="50" y1="230" x2="50" y2="20" stroke="#333" stroke-width="4"/>
+                    <line x1="50" y1="20" x2="150" y2="20" stroke="#333" stroke-width="4"/>
+                    <line x1="150" y1="20" x2="150" y2="50" stroke="#333" stroke-width="4"/>
+                    
+                    <!-- Hangman parts (hidden by default) -->
+                    <circle id="head" cx="150" cy="70" r="20" stroke="#333" stroke-width="3" fill="none" style="display: none;"/>
+                    <line id="body" x1="150" y1="90" x2="150" y2="160" stroke="#333" stroke-width="3" style="display: none;"/>
+                    <line id="leftArm" x1="150" y1="110" x2="120" y2="130" stroke="#333" stroke-width="3" style="display: none;"/>
+                    <line id="rightArm" x1="150" y1="110" x2="180" y2="130" stroke="#333" stroke-width="3" style="display: none;"/>
+                    <line id="leftLeg" x1="150" y1="160" x2="130" y2="200" stroke="#333" stroke-width="3" style="display: none;"/>
+                    <line id="rightLeg" x1="150" y1="160" x2="170" y2="200" stroke="#333" stroke-width="3" style="display: none;"/>
+                </svg>
+            </div>
+
+            <div class="word-display" id="wordDisplay"></div>
+
+            <div class="keyboard" id="keyboard"></div>
+
+            <div class="game-controls">
+                <button class="btn-new-game" id="newGameBtn">New Word</button>
+                <button class="btn-hint" id="hintBtn">Get Hint</button>
+            </div>
+
+            <div class="message" id="message"></div>
+        </main>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="hangman.js"></script>
+</body>
+</html>
+
