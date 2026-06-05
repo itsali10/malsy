@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --font-base: 'Nunito', 'Segoe UI', sans-serif;
+
+  /* ── Source palette ── */
+  --palette-airplane:   #B0B0E8;  /* Airplane View   */
+  --palette-peony:      #FFC0C0;  /* Peony Bundle    */
+  --palette-lavender:   #D1CAEA;  /* Autumn Lavender */
+  --palette-limeade:    #D6D35F;  /* Limeade         */
+  --palette-sun:        #F4D242;  /* Pure Sun        */
+  --palette-monet:      #898E46;  /* Monet Ponds     */
+  --palette-bubblegum:  #F29CC3;  /* Bubble Gum      */
+
+  /* ── Design tokens ── */
+  --clr-primary:      #5454A4;        /* darkened Airplane View — AA contrast on white */
+  --clr-primary-mid:  #8E8ED0;        /* medium Airplane View */
+  --clr-primary-soft: #ECEBFB;        /* very light Airplane View tint */
+  --clr-english:      #6060B0;        /* Airplane View, readable on white */
+  --clr-science:      #6A6E2C;        /* Monet Ponds, darkened */
+  --clr-social:       #9E8A00;        /* Pure Sun, darkened for text */
+  --clr-games:        #C85890;        /* Bubble Gum, darkened */
+  --clr-grades:       #84822A;        /* Limeade, darkened */
+  --clr-bg:           #FAFAFF;        /* near-white with faint lavender tint */
+  --clr-surface:      #FFFFFF;
+  --clr-border:       #E5E2F4;        /* light Autumn Lavender */
+  --clr-text:         #22204C;        /* deep navy-purple */
+  --clr-muted:        #706E90;        /* muted purple-grey */
+  --shadow-sm:  0 2px 8px  rgba(84,84,164,.08);
+  --shadow-md:  0 4px 20px rgba(84,84,164,.12);
+  --shadow-lg:  0 8px 32px rgba(84,84,164,.16);
+  --shadow-glow:0 0 24px   rgba(176,176,232,.45);
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --ease-bounce: cubic-bezier(.34,1.56,.64,1);
+  --ease-smooth: cubic-bezier(.4,0,.2,1);
+  --dur-fast: 150ms;
+  --dur-base: 260ms;
+  --dur-slow: 450ms;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-base);
+  color: var(--clr-text);
+  line-height: 1.5;
+  background: var(--clr-bg);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font-base);
+  cursor: pointer;
+}
+
+/* Achievement / notification toast */
+.achievement-toast {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: linear-gradient(135deg, #C85890, #F4D242);
+  color: white;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-glow);
+  z-index: 500;
+  opacity: 0;
+  transform: translateX(40px);
+  transition: all .3s var(--ease-bounce);
+  max-width: 280px;
+  pointer-events: none;
+}
+
+.achievement-toast.show {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.achievement-toast-title {
+  font-weight: 900;
+  font-size: .9rem;
+  margin-bottom: 3px;
+}
+
+.achievement-toast-body {
+  font-size: .82rem;
+  opacity: .9;
+}
+
+/* Grade colour helpers */
+.grade-excellent { color: #5A7020; }  /* Monet Ponds range */
+.grade-good      { color: #5050A0; }  /* Airplane View range */
+.grade-average   { color: #9A8000; }  /* Pure Sun range */
+.grade-fail      { color: #dc2626; }  /* semantic red — kept */
+.grade-neutral   { color: var(--clr-muted); }
+
+@keyframes pop-in {
+  from { transform: scale(.7); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.4); opacity: .7; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}

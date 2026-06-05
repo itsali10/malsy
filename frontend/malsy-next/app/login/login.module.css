@@ -1,0 +1,152 @@
+.body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #8E8ED0 0%, #D1CAEA 50%, #FFC0C0 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.loginContainer {
+  width: 100%;
+  max-width: 450px;
+}
+
+.loginBox {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.logoSection {
+  background: linear-gradient(135deg, #5454A4 0%, #8E8ED0 60%, #D1CAEA 100%);
+  color: white;
+  padding: 40px 30px;
+  text-align: center;
+}
+
+.logoSection h1 {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+}
+
+.logoSection p {
+  font-size: 1.1em;
+  opacity: 0.9;
+}
+
+.formContainer {
+  padding: 40px 30px;
+}
+
+.formContainer h2 {
+  color: #333;
+  margin-bottom: 25px;
+  font-size: 1.8em;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  color: #555;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 0.95em;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: #8E8ED0;
+  box-shadow: 0 0 0 3px rgba(142, 142, 208, 0.15);
+}
+
+.formGroup small {
+  display: block;
+  color: #999;
+  font-size: 0.85em;
+  margin-top: 5px;
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.btnPrimary {
+  background: linear-gradient(135deg, #5454A4 0%, #8E8ED0 100%);
+  color: white;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(84, 84, 164, 0.35);
+}
+
+.switchForm {
+  text-align: center;
+  margin-top: 20px;
+  color: #666;
+}
+
+.switchForm a {
+  color: #5454A4;
+  font-weight: 600;
+}
+
+.switchForm a:hover {
+  text-decoration: underline;
+}
+
+.message {
+  padding: 15px;
+  margin: 0 30px 10px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}

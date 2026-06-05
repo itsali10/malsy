@@ -1,0 +1,127 @@
+.panel {
+  background: linear-gradient(180deg, #07060f 0%, #100d2e 55%, #1a1448 100%);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1.5px solid rgba(124,58,237,.35);
+  box-shadow: 0 8px 32px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,.04);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.title {
+  margin-left: 8px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.55);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.stage {
+  position: relative;
+  height: 440px;
+  min-height: 380px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  padding-bottom: 22px;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(124,58,237,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,58,237,.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(to top, rgba(0,0,0,.6) 0%, transparent 60%);
+}
+
+.floorGlow {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  height: 88px;
+  background: radial-gradient(ellipse at center bottom, rgba(124,58,237,.48) 0%, transparent 72%);
+  filter: blur(8px);
+}
+
+.figure {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  transform-origin: bottom center;
+  animation: breathe 3.5s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: translateY(0) scale(1.48); }
+  50%       { transform: translateY(-12px) scale(1.48); }
+}
+
+.figShadow {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 78px;
+  height: 16px;
+  background: rgba(0,0,0,.5);
+  border-radius: 50%;
+  filter: blur(4px);
+  animation: shadow 3.5s ease-in-out infinite;
+}
+
+@keyframes shadow {
+  0%, 100% { transform: translateX(-50%) scaleX(1); opacity: .5; }
+  50%       { transform: translateX(-50%) scaleX(.75); opacity: .3; }
+}
+
+.figBody { display: flex; flex-direction: column; align-items: center; position: relative; }
+.figCap { font-size: 1.5rem; line-height: 1; margin-bottom: -6px; position: relative; z-index: 2; filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
+.figHead { width: 46px; height: 50px; position: relative; z-index: 1; }
+.figHair { position: absolute; top: 0; left: 0; right: 0; height: 24px; background: #92400e; border-radius: 23px 23px 0 0; }
+.figFace { position: absolute; bottom: 0; left: 4px; right: 4px; top: 10px; background: #fde68a; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.figEyes { display: flex; gap: 9px; margin-top: 4px; }
+.figEye { width: 6px; height: 7px; background: #1e1b4b; border-radius: 50%; animation: blink 4.5s ease-in-out infinite; }
+@keyframes blink { 0%, 88%, 100% { transform: scaleY(1); } 93% { transform: scaleY(.08); } }
+.figNose { width: 5px; height: 3px; background: #d97706; border-radius: 50%; }
+.figSmile { width: 14px; height: 6px; border-bottom: 2.5px solid #b45309; border-radius: 0 0 10px 10px; margin-bottom: 4px; }
+.figNeck { width: 14px; height: 10px; background: #fde68a; border-radius: 0 0 4px 4px; }
+.figTorsoGroup { display: flex; align-items: flex-start; }
+.figArm { width: 12px; height: 52px; background: #dbeafe; border-radius: 6px; }
+.figArmL { border-radius: 8px 4px 4px 8px; transform: rotate(-6deg); transform-origin: top center; }
+.figArmR { border-radius: 4px 8px 8px 4px; transform: rotate(6deg); transform-origin: top center; }
+.figTorso { width: 40px; height: 54px; background: #dbeafe; border-radius: 4px; position: relative; display: flex; justify-content: center; }
+.figCollarV { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 16px solid #bfdbfe; margin-top: 0; }
+.figSkirt { width: 58px; height: 52px; background: linear-gradient(180deg, #9ca3af 0%, #6b7280 100%); clip-path: polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%); border-radius: 0 0 4px 4px; }
+.figLegs { display: flex; gap: 6px; margin-top: -2px; }
+.figLeg { display: flex; flex-direction: column; align-items: center; }
+.figLeg::before { content: ''; width: 13px; height: 30px; background: #fde68a; border-radius: 0 0 3px 3px; display: block; }
+.figShoe { width: 18px; height: 8px; background: #1f2937; border-radius: 0 4px 4px 4px; margin-left: 4px; }
+
+.info { padding: 14px 16px 18px; background: rgba(255,255,255,.04); border-top: 1px solid rgba(255,255,255,.07); text-align: center; }
+.atpName { font-size: .9rem; font-weight: 800; color: rgba(255,255,255,.85); margin-bottom: 8px; letter-spacing: .04em; }
+.speech { background: rgba(124,58,237,.25); border: 1px solid rgba(124,58,237,.4); border-radius: 10px; padding: 9px 12px; position: relative; }
+.speech::before { content: ''; position: absolute; top: -7px; left: 50%; transform: translateX(-50%); border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 7px solid rgba(124,58,237,.4); }
+.atpMsg { font-size: .86rem; color: rgba(255,255,255,.88); line-height: 1.4; font-weight: 600; }

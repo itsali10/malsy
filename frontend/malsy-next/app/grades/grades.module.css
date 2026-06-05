@@ -1,0 +1,123 @@
+.page { min-height: 100vh; background: var(--clr-bg); font-family: var(--font-base); }
+
+.header {
+  background: var(--clr-surface); border-bottom: 2px solid var(--clr-border);
+  padding: 16px 28px; display: flex; align-items: center; gap: 20px;
+  position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm);
+}
+.backBtn {
+  padding: 8px 16px; background: var(--clr-primary-soft); color: var(--clr-primary);
+  border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 700; font-family: var(--font-base);
+}
+.header h1 { font-size: 1.4rem; font-weight: 900; color: var(--clr-text); flex: 1; }
+.printBtn {
+  padding: 8px 16px; background: #EEEFDA; color: #4A5A18;
+  border: 1.5px solid #B8B848; border-radius: var(--radius-sm);
+  cursor: pointer; font-weight: 700; font-family: var(--font-base);
+}  /* Monet Ponds tone */
+
+/* Banner */
+.banner {
+  background: linear-gradient(135deg, #5454A4, #8E8ED0, #D1CAEA);
+  padding: 24px 32px; display: flex; align-items: center; gap: 20px;
+  color: white; margin-bottom: 0;
+}
+.bannerPic { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,.5); }
+.bannerInfo h2 { font-size: 1.3rem; font-weight: 900; }
+.bannerInfo p  { font-size: .88rem; opacity: .85; }
+.overallBadge { margin-left: auto; text-align: center; background: rgba(255,255,255,.15); border-radius: var(--radius-md); padding: 16px 24px; display: flex; flex-direction: column; align-items: center; }
+.overallNum    { font-size: 2rem; font-weight: 900; color: white; }
+.overallLetter { font-size: 1.1rem; font-weight: 800; color: rgba(255,255,255,.85); }
+.overallStatus { font-size: .8rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; margin-top: 4px; }
+
+/* Tabs */
+.tabs { background: var(--clr-surface); border-bottom: 2px solid var(--clr-border); padding: 0 32px; display: flex; gap: 4px; }
+.tabBtn {
+  padding: 14px 20px; border: none; background: none;
+  color: var(--clr-muted); font-weight: 700; font-size: .95rem; cursor: pointer;
+  border-bottom: 3px solid transparent; margin-bottom: -2px; font-family: var(--font-base);
+  transition: color .2s, border-color .2s;
+}
+.tabBtn:hover { color: var(--clr-primary); }
+.tabActive { color: var(--clr-primary) !important; border-bottom-color: var(--clr-primary) !important; }
+
+/* Content */
+.content { max-width: 1100px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+
+/* Semester panel */
+.semPanel {
+  background: var(--clr-surface); border-radius: var(--radius-md);
+  padding: 24px; box-shadow: var(--shadow-md); border: 1.5px solid var(--clr-border);
+}
+.semPanel h2 { font-size: 1.1rem; font-weight: 900; color: var(--clr-text); margin-bottom: 16px; }
+
+.gradeForm { display: flex; flex-direction: column; gap: 12px; }
+.gradeRow { display: grid; grid-template-columns: 1fr 200px; gap: 12px; align-items: center; }
+.gradeRow label { font-size: .9rem; font-weight: 700; color: var(--clr-text); }
+.weightBadge { font-size: .75rem; color: var(--clr-muted); margin-left: 6px; font-weight: 400; }
+.gradeInput {
+  padding: 10px 12px; border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-sm); font-size: .95rem; font-family: var(--font-base);
+  outline: none; transition: border-color .2s;
+}
+.gradeInput:focus { border-color: var(--clr-primary); box-shadow: 0 0 0 3px rgba(84,84,164,.15); }
+.inputError { border-color: #dc2626 !important; }
+.saveBtn {
+  padding: 12px; background: linear-gradient(135deg, #5454A4, #8E8ED0);
+  color: white; border: none; border-radius: var(--radius-sm);
+  font-weight: 700; font-size: .95rem; cursor: pointer; font-family: var(--font-base); margin-top: 8px;
+}
+
+/* Results panel */
+.resultsPanel {
+  background: var(--clr-surface); border-radius: var(--radius-md);
+  padding: 24px; box-shadow: var(--shadow-md); border: 1.5px solid var(--clr-border);
+}
+.resultsPanel h2 { font-size: 1.1rem; font-weight: 900; color: var(--clr-text); margin-bottom: 18px; }
+
+.yearSummary { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.yearCard {
+  flex: 1; min-width: 140px;
+  background: var(--clr-bg); border-radius: var(--radius-md);
+  padding: 18px; text-align: center;
+  border: 1.5px solid var(--clr-border);
+}
+.yearCardLabel  { font-size: .8rem; font-weight: 700; color: var(--clr-muted); margin-bottom: 6px; }
+.yearCardValue  { font-size: 2rem; font-weight: 900; margin-bottom: 2px; }
+.yearCardLetter { font-size: 1.1rem; font-weight: 800; }
+.yearCardStatus { font-size: .78rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; display: inline-block; margin-top: 4px; }
+
+.breakdownGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+.breakdownTable { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.breakdownTable caption { font-weight: 800; color: var(--clr-text); padding-bottom: 8px; text-align: left; }
+.breakdownTable th { text-align: left; padding: 8px 10px; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--clr-muted); border-bottom: 2px solid var(--clr-border); }
+.breakdownTable td { padding: 9px 10px; border-bottom: 1px solid var(--clr-border); color: var(--clr-text); }
+.totalRow td { font-weight: 800; color: var(--clr-primary); border-top: 2px solid var(--clr-border); border-bottom: none; }
+
+.noData { font-size: .88rem; color: var(--clr-muted); font-style: italic; }
+
+.statusPass { background: #EEEFDA; color: #4A5A18; }  /* Monet Ponds */
+.statusFail { background: #fee2e2; color: #991b1b; }  /* semantic red — kept */
+.statusNone { background: var(--clr-primary-soft); color: var(--clr-primary); }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--clr-primary); color: white;
+  padding: 12px 24px; border-radius: 999px;
+  font-weight: 700; font-size: .9rem;
+  box-shadow: var(--shadow-glow); z-index: 400;
+}
+
+@media (max-width: 700px) {
+  .gradeRow { grid-template-columns: 1fr; }
+  .breakdownGrid { grid-template-columns: 1fr; }
+  .banner { flex-direction: column; text-align: center; }
+  .overallBadge { margin-left: 0; }
+}
+
+@media print {
+  .header, .tabs, .saveBtn { display: none; }
+  .page { background: white; }
+}

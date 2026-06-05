@@ -1,0 +1,164 @@
+.page { min-height: 100vh; background: #0a0a1a; color: #E8E4FF; font-family: var(--font-base); }
+
+.header {
+  background: rgba(255,255,255,.05); border-bottom: 1px solid rgba(84,84,164,.35);
+  padding: 16px 28px; display: flex; align-items: center; gap: 20px;
+  position: sticky; top: 0; z-index: 100;
+}
+.backBtn {
+  padding: 8px 16px; background: rgba(84,84,164,.2); color: #C0C0F0;
+  border: 1px solid rgba(84,84,164,.4); border-radius: var(--radius-sm);
+  cursor: pointer; font-weight: 700; font-family: var(--font-base);
+}
+.header h1 { font-size: 1.4rem; font-weight: 900; color: #C0C0F0; flex: 1; }
+.badge { background: rgba(214,211,95,.15); color: #D6D35F; border: 1px solid rgba(214,211,95,.35); padding: 6px 14px; border-radius: 999px; font-size: .8rem; font-weight: 800; }  /* Limeade */
+
+.tabs {
+  background: rgba(255,255,255,.04); border-bottom: 1px solid rgba(255,255,255,.08);
+  padding: 0 28px; display: flex; gap: 4px;
+}
+.tabBtn {
+  padding: 14px 20px; border: none; background: none; color: rgba(255,255,255,.6);
+  font-weight: 700; font-size: .9rem; cursor: pointer; border-bottom: 3px solid transparent;
+  margin-bottom: -1px; font-family: var(--font-base); transition: all .2s;
+}
+.tabActive { color: #C0C0F0; border-bottom-color: #B0B0E8; }  /* Airplane View */
+
+.content { max-width: 1100px; margin: 0 auto; padding: 28px; }
+
+/* ── Equipment ── */
+.equipmentSection { display: flex; flex-direction: column; gap: 20px; }
+.catTabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.catBtn {
+  padding: 8px 18px; background: rgba(255,255,255,.07); color: rgba(255,255,255,.8);
+  border: 1px solid rgba(255,255,255,.12); border-radius: 999px;
+  cursor: pointer; font-weight: 700; font-family: var(--font-base); font-size: .88rem;
+}
+.catActive { background: rgba(84,84,164,.3); border-color: rgba(176,176,232,.6); color: #C0C0F0; }
+
+.equipGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+.equipCard {
+  background: rgba(255,255,255,.06); border: 1.5px solid rgba(255,255,255,.1);
+  border-radius: var(--radius-md); padding: 16px 12px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  transition: all .2s; text-align: center;
+}
+.equipCard:hover { background: rgba(84,84,164,.18); border-color: rgba(176,176,232,.4); transform: translateY(-2px); }
+.equipSelected { background: rgba(84,84,164,.28); border-color: #B0B0E8; }  /* Airplane View */
+.equipIcon { font-size: 2.2rem; }
+.equipName { font-size: .82rem; font-weight: 700; color: rgba(255,255,255,.9); }
+
+.equipDetail {
+  background: rgba(84,84,164,.15); border: 1.5px solid rgba(176,176,232,.30);
+  border-radius: var(--radius-md); padding: 20px; display: flex; gap: 16px; align-items: center;
+}
+.equipDetailIcon { font-size: 3rem; }
+.equipDetail h3 { font-size: 1.1rem; font-weight: 900; margin-bottom: 6px; color: #C0C0F0; }  /* Airplane View */
+.equipDetail p  { font-size: .9rem; color: rgba(255,255,255,.8); }
+
+/* ── Mixer ── */
+.mixerSection { display: flex; flex-direction: column; gap: 20px; }
+.mixerSection h2 { font-size: 1.5rem; font-weight: 900; color: #C0C0F0; }
+.mixerHint { font-size: .9rem; color: rgba(255,255,255,.7); }
+
+.chemRow { display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: start; }
+.chemRow h3 { font-size: 1rem; font-weight: 800; color: rgba(255,255,255,.9); margin-bottom: 12px; }
+.plusSign { font-size: 3rem; font-weight: 900; color: #B0B0E8; align-self: center; text-align: center; }  /* Airplane View */
+
+.chemGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
+.chemCard {
+  background: rgba(255,255,255,.07); border: 1.5px solid;
+  border-radius: var(--radius-sm); padding: 10px 6px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
+  transition: all .2s; position: relative;
+}
+.chemCard:hover { transform: translateY(-2px); opacity: .9; }
+.chemSelected { outline: 3px solid #B0B0E8; }  /* Airplane View */
+.chemName { font-size: .72rem; font-weight: 800; color: rgba(255,255,255,.9); }
+.safetyStar { font-size: .75rem; }
+.safe    { color: #B8C850; }   /* Limeade / Monet Ponds light */
+.warning { color: #F4D242; }   /* Pure Sun */
+.danger  { color: #FFC0C0; }   /* Peony Bundle */
+
+.reactBtn {
+  padding: 14px 28px; background: linear-gradient(135deg, #5454A4, #8E8ED0);
+  color: white; border: none; border-radius: var(--radius-md);
+  font-weight: 800; font-size: 1.05rem; cursor: pointer; font-family: var(--font-base);
+  align-self: center; margin: 0 auto; display: block;
+  transition: opacity .2s;
+}
+.reactBtn:disabled { opacity: .5; cursor: not-allowed; }
+
+.reactionResult {
+  background: rgba(255,255,255,.07); border: 2px solid;
+  border-radius: var(--radius-lg); padding: 24px;
+  display: flex; gap: 20px; align-items: center;
+  animation: pop-in .4s var(--ease-bounce);
+}
+.flask {
+  width: 80px; height: 100px; border-radius: 0 0 50% 50% / 0 0 40% 40%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem; flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,.4);
+}
+.reactionInfo h3 { font-size: 1.2rem; font-weight: 900; color: #C0C0F0; margin-bottom: 6px; }  /* Airplane View */
+.equation { font-family: monospace; font-size: .95rem; color: #D6D35F; background: rgba(0,0,0,.3); padding: 6px 12px; border-radius: 6px; margin-bottom: 8px; display: inline-block; }  /* Limeade */
+.reactionDesc { font-size: .9rem; color: rgba(255,255,255,.8); }
+
+.noReaction { text-align: center; font-size: .9rem; color: rgba(255,255,255,.5); padding: 20px; }
+
+/* ── pH ── */
+.phSection { display: flex; flex-direction: column; gap: 20px; }
+.phSection h2 { font-size: 1.5rem; font-weight: 900; color: #C0C0F0; }  /* Airplane View */
+.phChemGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
+
+.phResult { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+.phMeter {
+  width: 160px; height: 160px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  box-shadow: 0 0 40px currentColor; animation: pop-in .4s var(--ease-bounce);
+}
+.phValue { font-size: 3.5rem; font-weight: 900; color: white; }
+.phLabel { font-size: 1rem; font-weight: 800; color: rgba(255,255,255,.9); }
+
+.phScale { display: flex; gap: 2px; }
+.phCell { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 700; color: white; text-shadow: 0 1px 2px rgba(0,0,0,.8); transition: opacity .3s; }
+
+.phInfo { font-size: 1rem; color: rgba(255,255,255,.8); text-align: center; }
+
+/* ── Quiz ── */
+.quizSection { display: flex; flex-direction: column; gap: 20px; max-width: 600px; margin: 0 auto; }
+.quizSection h2 { font-size: 1.5rem; font-weight: 900; color: #C0C0F0; text-align: center; }  /* Airplane View */
+
+.quizCard {
+  background: rgba(255,255,255,.07); border: 1.5px solid rgba(255,255,255,.12);
+  border-radius: var(--radius-lg); padding: 28px;
+}
+.quizCounter { font-size: .82rem; color: rgba(255,255,255,.6); margin-bottom: 14px; }
+.quizQuestion { font-size: 1.1rem; font-weight: 800; margin-bottom: 20px; }
+.quizOptions { display: flex; flex-direction: column; gap: 10px; }
+.quizOpt {
+  padding: 14px; background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.15);
+  border-radius: var(--radius-sm); color: rgba(255,255,255,.9);
+  font-family: var(--font-base); font-weight: 700; cursor: pointer; text-align: left;
+  transition: all .2s;
+}
+.quizOpt:not(:disabled):hover { background: rgba(84,84,164,.2); border-color: rgba(176,176,232,.4); }
+.optCorrect { background: rgba(185,185,72,.25); border-color: #B8B848; color: #D6D35F; }  /* Limeade */
+.optWrong   { background: rgba(255,192,192,.18); border-color: #FFC0C0; color: #FFC0C0; }  /* Peony */
+
+.quizDone {
+  background: rgba(255,255,255,.07); border-radius: var(--radius-lg);
+  padding: 40px; text-align: center; display: flex; flex-direction: column; gap: 16px;
+}
+.quizScore { font-size: 3rem; font-weight: 900; color: #C0C0F0; }  /* Airplane View */
+.restartBtn {
+  padding: 12px 28px; background: rgba(84,84,164,.3); color: #C0C0F0;
+  border: 1.5px solid rgba(176,176,232,.5); border-radius: var(--radius-md);
+  font-weight: 700; cursor: pointer; font-family: var(--font-base); font-size: 1rem; margin: 0 auto;
+}
+
+@media (max-width: 700px) {
+  .chemRow { grid-template-columns: 1fr; }
+  .plusSign { display: none; }
+}
