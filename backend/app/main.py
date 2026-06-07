@@ -50,6 +50,7 @@ from .evaluation_engine import weekly_evaluation, monthly_evaluation
 from .evaluation_store import eval_summary, unit_breakdown, reset_student_eval
 from .tts_api import mount_tts_static, router as tts_router
 from .speech_api import router as speech_router
+from .pronunciation_api import router as pronunciation_router
 from .routers import auth as auth_router
 from .routers import users as users_router
 from .routers import subjects as subjects_router
@@ -117,6 +118,7 @@ async def generic_error_handler(request: Request, exc: Exception):
 mount_tts_static(app)
 app.include_router(tts_router)
 app.include_router(speech_router)
+app.include_router(pronunciation_router)
 app.include_router(auth_router.router)
 app.include_router(users_router.router)
 app.include_router(subjects_router.router)

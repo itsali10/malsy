@@ -1,5 +1,11 @@
 fastapi
 uvicorn
+
+# Pronunciation scoring
+torch
+transformers
+soundfile
+scipy
 python-dotenv
 pypdf
 chromadb
@@ -16,3 +22,4 @@ alembic
 passlib[bcrypt]
 python-jose[cryptography]
 python-multipart
+pydantic[email]
