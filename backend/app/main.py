@@ -73,9 +73,9 @@ async def lifespan(app: FastAPI):
     try:
         async with engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
-        print("✅  Database connected successfully")
+        print("[OK]  Database connected successfully")
     except Exception as e:
-        print(f"❌  Database connection FAILED: {e}")
+        print(f"[ERR] Database connection FAILED: {e}")
     yield
     # ── shutdown ─────────────────────────────────────────────
     await engine.dispose()

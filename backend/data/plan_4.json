@@ -1,0 +1,39 @@
+{
+  "objectives": [
+    "Understand the importance of planning a unit",
+    "Learn how to break down a unit into smaller parts",
+    "Develop skills in creating engaging lesson plans"
+  ],
+  "units": [
+    {
+      "unit_id": "u1",
+      "title": "Introduction to Unit Planning",
+      "keywords": [
+        "unit planning",
+        "importance",
+        "organization"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u2",
+      "title": "Breaking Down a Unit",
+      "keywords": [
+        "unit components",
+        "sequencing",
+        "activities"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u3",
+      "title": "Creating Engaging Lesson Plans",
+      "keywords": [
+        "engagement strategies",
+        "differentiation",
+        "assessment"
+      ],
+      "minutes": 90
+    }
+  ]
+}

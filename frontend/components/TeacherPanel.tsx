@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import styles from './TeacherPanel.module.css';
+
+const AvatarCanvas = dynamic(() => import('./AvatarCanvas'), { ssr: false });
 
 interface Props {
   name: string;
@@ -57,36 +60,7 @@ export default function TeacherPanel({ name, engPct, sciPct, ssPct }: Props) {
       <div className={styles.stage}>
         <div className={styles.grid} />
         <div className={styles.floorGlow} />
-        <div className={styles.figure}>
-          <div className={styles.figShadow} />
-          <div className={styles.figBody}>
-            <div className={styles.figCap}>🎓</div>
-            <div className={styles.figHead}>
-              <div className={styles.figHair} />
-              <div className={styles.figFace}>
-                <div className={styles.figEyes}>
-                  <div className={styles.figEye} />
-                  <div className={styles.figEye} />
-                </div>
-                <div className={styles.figNose} />
-                <div className={styles.figSmile} />
-              </div>
-            </div>
-            <div className={styles.figNeck} />
-            <div className={styles.figTorsoGroup}>
-              <div className={`${styles.figArm} ${styles.figArmL}`} />
-              <div className={styles.figTorso}>
-                <div className={styles.figCollarV} />
-              </div>
-              <div className={`${styles.figArm} ${styles.figArmR}`} />
-            </div>
-            <div className={styles.figSkirt} />
-            <div className={styles.figLegs}>
-              <div className={styles.figLeg}><div className={styles.figShoe} /></div>
-              <div className={styles.figLeg}><div className={styles.figShoe} /></div>
-            </div>
-          </div>
-        </div>
+        <AvatarCanvas />
       </div>
       <div className={styles.info}>
         <p className={styles.atpName}>Ms. Malsy — AI Teacher</p>

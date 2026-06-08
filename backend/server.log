@@ -1,0 +1,41 @@
+[LLM] Using OpenAI with model: gpt-3.5-turbo
+[LLM] Available models: gpt-3.5-turbo, gpt-4, gpt-4o-mini, gpt-4o
+[LLM] Change model via OPENAI_MODEL in .env
+[LLM] Using OpenAI with model: gpt-3.5-turbo
+[LLM] Available models: gpt-3.5-turbo, gpt-4, gpt-4o-mini, gpt-4o
+[LLM] Change model via OPENAI_MODEL in .env
+[LLM] Using OpenAI with model: gpt-3.5-turbo
+[LLM] Available models: gpt-3.5-turbo, gpt-4, gpt-4o-mini, gpt-4o
+[LLM] Change model via OPENAI_MODEL in .env
+  [LLM] Using OpenAI with model: gpt-3.5-turbo
+[LLM] Available models: gpt-3.5-turbo, gpt-4, gpt-4o-mini, gpt-4o
+[LLM] Change model via OPENAI_MODEL in .env
+[LLM] Using OpenAI with model: gpt-3.5-turbo
+[LLM] Available models: gpt-3.5-turbo, gpt-4, gpt-4o-mini, gpt-4o
+[LLM] Change model via OPENAI_MODEL in .env
+[LLM] Using OpenAI with model: gpt-3.5-turbo
+[LLM] Available models: gpt-3.5-turbo, gpt-4, gpt-4o-mini, gpt-4o
+[LLM] Change model via OPENAI_MODEL in .env
+[OK]  Database connected successfully
+[LLM] Using OpenAI with model: gpt-3.5-turbo
+[LLM] Available models: gpt-3.5-turbo, gpt-4, gpt-4o-mini, gpt-4o
+[LLM] Change model via OPENAI_MODEL in .env
+[LLM] Using OpenAI with model: gpt-3.5-turbo
+[LLM] Available models: gpt-3.5-turbo, gpt-4, gpt-4o-mini, gpt-4o
+[LLM] Change model via OPENAI_MODEL in .env
+[LLM] Using OpenAI with model: gpt-3.5-turbo
+[LLM] Available models: gpt-3.5-turbo, gpt-4, gpt-4o-mini, gpt-4o
+[LLM] Change model via OPENAI_MODEL in .env
+[OK]  Database connected successfully
+INFO:     127.0.0.1:58770 - "OPTIONS /dashboard/next-session HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62971 - "OPTIONS /dashboard/my-week HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65167 - "OPTIONS /dashboard/my-week HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57263 - "OPTIONS /dashboard/my-subjects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57978 - "OPTIONS /dashboard/next-session HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61814 - "OPTIONS /dashboard/my-subjects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58770 - "GET /dashboard/next-session HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:65167 - "GET /dashboard/my-week HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:57978 - "GET /dashboard/my-subjects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58770 - "GET /dashboard/next-session HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:65167 - "GET /dashboard/my-week HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:57978 - "GET /dashboard/my-subjects HTTP/1.1" 401 Unauthorized

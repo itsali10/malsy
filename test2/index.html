@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Avatar Face Controller</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; font-family: Arial, sans-serif; background: #111; color: #f1f1f1; overflow: hidden; }
+    .layout { display: grid; grid-template-columns: 1fr 360px; height: 100vh; }
+    #scene { width: 100%; height: 100vh; display: block; }
+    .panel { padding: 16px; border-left: 1px solid #2a2a2a; background: #161616; height: 100vh; overflow-y: auto; overflow-x: hidden; box-sizing: border-box; }
+    .panel h2 { margin-top: 0; }
+    .row { margin-bottom: 10px; display: flex; gap: 8px; align-items: center; }
+    .row label { min-width: 90px; font-size: 13px; }
+    .row input[type="text"] { width: 100%; padding: 6px; border: 1px solid #444; border-radius: 6px; background: #1d1d1d; color: #fff; }
+    .row textarea { width: 100%; min-height: 80px; padding: 8px; border: 1px solid #444; border-radius: 6px; background: #1d1d1d; color: #fff; resize: vertical; }
+    .row button { padding: 7px 10px; border: 1px solid #444; border-radius: 6px; background: #222; color: #fff; cursor: pointer; }
+    .row button:hover { background: #2c2c2c; }
+    .mono { font-family: Consolas, monospace; font-size: 12px; background: #1f1f1f; border-radius: 6px; padding: 8px; white-space: pre-wrap; }
+    .small { font-size: 12px; opacity: 0.9; }
+    .pill { display: inline-block; margin: 3px 4px 0 0; padding: 4px 7px; border-radius: 999px; background: #2a2a2a; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <canvas id="scene"></canvas>
+    <aside class="panel">
+      <h2>Avatar Face Controls</h2>
+
+      <div class="row">
+        <label>FastAPI URL</label>
+        <input id="apiUrl" type="text" value="http://127.0.0.1:8000" />
+      </div>
+      <div class="row">
+        <label>Student ID</label>
+        <input id="studentId" type="text" value="kid1" />
+      </div>
+      <div class="row">
+        <label>Chapter ID</label>
+        <input id="chapterId" type="text" value="english_g6:unit_01" />
+      </div>
+      <div class="row">
+        <label>Text</label>
+        <textarea id="textInput">Hello! I am your AI teacher. Today we will learn together.</textarea>
+      </div>
+      <div class="row">
+        <button id="btnStartLesson">Start Lesson (from backend)</button>
+      </div>
+      <div class="row">
+        <button id="btnSpeak">Speak (TTS + Lip Sync)</button>
+        <button id="btnPause">Pause</button>
+        <button id="btnResume">Resume</button>
+        <button id="btnStop">Stop</button>
+      </div>
+      <div class="row">
+        <audio id="audioDebug" controls style="width:100%"></audio>
+      </div>
+
+      <hr />
+      <div class="row">
+        <button id="btnTalkOn">Talk ON</button>
+        <button id="btnTalkOff">Talk OFF</button>
+      </div>
+      <div class="row">
+        <button id="btnSmile">Smile</button>
+        <button id="btnNeutral">Neutral</button>
+      </div>
+      <div class="row">
+        <button id="btnBlink">Blink</button>
+      </div>
+      <div class="row">
+        <label>Emotion</label>
+        <button data-emotion="happy" class="emotionBtn">Happy</button>
+        <button data-emotion="sad" class="emotionBtn">Sad</button>
+        <button data-emotion="angry" class="emotionBtn">Angry</button>
+        <button data-emotion="surprised" class="emotionBtn">Surprised</button>
+      </div>
+
+      <hr />
+      <p class="small"><strong>Counting Animation:</strong></p>
+      <div class="row" style="flex-wrap:wrap;gap:6px;align-items:center;">
+        <label style="min-width:auto;font-size:12px;">Count to:</label>
+        <select id="countToSelect" style="padding:5px 8px;border:1px solid #444;border-radius:6px;background:#1d1d1d;color:#fff;font-size:13px;">
+          <option value="3">3</option>
+          <option value="5" selected>5</option>
+          <option value="10">10</option>
+        </select>
+        <button id="btnPlayCounting" style="background:#1a2a3a;border-color:#336699;flex:1;">▶ Play Counting</button>
+      </div>
+      <div id="countingStatus" class="mono" style="font-size:11px;opacity:0.7;">Ready.</div>
+
+      <hr />
+      <p class="small"><strong>Gesture Test:</strong></p>
+      <div class="row" style="flex-wrap:wrap;gap:6px;">
+        <button class="gestureBtn" data-gesture="explaining"  title="Looping gentle arm sway">Explaining</button>
+        <button class="gestureBtn" data-gesture="asking"      title="Looping open questioning palms">Asking</button>
+        <button class="gestureBtn" data-gesture="emphasis"    title="Both arms raise once (~1.8 s)">Emphasis</button>
+        <button class="gestureBtn" data-gesture="pointing"    title="Right arm extends, index points (~2 s)">Pointing</button>
+        <button class="gestureBtn" data-gesture="list"        title="Both arms open outward (looping)">List</button>
+        <button class="gestureBtn" data-gesture="vocab"       title="Right arm lifts for a term (~2.2 s)">Vocab</button>
+      </div>
+      <div class="row">
+        <button id="btnStopGesture" style="width:100%;background:#2a1010;border-color:#663333;">Stop Gesture</button>
+      </div>
+      <div id="gestureStatus" class="mono" style="font-size:11px;opacity:0.7;">No gesture running.</div>
+
+      <hr />
+      <p class="small"><strong>Detected morph targets:</strong></p>
+      <div id="morphTargets" class="mono">Loading...</div>
+      <p class="small"><strong>Strict Check (lesson grounding):</strong></p>
+      <div id="strictCheck" class="mono">Waiting for lesson analysis...</div>
+      <p class="small">Tip: Rename Blender shape keys with words like <code>mouth</code>, <code>smile</code>, <code>blink</code>, <code>brow</code>.</p>
+      <div id="status" class="mono">Status: loading avatar...</div>
+    </aside>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script src="./teachingAnimations.js"></script>
+  <script type="module" src="./app.js"></script>
+  <script>
+    // Gesture test buttons — wired after app.js exposes window.__testGesture
+    const gestureStatusEl = document.getElementById("gestureStatus");
+    let _gesturePollTimer = null;
+
+    function _setGestureStatus(text, color) {
+      gestureStatusEl.textContent = text;
+      gestureStatusEl.style.color = color || "";
+    }
+
+    document.querySelectorAll(".gestureBtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const type = btn.dataset.gesture;
+        // Use the public API if available, fall back to the legacy test helper.
+        const trigger = window.playAnimation || window.__testGesture;
+        if (typeof trigger !== "function") {
+          _setGestureStatus("Avatar not ready yet — wait for it to load.", "#f87");
+          return;
+        }
+        trigger(type);
+        // Highlight the active button.
+        document.querySelectorAll(".gestureBtn").forEach(b => b.style.background = "");
+        btn.style.background = "#1a3a1a";
+        _setGestureStatus(`▶ ${type}`, "#8f8");
+        // Auto-clear highlight for one-shot clips.
+        clearTimeout(_gesturePollTimer);
+        const clips = window.TEACHING_CLIPS || {};
+        const clip = clips[type];
+        if (clip && !clip.loop && clip.duration) {
+          _gesturePollTimer = setTimeout(() => {
+            btn.style.background = "";
+            _setGestureStatus("Finished — arms returning to A-pose.", "#aaa");
+          }, (clip.duration + 0.5) * 1000);
+        }
+      });
+    });
+
+    document.getElementById("btnPlayCounting").addEventListener("click", () => {
+      if (typeof window.playCountingAnimation !== "function") {
+        document.getElementById("countingStatus").textContent = "Avatar not ready yet.";
+        return;
+      }
+      const n = parseInt(document.getElementById("countToSelect").value, 10);
+      const btn = document.getElementById("btnPlayCounting");
+      btn.style.background = "#1a3a1a";
+      btn.disabled = true;
+      document.getElementById("countingStatus").textContent = `▶ Counting 1 to ${n}…`;
+      window.playCountingAnimation(n, () => {
+        btn.style.background = "";
+        btn.disabled = false;
+        document.getElementById("countingStatus").textContent = "Finished — returned to A-pose.";
+      });
+    });
+
+    document.getElementById("btnStopGesture").addEventListener("click", () => {
+      const stop = window.stopAnimation || window.__stopGesture;
+      if (typeof stop !== "function") return;
+      stop();
+      clearTimeout(_gesturePollTimer);
+      document.querySelectorAll(".gestureBtn").forEach(b => b.style.background = "");
+      _setGestureStatus("Stopped — arms returning to A-pose.", "#aaa");
+    });
+  </script>
+</body>
+</html>
