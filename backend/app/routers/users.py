@@ -25,7 +25,7 @@ async def update_my_profile(
     db: AsyncSession = Depends(get_db),
 ):
     for field, value in payload.model_dump(exclude_none=True).items():
-        setattr(current_user, field, str(value) if field == "parent_email" else value)
+        setattr(current_user, field, str(value) if field == "guardian_email" else value)
     await db.commit()
     await db.refresh(current_user)
     return current_user

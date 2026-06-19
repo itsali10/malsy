@@ -24,9 +24,37 @@
   --rl: 24px;
 }
 
+/* ── THEME: LIGHT ─────────────────────────────────────────────── */
+[data-theme="light"] {
+  --navy:  #F0EEFF;
+  --navym: #E4DFFF;
+  --navys: #D8D1FF;
+  --w:     #0D0B2E;
+  --g3:    #5B5880;
+  --g5:    #9B98C0;
+  --vl:    #5B21F5;
+}
+
+[data-theme="light"] body        { background: var(--navy); color: var(--w); }
+[data-theme="light"] .card       { background: rgba(255,255,255,.75); border-color: rgba(91,33,245,.12); }
+[data-theme="light"] .lesson-card{ background: rgba(255,255,255,.8);  border-color: rgba(91,33,245,.12); }
+[data-theme="light"] .challenge-item { background: rgba(255,255,255,.75); border-color: rgba(91,33,245,.12); }
+[data-theme="light"] .challenge-item:hover { background: rgba(255,255,255,.95); }
+[data-theme="light"] .modal-box  { background: #fff; border-color: rgba(91,33,245,.15); }
+[data-theme="light"] .field-input{ background: rgba(91,33,245,.06); border-color: rgba(91,33,245,.2); color: var(--w); }
+[data-theme="light"] .field-input::placeholder { color: var(--g5); }
+[data-theme="light"] #sidebar    { background: var(--navym); border-color: rgba(91,33,245,.1); }
+[data-theme="light"] #main       { background: var(--navy); }
+[data-theme="light"] #topbar     { background: var(--navym); border-color: rgba(91,33,245,.1); }
+[data-theme="light"] .sb-logo-row .logo-wordmark { color: var(--v); }
+[data-theme="light"] .settings-nav { background: var(--navym); }
+[data-theme="light"] .setting-row { background: rgba(255,255,255,.6); border-color: rgba(91,33,245,.08); }
+
+
 /* ── RESET & BASE ─────────────────────────────────────────────── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { height: 100%; overflow: hidden; }
+html:has(.auth-root), body:has(.auth-root) { overflow: auto; }
 body {
   font-family: var(--fb);
   background: var(--navy);
@@ -628,8 +656,8 @@ a { text-decoration: none; color: inherit; }
 /* ── AUTH / LOGIN PAGE ─────────────────────────────────────────── */
 .auth-root {
   min-height: 100vh; width: 100%;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--navy); position: relative; overflow: hidden;
+  display: flex; align-items: flex-start; justify-content: center;
+  background: var(--navy); position: relative; overflow: visible;
   padding: 32px 16px; box-sizing: border-box;
 }
 

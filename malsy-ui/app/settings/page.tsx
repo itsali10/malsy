@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Toggle from '../../components/ui/Toggle';
+import { useTheme, type Theme } from '../../lib/theme';
 
 const tabs = [
   { icon: '🎨', label: 'Appearance' },
@@ -13,9 +14,27 @@ const tabs = [
   { icon: 'ℹ️', label: 'About MALSY' },
 ];
 
+const THEMES: { id: Theme; label: string; desc: string; bg: string; dot1: string; dot2: string; dot3: string }[] = [
+  {
+    id: 'dark',
+    label: 'Dark',
+    desc: 'Deep navy — easy on the eyes',
+    bg: '#0D0B2E',
+    dot1: '#5B21F5', dot2: '#00E5A0', dot3: '#1A1650',
+  },
+  {
+    id: 'light',
+    label: 'Light',
+    desc: 'Pale violet — bright & clean',
+    bg: '#F0EEFF',
+    dot1: '#5B21F5', dot2: '#00B87E', dot3: '#E4DFFF',
+  },
+];
+
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState(0);
   const [vol, setVol] = useState(80);
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="page-enter">
@@ -39,27 +58,60 @@ export default function SettingsPage() {
           {/* Appearance */}
           <div className="setting-group">
             <div className="sg-title">Theme</div>
-            <div className="setting-row">
-              <span className="sr-icon">🌙</span>
-              <div className="sr-body">
-                <div className="sr-name">Dark Mode</div>
-                <div className="sr-desc">Easier on the eyes during night study sessions</div>
-              </div>
-              <Toggle defaultOn />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 8 }}>
+              {THEMES.map(t => {
+                const active = theme === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setTheme(t.id)}
+                    style={{
+                      background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                      borderRadius: 16,
+                      outline: active ? `2px solid var(--mint)` : '2px solid transparent',
+                      outlineOffset: 3,
+                      transition: 'outline .15s',
+                    }}
+                  >
+                    {/* Mini preview card */}
+                    <div style={{
+                      borderRadius: 14, overflow: 'hidden',
+                      border: `1px solid ${active ? 'var(--mint)' : 'rgba(255,255,255,.1)'}`,
+                    }}>
+                      {/* Preview bg */}
+                      <div style={{ background: t.bg, padding: '18px 16px 14px', position: 'relative' }}>
+                        {/* Fake sidebar strip */}
+                        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 12, background: t.dot3, opacity: .9 }} />
+                        {/* Fake content dots */}
+                        <div style={{ marginLeft: 18, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                          <div style={{ height: 6, width: '70%', borderRadius: 99, background: t.dot1, opacity: .9 }} />
+                          <div style={{ height: 4, width: '50%', borderRadius: 99, background: t.dot2, opacity: .7 }} />
+                          <div style={{ height: 4, width: '60%', borderRadius: 99, background: t.dot1, opacity: .4 }} />
+                        </div>
+                        {/* Active check */}
+                        {active && (
+                          <div style={{
+                            position: 'absolute', top: 8, right: 8,
+                            width: 18, height: 18, borderRadius: '50%',
+                            background: 'var(--mint)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 10, color: '#0D0B2E', fontWeight: 800,
+                          }}>✓</div>
+                        )}
+                      </div>
+                      {/* Label strip */}
+                      <div style={{
+                        background: 'rgba(255,255,255,.04)', padding: '8px 12px',
+                        textAlign: 'left',
+                      }}>
+                        <div style={{ fontFamily: 'var(--fd)', fontWeight: 700, fontSize: 12, color: 'var(--w)' }}>{t.label}</div>
+                        <div style={{ fontSize: 10, color: 'var(--g3)', marginTop: 2 }}>{t.desc}</div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-            <div className="setting-row">
-              <span className="sr-icon">🎨</span>
-              <div className="sr-body">
-                <div className="sr-name">Accent Color</div>
-                <div className="sr-desc">Choose your platform highlight color</div>
-              </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {['var(--v)','var(--mint)','var(--coral)','var(--sky)'].map((c, i) => (
-                  <div key={i} style={{ width: 22, height: 22, borderRadius: '50%', background: c, border: i === 0 ? '2px solid white' : undefined, cursor: 'pointer' }} />
-                ))}
-              </div>
-            </div>
-            <div className="setting-row">
+            <div className="setting-row" style={{ marginTop: 8 }}>
               <span className="sr-icon">✨</span>
               <div className="sr-body">
                 <div className="sr-name">Space Theme</div>

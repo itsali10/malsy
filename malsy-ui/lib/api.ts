@@ -42,11 +42,13 @@ export interface RegisterPayload {
   last_name: string;
   email: string;
   password: string;
-  date_of_birth?: string;
-  grade_level?: number;
-  phone_number?: string;
-  parent_email?: string;
-  parent_phone_number?: string;
+  date_of_birth: string;
+  grade_level: number;
+  phone_number: string;
+  guardian_name: string;
+  guardian_gender: string;
+  guardian_email: string;
+  guardian_phone_number: string;
 }
 
 export interface MySubjectRead {

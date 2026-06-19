@@ -7,15 +7,13 @@ import StatCard from '../components/ui/StatCard';
 import { api, UserRead, MySubjectRead, LessonEvaluationRead } from '../lib/api';
 import { auth } from '../lib/auth';
 
+const ALLOWED_SUBJECTS = ['english', 'science', 'history', 'math'];
+
 const SUBJ_META: Record<string, { icon: string; color: string; bg: string }> = {
-  biology:     { icon: '🧬', color: 'var(--mint)',  bg: 'rgba(0,229,160,.15)' },
-  chemistry:   { icon: '⚗️', color: 'var(--vl)',   bg: 'rgba(91,33,245,.15)' },
-  mathematics: { icon: '🧮', color: 'var(--sky)',   bg: 'rgba(59,191,255,.12)' },
-  math:        { icon: '🧮', color: 'var(--sky)',   bg: 'rgba(59,191,255,.12)' },
-  arabic:      { icon: '📚', color: 'var(--amber)', bg: 'rgba(255,184,48,.12)' },
-  physics:     { icon: '🔭', color: 'var(--amber)', bg: 'rgba(255,184,48,.12)' },
-  science:     { icon: '🌍', color: 'var(--mint)',  bg: 'rgba(0,229,160,.10)' },
-  english:     { icon: '📖', color: 'var(--sky)',   bg: 'rgba(59,191,255,.12)' },
+  english: { icon: '📖', color: 'var(--sky)',   bg: 'rgba(59,191,255,.12)' },
+  science: { icon: '🔬', color: 'var(--mint)',  bg: 'rgba(0,229,160,.10)'  },
+  history: { icon: '🏛️', color: 'var(--amber)', bg: 'rgba(255,184,48,.12)' },
+  math:    { icon: '🧮', color: 'var(--vl)',    bg: 'rgba(91,33,245,.15)'  },
 };
 
 function subjMeta(name: string) {
@@ -28,12 +26,11 @@ function avg(arr: (number | undefined)[]): number {
   return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
 }
 
-// Fallback hardcoded subjects when API returns empty
 const FALLBACK_SUBJECTS = [
-  { subject_id: '1', subject_name: 'Biology',          subject_code: 'BIO', enrolled_sessions_count: 12 },
-  { subject_id: '2', subject_name: 'Mathematics',      subject_code: 'MAT', enrolled_sessions_count: 10 },
-  { subject_id: '3', subject_name: 'Arabic Language',  subject_code: 'ARA', enrolled_sessions_count: 8  },
-  { subject_id: '4', subject_name: 'Chemistry',        subject_code: 'CHE', enrolled_sessions_count: 9  },
+  { subject_id: '1', subject_name: 'English', subject_code: 'ENG', enrolled_sessions_count: 12 },
+  { subject_id: '2', subject_name: 'Science', subject_code: 'SCI', enrolled_sessions_count: 10 },
+  { subject_id: '3', subject_name: 'History', subject_code: 'HIS', enrolled_sessions_count: 9  },
+  { subject_id: '4', subject_name: 'Math',    subject_code: 'MAT', enrolled_sessions_count: 8  },
 ];
 
 export default function DashboardPage() {
@@ -49,7 +46,10 @@ export default function DashboardPage() {
       api.evaluations.mine().catch(() => []),
     ]).then(([u, s, e]) => {
       if (u) { setUser(u); auth.setUser(u); }
-      setSubjects(Array.isArray(s) && s.length ? s : FALLBACK_SUBJECTS);
+      const filtered = Array.isArray(s)
+        ? s.filter(sub => ALLOWED_SUBJECTS.includes(sub.subject_name.toLowerCase()))
+        : [];
+      setSubjects(filtered.length ? filtered : FALLBACK_SUBJECTS);
       setEvals(Array.isArray(e) ? e : []);
     }).finally(() => setLoading(false));
   }, []);

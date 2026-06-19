@@ -29,11 +29,13 @@ class UserCreate(BaseModel):
     last_name: str
     email: EmailStr
     password: str
-    date_of_birth: Optional[date] = None
-    grade_level: Optional[int] = None
-    phone_number: Optional[str] = None
-    parent_email: Optional[EmailStr] = None
-    parent_phone_number: Optional[str] = None
+    date_of_birth: date
+    grade_level: int
+    phone_number: str
+    guardian_name: str
+    guardian_gender: str
+    guardian_email: EmailStr
+    guardian_phone_number: str
 
 
 class UserRead(BaseModel):
@@ -45,8 +47,10 @@ class UserRead(BaseModel):
     date_of_birth: Optional[date] = None
     grade_level: Optional[int] = None
     phone_number: Optional[str] = None
-    parent_email: Optional[str] = None
-    parent_phone_number: Optional[str] = None
+    guardian_name: Optional[str] = None
+    guardian_gender: Optional[str] = None
+    guardian_email: Optional[str] = None
+    guardian_phone_number: Optional[str] = None
     account_status: str
     created_at: datetime
     last_login: Optional[datetime] = None
@@ -60,8 +64,10 @@ class UserUpdate(BaseModel):
     date_of_birth: Optional[date] = None
     grade_level: Optional[int] = None
     phone_number: Optional[str] = None
-    parent_email: Optional[EmailStr] = None
-    parent_phone_number: Optional[str] = None
+    guardian_name: Optional[str] = None
+    guardian_gender: Optional[str] = None
+    guardian_email: Optional[EmailStr] = None
+    guardian_phone_number: Optional[str] = None
 
 
 # ─── Subjects ───────────────────────────────────────────────────────────────
@@ -254,7 +260,7 @@ class ExperimentSessionRead(BaseModel):
 
 class NotificationCreate(BaseModel):
     user_id: uuid.UUID
-    parent_email: EmailStr
+    guardian_email: EmailStr
     notification_type: str
     subject: str
     message: str
@@ -264,7 +270,7 @@ class NotificationCreate(BaseModel):
 class NotificationRead(BaseModel):
     notification_id: uuid.UUID
     user_id: uuid.UUID
-    parent_email: str
+    guardian_email: str
     notification_type: str
     subject: str
     message: str

@@ -12,8 +12,10 @@ interface LoginForm { email: string; password: string; }
 interface RegisterForm {
   first_name: string; last_name: string;
   email: string; password: string;
-  grade_level: string; parent_email: string;
-  showOptional: boolean;
+  date_of_birth: string; grade_level: string;
+  phone_number: string;
+  guardian_name: string; guardian_gender: string;
+  guardian_email: string; guardian_phone_number: string;
 }
 
 export default function LoginPage() {
@@ -25,7 +27,9 @@ export default function LoginPage() {
   const [lf, setLf] = useState<LoginForm>({ email: '', password: '' });
   const [rf, setRf] = useState<RegisterForm>({
     first_name: '', last_name: '', email: '', password: '',
-    grade_level: '', parent_email: '', showOptional: false,
+    date_of_birth: '', grade_level: '', phone_number: '',
+    guardian_name: '', guardian_gender: '',
+    guardian_email: '', guardian_phone_number: '',
   });
 
   function switchTab(t: Tab) { setTab(t); setError(''); setSuccess(''); }
@@ -51,8 +55,13 @@ export default function LoginPage() {
       await api.auth.register({
         first_name: rf.first_name.trim(), last_name: rf.last_name.trim(),
         email: rf.email.trim(), password: rf.password,
-        grade_level: rf.grade_level ? parseInt(rf.grade_level, 10) : undefined,
-        parent_email: rf.parent_email.trim() || undefined,
+        date_of_birth: rf.date_of_birth,
+        grade_level: parseInt(rf.grade_level, 10),
+        phone_number: rf.phone_number.trim(),
+        guardian_name: rf.guardian_name.trim(),
+        guardian_gender: rf.guardian_gender,
+        guardian_email: rf.guardian_email.trim(),
+        guardian_phone_number: rf.guardian_phone_number.trim(),
       });
       setSuccess('Account created! Sign in below.');
       setLf(p => ({ ...p, email: rf.email }));
@@ -143,28 +152,54 @@ export default function LoginPage() {
                 <input className="field-input" type="password" placeholder="Min. 8 characters" required minLength={8} autoComplete="new-password"
                   value={rf.password} onChange={e => setRf(p => ({ ...p, password: e.target.value }))} />
               </div>
-
-              <div className="auth-section-toggle" onClick={() => setRf(p => ({ ...p, showOptional: !p.showOptional }))}>
-                <span>{rf.showOptional ? '▾' : '▸'}</span> Optional details
-              </div>
-
-              {rf.showOptional && (
-                <div className="field-group">
-                  <div className="field-row">
-                    <div>
-                      <label className="field-label">Grade level</label>
-                      <input className="field-input" type="number" placeholder="9" min={1} max={12}
-                        value={rf.grade_level} onChange={e => setRf(p => ({ ...p, grade_level: e.target.value }))} />
-                    </div>
-                    <div>
-                      <label className="field-label">Parent email</label>
-                      <input className="field-input" type="email" placeholder="parent@email.com"
-                        value={rf.parent_email} onChange={e => setRf(p => ({ ...p, parent_email: e.target.value }))} />
-                    </div>
+              <div className="field-group">
+                <div className="field-row">
+                  <div>
+                    <label className="field-label">Date of birth</label>
+                    <input className="field-input" type="date" required
+                      value={rf.date_of_birth} onChange={e => setRf(p => ({ ...p, date_of_birth: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label className="field-label">Grade level</label>
+                    <input className="field-input" type="number" placeholder="9" min={1} max={12} required
+                      value={rf.grade_level} onChange={e => setRf(p => ({ ...p, grade_level: e.target.value }))} />
                   </div>
                 </div>
-              )}
-
+              </div>
+              <div className="field-group">
+                <label className="field-label">Phone number</label>
+                <input className="field-input" type="tel" placeholder="01012345678" required
+                  value={rf.phone_number} onChange={e => setRf(p => ({ ...p, phone_number: e.target.value }))} />
+              </div>
+              <div className="field-group">
+                <div className="field-row">
+                  <div>
+                    <label className="field-label">Guardian name</label>
+                    <input className="field-input" type="text" placeholder="Full name" required
+                      value={rf.guardian_name} onChange={e => setRf(p => ({ ...p, guardian_name: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label className="field-label">Guardian gender</label>
+                    <select className="field-input" required
+                      value={rf.guardian_gender} onChange={e => setRf(p => ({ ...p, guardian_gender: e.target.value }))}>
+                      <option value="" disabled>Select</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div className="field-group">
+                <label className="field-label">Guardian email</label>
+                <input className="field-input" type="email" placeholder="guardian@email.com" required
+                  value={rf.guardian_email} onChange={e => setRf(p => ({ ...p, guardian_email: e.target.value }))} />
+              </div>
+              <div className="field-group">
+                <label className="field-label">Guardian phone number</label>
+                <input className="field-input" type="tel" placeholder="01012345678" required
+                  value={rf.guardian_phone_number} onChange={e => setRf(p => ({ ...p, guardian_phone_number: e.target.value }))} />
+              </div>
               <button type="submit" className="auth-submit" disabled={loading}>
                 {loading ? 'Creating account…' : 'Create Account →'}
               </button>

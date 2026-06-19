@@ -27,8 +27,10 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
         date_of_birth=payload.date_of_birth,
         grade_level=payload.grade_level,
         phone_number=payload.phone_number,
-        parent_email=str(payload.parent_email) if payload.parent_email else None,
-        parent_phone_number=payload.parent_phone_number,
+        guardian_name=payload.guardian_name,
+        guardian_gender=payload.guardian_gender,
+        guardian_email=str(payload.guardian_email),
+        guardian_phone_number=payload.guardian_phone_number,
     )
     db.add(user)
     await db.commit()

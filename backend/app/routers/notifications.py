@@ -16,13 +16,13 @@ router = APIRouter(prefix="/notifications", tags=["Notifications"])
 
 @router.get("/parent", response_model=List[NotificationRead])
 async def get_parent_notifications(
-    parent_email: str,
+    guardian_email: str,
     db: AsyncSession = Depends(get_db),
 ):
     """Public endpoint — parents can fetch their notifications by email."""
     result = await db.execute(
         select(ParentNotification)
-        .where(ParentNotification.parent_email == parent_email)
+        .where(ParentNotification.guardian_email == guardian_email)
         .order_by(ParentNotification.sent_at.desc())
     )
     return result.scalars().all()
@@ -36,7 +36,7 @@ async def send_notification(
 ):
     notification = ParentNotification(
         user_id=payload.user_id,
-        parent_email=str(payload.parent_email),
+        guardian_email=str(payload.guardian_email),
         notification_type=payload.notification_type,
         subject=payload.subject,
         message=payload.message,
@@ -51,13 +51,13 @@ async def send_notification(
 @router.put("/{notification_id}/read", response_model=NotificationRead)
 async def mark_as_read(
     notification_id: uuid.UUID,
-    parent_email: str,
+    guardian_email: str,
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
         select(ParentNotification).where(
             ParentNotification.notification_id == notification_id,
-            ParentNotification.parent_email == parent_email,
+            ParentNotification.guardian_email == guardian_email,
         )
     )
     notification = result.scalar_one_or_none()
