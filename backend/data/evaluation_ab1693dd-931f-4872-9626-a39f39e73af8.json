@@ -1,0 +1,75 @@
+{
+  "student_id": "ab1693dd-931f-4872-9626-a39f39e73af8",
+  "updated_at": "2026-06-20T11:00:09.961340Z",
+  "totals": {
+    "attempts": 2,
+    "correct": 1,
+    "accuracy": 50.0
+  },
+  "recent_attempts": [
+    {
+      "ts": "2026-06-20T10:59:27.720485Z",
+      "unit_id": "u1",
+      "item_id": "content",
+      "quiz_question": "What is lesson planning?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-20T11:00:09.961340Z",
+      "unit_id": "u1",
+      "item_id": "content",
+      "quiz_question": "What is lesson planning?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ],
+  "by_unit": {
+    "u1": {
+      "attempts": 2,
+      "correct": 1,
+      "accuracy": 50.0
+    }
+  },
+  "by_item": {
+    "u1:content": {
+      "attempts": 2,
+      "incorrect": 1,
+      "remediation_used": 0
+    }
+  },
+  "tutor_quality_events": [
+    {
+      "ts": "2026-06-20T10:59:27.720485Z",
+      "unit_id": "u1",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of what lesson planning is",
+          "Importance of engaging and child-friendly lessons"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 85,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-20T11:00:09.961340Z",
+      "unit_id": "u1",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of what lesson planning is",
+          "Importance of engaging and child-friendly lessons"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 85,
+        "mentions_page_ranges": false
+      }
+    }
+  ]
+}

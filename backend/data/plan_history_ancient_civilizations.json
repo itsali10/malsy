@@ -1,0 +1,39 @@
+{
+  "objectives": [
+    "Understand the concept of ancient civilizations",
+    "Identify key characteristics of early societies",
+    "Explore the development of ancient civilizations"
+  ],
+  "units": [
+    {
+      "unit_id": "u1",
+      "title": "Introduction to Ancient Civilizations",
+      "keywords": [
+        "civilizations",
+        "societies",
+        "history"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u2",
+      "title": "Key Characteristics of Early Societies",
+      "keywords": [
+        "agriculture",
+        "settlements",
+        "culture"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u3",
+      "title": "Development of Ancient Civilizations",
+      "keywords": [
+        "technology",
+        "trade",
+        "governance"
+      ],
+      "minutes": 90
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "objectives": [
+    "Understand the importance of planning",
+    "Learn how to create a unit plan",
+    "Develop skills in organizing lesson content"
+  ],
+  "units": [
+    {
+      "unit_id": "u1",
+      "title": "Introduction to Unit Planning",
+      "keywords": [
+        "planning",
+        "organization",
+        "lesson content"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u2",
+      "title": "Components of a Unit Plan",
+      "keywords": [
+        "objectives",
+        "activities",
+        "assessment"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u3",
+      "title": "Creating a Unit Schedule",
+      "keywords": [
+        "timeline",
+        "resources",
+        "flexibility"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u4",
+      "title": "Implementing the Unit Plan",
+      "keywords": [
+        "teaching",
+        "engagement",
+        "adaptation"
+      ],
+      "minutes": 90
+    }
+  ]
+}

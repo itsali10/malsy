@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
+import AvatarWidget from './AvatarWidget';
 import { ThemeProvider } from '../lib/theme';
 
 const AUTH_PATHS = ['/login'];
@@ -46,6 +47,7 @@ export default function ClientShell({ children }: { children: React.ReactNode })
         <TopBar />
         <div id="content">{children}</div>
       </div>
+      <AvatarWidget />
     </ThemeProvider>
   );
 }

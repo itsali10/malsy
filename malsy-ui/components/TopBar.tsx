@@ -9,11 +9,7 @@ const META: Record<string, [string, string]> = {
   '/':            ['Dashboard',    'Good morning'],
   '/lessons':     ['Lessons',      'Choose a subject to study'],
   '/challenges':  ['Challenges',   "Beat today's challenge & earn XP"],
-  '/leaderboard': ['Leaderboard',  'Class rankings'],
   '/schedule':    ['Schedule',     'Your classes and exams'],
-  '/arcade':      ['Arcade',       'Play games, earn rewards'],
-  '/lab':         ['Lab',          'Virtual experiments from your textbook'],
-  '/inbox':       ['Inbox',        'Messages'],
   '/profile':     ['Profile',      'Your progress'],
   '/settings':    ['Settings',     'Preferences & account'],
 };

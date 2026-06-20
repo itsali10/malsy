@@ -1,16 +1,17 @@
 {
-  "student_id": "211005839",
-  "chapter_id": "4",
-  "book_id": "4",
+  "student_id": "ab1693dd-931f-4872-9626-a39f39e73af8",
+  "chapter_id": "history:unit_02",
+  "book_id": "history",
   "graph_chapter_id": "u1",
   "session_units": [
     {
       "unit_id": "u1",
-      "title": "Introduction to Unit Planning",
+      "title": "Exploring Ancient Civilizations",
       "keywords": [
-        "unit planning",
-        "importance",
-        "organization"
+        "civilizations",
+        "ancient",
+        "society",
+        "culture"
       ],
       "minutes": 90
     }
@@ -18,11 +19,9 @@
   "current_pos": 0,
   "unit_part": 0,
   "last_quiz": {
-    "question": "Why is it important for teachers to plan their lessons carefully? Can you give an example of how organizing a unit can help students learn better?",
+    "question": "Can you name one societal role in ancient civilizations and explain its importance in society?",
     "expected_points": [
-      "To set clear goals for what students should learn",
-      "To ensure all necessary materials are ready",
-      "To help students learn and succeed"
+      "Name one societal role (e.g., ruler, priest, artisan, farmer, slave) and explain its importance in the functioning of the civilization."
     ]
   }
 }

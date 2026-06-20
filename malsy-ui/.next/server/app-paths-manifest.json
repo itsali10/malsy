@@ -1,7 +1,9 @@
 {
+  "/lessons/learn/page": "app/lessons/learn/page.js",
   "/lessons/page": "app/lessons/page.js",
-  "/schedule/page": "app/schedule/page.js",
-  "/challenges/page": "app/challenges/page.js",
-  "/settings/page": "app/settings/page.js",
-  "/page": "app/page.js"
+  "/page": "app/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/lessons/subject/[subject]/page": "app/lessons/subject/[subject]/page.js",
+  "/api/generate-lesson-video/route": "app/api/generate-lesson-video/route.js",
+  "/api/lesson-video-status/[jobId]/route": "app/api/lesson-video-status/[jobId]/route.js"
 }

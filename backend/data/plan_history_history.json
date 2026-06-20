@@ -1,0 +1,39 @@
+{
+  "objectives": [
+    "Understand the importance of planning units for effective teaching",
+    "Learn how to break down a chapter into manageable units",
+    "Develop skills to create engaging and child-friendly unit plans"
+  ],
+  "units": [
+    {
+      "unit_id": "u1",
+      "title": "Introduction to Unit Planning",
+      "keywords": [
+        "planning",
+        "teaching",
+        "importance"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u2",
+      "title": "Breaking Down a Chapter",
+      "keywords": [
+        "chapter",
+        "break down",
+        "manageable"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u3",
+      "title": "Creating Engaging Unit Plans",
+      "keywords": [
+        "engaging",
+        "child-friendly",
+        "skills"
+      ],
+      "minutes": 90
+    }
+  ]
+}

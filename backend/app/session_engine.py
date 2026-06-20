@@ -33,19 +33,23 @@ def plan_index_for_real_unit(plan: Dict[str, Any], real_unit_id: str) -> Optiona
             return i
     return None
 
-def _plan_key(chapter_id: str) -> str:
+def _plan_key(chapter_id: str, lesson_title: str = "") -> str:
     # Windows doesn't allow colons in filenames, so replace with underscore
     safe_id = chapter_id.replace(":", "_")
+    if lesson_title:
+        safe_title = lesson_title.lower().replace(" ", "_")[:32]
+        return f"plan_{safe_id}_{safe_title}.json"
     return f"plan_{safe_id}.json"
 
 def _progress_key(student_id: str) -> str:
     return f"progress_{student_id}.json"
 
-def get_or_create_plan(chapter_id: str) -> Dict[str, Any]:
-    plan = load_json(_plan_key(chapter_id), default=None)
+def get_or_create_plan(chapter_id: str, lesson_title: str = "", lesson_description: str = "") -> Dict[str, Any]:
+    key = _plan_key(chapter_id, lesson_title)
+    plan = load_json(key, default=None)
     if plan is None:
-        plan = build_chapter_plan(chapter_id)
-        save_json(_plan_key(chapter_id), plan)
+        plan = build_chapter_plan(chapter_id, lesson_title=lesson_title, lesson_description=lesson_description)
+        save_json(key, plan)
     return plan
 
 def load_progress(student_id: str) -> Dict[str, Any]:

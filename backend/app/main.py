@@ -179,6 +179,8 @@ def root():
 class StartSessionReq(BaseModel):
     student_id: str
     chapter_id: str
+    lesson_title: str = ""
+    lesson_description: str = ""
 
 class NextUnitReq(BaseModel):
     student_id: str
@@ -254,7 +256,7 @@ def start_session(req: StartSessionReq):
     # Step A: try to start requested chapter
     def _start_chapter(chapter_id: str):
         book_id = progress_book_id(chapter_id)
-        plan = get_or_create_plan(book_id)
+        plan = get_or_create_plan(book_id, lesson_title=req.lesson_title, lesson_description=req.lesson_description)
         progress = load_progress(req.student_id)
 
         # If chapter_id is a specific unit (e.g., "english_g6:unit_01"), find it in the plan

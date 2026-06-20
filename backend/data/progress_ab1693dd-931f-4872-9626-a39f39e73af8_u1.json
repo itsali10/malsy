@@ -1,0 +1,28 @@
+{
+  "student_id": "ab1693dd-931f-4872-9626-a39f39e73af8",
+  "chapter_id": "u1",
+  "current_item_index": 0,
+  "done_items": [],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [
+    {
+      "ts": "2026-06-20T10:59:26.119958Z",
+      "item_id": "content",
+      "quiz_question": "What is lesson planning?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-20T11:00:09.253456Z",
+      "item_id": "content",
+      "quiz_question": "What is lesson planning?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ]
+}

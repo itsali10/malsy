@@ -1,4 +1,9 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import ProgressBar from '../../components/ui/ProgressBar';
+import { auth } from '../../lib/auth';
+import type { UserRead } from '../../lib/api';
 
 const badges = [
   { icon: '🧬', label: 'Bio Master', bg: 'linear-gradient(135deg,#5B21F5,#8B55FF)', col: 'var(--vl)', locked: false },
@@ -10,15 +15,32 @@ const badges = [
 ];
 
 export default function ProfilePage() {
+  const [user, setUser] = useState<UserRead | null>(null);
+
+  useEffect(() => {
+    setUser(auth.getUser());
+  }, []);
+
+  const initials = user
+    ? `${user.first_name[0]}${user.last_name[0]}`.toUpperCase()
+    : '??';
+  const fullName = user ? `${user.first_name} ${user.last_name}` : '—';
+  const gradeLabel = user?.grade_level
+    ? `Grade ${user.grade_level}`
+    : user?.role ?? '';
+
   return (
     <div className="page-enter">
       {/* Hero */}
       <div className="profile-hero">
         <div className="prof-top">
-          <div className="prof-av">SA</div>
+          <div className="prof-av">{initials}</div>
           <div>
-            <div className="prof-name">Sara Ahmed</div>
-            <div className="prof-class">Class 9-A · Cairo International School</div>
+            <div className="prof-name">{fullName}</div>
+            <div className="prof-class">{gradeLabel}</div>
+            {user?.email && (
+              <div style={{ fontSize: 12, color: 'var(--g3)', marginTop: 2 }}>{user.email}</div>
+            )}
             <div className="prof-xp">⭐ Level 7 · 1,240 XP · 260 XP to Level 8</div>
             <div style={{ marginTop: 8 }}>
               <div className="pbar-wrap" style={{ width: 200 }}>

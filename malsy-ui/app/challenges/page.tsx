@@ -1,50 +1,133 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { auth } from '../../lib/auth';
+
+// ── Game stats storage ───────────────────────────────────────────
+
+const STORAGE_KEY = 'malsy_game_stats';
+const MAX_PLAYS_PER_DAY = 3;
+
+interface GameStat {
+  totalScore: number;
+  bestScore: number;
+  playsToday: number;
+  lastPlayDate: string;  // ISO date string YYYY-MM-DD
+  streak: number;
+  lastStreakDate: string; // last date they played (to detect consecutive days)
+}
+
+interface AllStats {
+  hangman: GameStat;
+  spelling: GameStat;
+}
+
+type GameKey = keyof AllStats;
+
+function today(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function yesterday(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function defaultStat(): GameStat {
+  return { totalScore: 0, bestScore: 0, playsToday: 0, lastPlayDate: '', streak: 0, lastStreakDate: '' };
+}
+
+function loadStats(userId: string): AllStats {
+  try {
+    const raw = localStorage.getItem(`${STORAGE_KEY}_${userId}`);
+    if (!raw) return { hangman: defaultStat(), spelling: defaultStat() };
+    return JSON.parse(raw) as AllStats;
+  } catch {
+    return { hangman: defaultStat(), spelling: defaultStat() };
+  }
+}
+
+function saveStats(userId: string, stats: AllStats) {
+  localStorage.setItem(`${STORAGE_KEY}_${userId}`, JSON.stringify(stats));
+}
+
+function playsLeft(stat: GameStat): number {
+  if (stat.lastPlayDate !== today()) return MAX_PLAYS_PER_DAY;
+  return Math.max(0, MAX_PLAYS_PER_DAY - stat.playsToday);
+}
+
+function recordPlay(stat: GameStat): GameStat {
+  const td = today();
+  const isNewDay = stat.lastPlayDate !== td;
+
+  let { streak, lastStreakDate } = stat;
+  if (isNewDay) {
+    // Extend streak if they played yesterday, else start fresh at 1
+    streak = lastStreakDate === yesterday() ? streak + 1 : 1;
+    lastStreakDate = td;
+  }
+
+  return {
+    ...stat,
+    playsToday: isNewDay ? 1 : stat.playsToday + 1,
+    lastPlayDate: td,
+    streak,
+    lastStreakDate,
+  };
+}
+
+function recordScore(stat: GameStat, score: number): GameStat {
+  return {
+    ...stat,
+    totalScore: stat.totalScore + score,
+    bestScore: Math.max(stat.bestScore, score),
+  };
+}
 
 // ── Hangman data ─────────────────────────────────────────────────
 
 const HANGMAN_WORDS = [
-  { word: 'CHEMISTRY',    hint: 'The study of matter and its properties',     category: 'Science'       },
-  { word: 'EXPERIMENT',   hint: 'A test to discover something',               category: 'Science'       },
-  { word: 'MOLECULE',     hint: 'A group of atoms bonded together',           category: 'Science'       },
-  { word: 'GRAMMAR',      hint: 'Rules for using language correctly',         category: 'English'       },
-  { word: 'VOCABULARY',   hint: 'Words you know and use',                     category: 'English'       },
-  { word: 'SENTENCE',     hint: 'A group of words expressing a complete thought', category: 'English'   },
-  { word: 'CONTINENT',    hint: 'Large landmasses on Earth',                  category: 'Geography'     },
-  { word: 'CIVILIZATION', hint: 'Advanced human society',                     category: 'History'       },
-  { word: 'GOVERNMENT',   hint: 'System that rules a country',                category: 'Social Studies'},
-  { word: 'CULTURE',      hint: 'Beliefs and customs of a group',             category: 'Social Studies'},
-  { word: 'EDUCATION',    hint: 'Process of learning',                        category: 'General'       },
-  { word: 'KNOWLEDGE',    hint: 'Information and understanding',              category: 'General'       },
-  { word: 'STUDENT',      hint: 'Someone who learns',                         category: 'General'       },
-  { word: 'TEACHER',      hint: 'Someone who teaches',                        category: 'General'       },
-  { word: 'SCIENCE',      hint: 'Study of the natural world',                 category: 'Science'       },
+  { word: 'CHEMISTRY',    hint: 'The study of matter and its properties',         category: 'Science'        },
+  { word: 'EXPERIMENT',   hint: 'A test to discover something',                   category: 'Science'        },
+  { word: 'MOLECULE',     hint: 'A group of atoms bonded together',               category: 'Science'        },
+  { word: 'GRAMMAR',      hint: 'Rules for using language correctly',             category: 'English'        },
+  { word: 'VOCABULARY',   hint: 'Words you know and use',                         category: 'English'        },
+  { word: 'SENTENCE',     hint: 'A group of words expressing a complete thought', category: 'English'        },
+  { word: 'CONTINENT',    hint: 'Large landmasses on Earth',                      category: 'Geography'      },
+  { word: 'CIVILIZATION', hint: 'Advanced human society',                         category: 'History'        },
+  { word: 'GOVERNMENT',   hint: 'System that rules a country',                    category: 'Social Studies' },
+  { word: 'CULTURE',      hint: 'Beliefs and customs of a group',                 category: 'Social Studies' },
+  { word: 'EDUCATION',    hint: 'Process of learning',                            category: 'General'        },
+  { word: 'KNOWLEDGE',    hint: 'Information and understanding',                  category: 'General'        },
+  { word: 'STUDENT',      hint: 'Someone who learns',                             category: 'General'        },
+  { word: 'TEACHER',      hint: 'Someone who teaches',                            category: 'General'        },
+  { word: 'SCIENCE',      hint: 'Study of the natural world',                     category: 'Science'        },
 ];
 
 // ── Spelling Bee data ────────────────────────────────────────────
 
 const SPELLING_WORDS = [
-  { word: 'CHEMISTRY',    hint: 'The study of matter and chemicals',  difficulty: 1 },
-  { word: 'EXPERIMENT',   hint: 'A scientific test',                  difficulty: 1 },
-  { word: 'MOLECULE',     hint: 'A group of atoms',                   difficulty: 2 },
-  { word: 'GRAMMAR',      hint: 'Rules of language',                  difficulty: 1 },
-  { word: 'VOCABULARY',   hint: 'Words you know',                     difficulty: 2 },
-  { word: 'SENTENCE',     hint: 'A complete thought in words',        difficulty: 1 },
-  { word: 'CONTINENT',    hint: 'Large landmasses',                   difficulty: 1 },
-  { word: 'CIVILIZATION', hint: 'Advanced society',                   difficulty: 3 },
-  { word: 'GOVERNMENT',   hint: 'System that rules',                  difficulty: 2 },
-  { word: 'EDUCATION',    hint: 'Process of learning',                difficulty: 1 },
-  { word: 'KNOWLEDGE',    hint: 'Information you know',               difficulty: 2 },
-  { word: 'SCIENCE',      hint: 'Study of nature',                    difficulty: 1 },
-  { word: 'MATHEMATICS',  hint: 'Study of numbers',                   difficulty: 2 },
-  { word: 'GEOGRAPHY',    hint: 'Study of Earth',                     difficulty: 2 },
-  { word: 'HISTORY',      hint: 'Study of the past',                  difficulty: 1 },
-  { word: 'LITERATURE',   hint: 'Written works',                      difficulty: 2 },
-  { word: 'PHYSICS',      hint: 'Study of motion and energy',         difficulty: 2 },
-  { word: 'BIOLOGY',      hint: 'Study of living things',             difficulty: 2 },
-  { word: 'ASTRONOMY',    hint: 'Study of space',                     difficulty: 3 },
-  { word: 'PRONUNCIATION',hint: 'How to say a word',                  difficulty: 3 },
+  { word: 'CHEMISTRY',     hint: 'The study of matter and chemicals', difficulty: 1 },
+  { word: 'EXPERIMENT',    hint: 'A scientific test',                 difficulty: 1 },
+  { word: 'MOLECULE',      hint: 'A group of atoms',                  difficulty: 2 },
+  { word: 'GRAMMAR',       hint: 'Rules of language',                 difficulty: 1 },
+  { word: 'VOCABULARY',    hint: 'Words you know',                    difficulty: 2 },
+  { word: 'SENTENCE',      hint: 'A complete thought in words',       difficulty: 1 },
+  { word: 'CONTINENT',     hint: 'Large landmasses',                  difficulty: 1 },
+  { word: 'CIVILIZATION',  hint: 'Advanced society',                  difficulty: 3 },
+  { word: 'GOVERNMENT',    hint: 'System that rules',                 difficulty: 2 },
+  { word: 'EDUCATION',     hint: 'Process of learning',               difficulty: 1 },
+  { word: 'KNOWLEDGE',     hint: 'Information you know',              difficulty: 2 },
+  { word: 'SCIENCE',       hint: 'Study of nature',                   difficulty: 1 },
+  { word: 'MATHEMATICS',   hint: 'Study of numbers',                  difficulty: 2 },
+  { word: 'GEOGRAPHY',     hint: 'Study of Earth',                    difficulty: 2 },
+  { word: 'HISTORY',       hint: 'Study of the past',                 difficulty: 1 },
+  { word: 'LITERATURE',    hint: 'Written works',                     difficulty: 2 },
+  { word: 'PHYSICS',       hint: 'Study of motion and energy',        difficulty: 2 },
+  { word: 'BIOLOGY',       hint: 'Study of living things',            difficulty: 2 },
+  { word: 'ASTRONOMY',     hint: 'Study of space',                    difficulty: 3 },
+  { word: 'PRONUNCIATION', hint: 'How to say a word',                 difficulty: 3 },
 ];
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -53,7 +136,7 @@ const TOTAL_WORDS = 10;
 
 // ── Hangman modal ────────────────────────────────────────────────
 
-function HangmanModal({ onClose }: { onClose: () => void }) {
+function HangmanModal({ onClose }: { onClose: (score: number) => void }) {
   const pick = () => HANGMAN_WORDS[Math.floor(Math.random() * HANGMAN_WORDS.length)];
 
   const [word, setWord]         = useState(pick);
@@ -106,26 +189,20 @@ function HangmanModal({ onClose }: { onClose: () => void }) {
   const earnedNow = 10 + (wrong === 0 ? 5 : 0);
 
   return (
-    <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(score); }}>
       <div className="modal-box" style={{ maxWidth: 660 }}>
-
-        {/* Header */}
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg,rgba(59,191,255,.18),rgba(91,33,245,.08))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
-              🔤
-            </div>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg,rgba(59,191,255,.18),rgba(91,33,245,.08))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🔤</div>
             <div>
               <div style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 15 }}>Hangman</div>
               <div style={{ fontSize: 11, color: 'var(--g3)' }}>Score: {score} pts · press A–Z to guess</div>
             </div>
           </div>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={() => onClose(score)}>✕</button>
         </div>
 
         <div className="modal-body">
-
-          {/* Status banners */}
           {status === 'won' && (
             <div className="auth-success" style={{ marginBottom: 16 }}>
               ✅ Correct! +{earnedNow} pts{wrong === 0 ? ' (perfect bonus!)' : ''} — next word…
@@ -138,8 +215,6 @@ function HangmanModal({ onClose }: { onClose: () => void }) {
           )}
 
           <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-
-            {/* SVG figure */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flexShrink: 0 }}>
               <svg viewBox="0 0 200 260" style={{ width: 140, height: 175 }}>
                 <line x1="20" y1="250" x2="180" y2="250" stroke="rgba(255,255,255,.25)" strokeWidth="4" strokeLinecap="round"/>
@@ -158,13 +233,10 @@ function HangmanModal({ onClose }: { onClose: () => void }) {
               </div>
             </div>
 
-            {/* Word area */}
             <div style={{ flex: 1, minWidth: 220 }}>
               <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--vl)', marginBottom: 10 }}>
                 Category: {word.category}
               </div>
-
-              {/* Letter slots */}
               <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 18 }}>
                 {letters.map((letter, i) => (
                   <div key={i} style={{
@@ -174,57 +246,38 @@ function HangmanModal({ onClose }: { onClose: () => void }) {
                     fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 20,
                     color: guessed.includes(letter) ? 'var(--mint)' : 'transparent',
                     transition: 'color .2s, border-color .2s',
-                  }}>
-                    {letter}
-                  </div>
+                  }}>{letter}</div>
                 ))}
               </div>
-
-              {/* Hint */}
               {showHint && (
                 <div style={{ background: 'rgba(255,184,48,.08)', border: '1px solid rgba(255,184,48,.2)', borderRadius: 10, padding: '8px 12px', fontSize: 12, color: 'var(--amber)', marginBottom: 14 }}>
                   💡 {word.hint}
                 </div>
               )}
-
               <div style={{ display: 'flex', gap: 8 }}>
-                <button className="btn btn-o btn-sm" onClick={() => { setShowHint(true); setHintUsed(true); }} disabled={hintUsed}>
-                  💡 Hint
-                </button>
-                <button className="btn btn-o btn-sm" onClick={() => startNew(false)}>
-                  New Game
-                </button>
+                <button className="btn btn-o btn-sm" onClick={() => { setShowHint(true); setHintUsed(true); }} disabled={hintUsed}>💡 Hint</button>
+                <button className="btn btn-o btn-sm" onClick={() => startNew(false)}>New Game</button>
               </div>
             </div>
           </div>
 
-          {/* Keyboard */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 20 }}>
             {LETTERS.map(letter => {
               const used = guessed.includes(letter);
               const correct = used && word.word.includes(letter);
               const miss    = used && !word.word.includes(letter);
               return (
-                <button
-                  key={letter}
-                  onClick={() => guessLetter(letter)}
-                  disabled={used || status !== 'playing'}
-                  style={{
-                    width: 33, height: 33, borderRadius: 7, border: '1px solid transparent',
-                    fontFamily: 'var(--fd)', fontWeight: 700, fontSize: 11, cursor: used ? 'default' : 'pointer',
-                    background: correct ? 'rgba(0,229,160,.18)' : miss ? 'rgba(255,107,107,.12)' : 'rgba(255,255,255,.07)',
-                    borderColor: correct ? 'rgba(0,229,160,.3)' : miss ? 'rgba(255,107,107,.2)' : 'rgba(255,255,255,.08)',
-                    color: correct ? 'var(--mint)' : miss ? 'var(--coral)' : 'var(--w)',
-                    opacity: used ? 0.6 : 1,
-                    transition: 'all .15s',
-                  }}
-                >
-                  {letter}
-                </button>
+                <button key={letter} onClick={() => guessLetter(letter)} disabled={used || status !== 'playing'} style={{
+                  width: 33, height: 33, borderRadius: 7, border: '1px solid transparent',
+                  fontFamily: 'var(--fd)', fontWeight: 700, fontSize: 11, cursor: used ? 'default' : 'pointer',
+                  background: correct ? 'rgba(0,229,160,.18)' : miss ? 'rgba(255,107,107,.12)' : 'rgba(255,255,255,.07)',
+                  borderColor: correct ? 'rgba(0,229,160,.3)' : miss ? 'rgba(255,107,107,.2)' : 'rgba(255,255,255,.08)',
+                  color: correct ? 'var(--mint)' : miss ? 'var(--coral)' : 'var(--w)',
+                  opacity: used ? 0.6 : 1, transition: 'all .15s',
+                }}>{letter}</button>
               );
             })}
           </div>
-
         </div>
       </div>
     </div>
@@ -233,7 +286,7 @@ function HangmanModal({ onClose }: { onClose: () => void }) {
 
 // ── Spelling Bee modal ───────────────────────────────────────────
 
-function SpellingBeeModal({ onClose }: { onClose: () => void }) {
+function SpellingBeeModal({ onClose }: { onClose: (score: number) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [score, setScore]               = useState(0);
@@ -312,26 +365,20 @@ function SpellingBeeModal({ onClose }: { onClose: () => void }) {
   const diffColors = ['', 'var(--mint)', 'var(--amber)', 'var(--coral)'];
 
   return (
-    <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(score); }}>
       <div className="modal-box">
-
-        {/* Header */}
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg,rgba(255,184,48,.22),rgba(255,184,48,.06))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
-              🐝
-            </div>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg,rgba(255,184,48,.22),rgba(255,184,48,.06))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🐝</div>
             <div>
               <div style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 15 }}>Spelling Bee</div>
               <div style={{ fontSize: 11, color: 'var(--g3)' }}>Score: {score} · Level: {level}/3</div>
             </div>
           </div>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={() => onClose(score)}>✕</button>
         </div>
 
         <div className="modal-body">
-
-          {/* Progress */}
           <div style={{ background: 'rgba(255,255,255,.06)', borderRadius: 999, height: 4, marginBottom: 6, overflow: 'hidden' }}>
             <div style={{ width: `${progress}%`, height: '100%', borderRadius: 999, background: 'var(--mint)', transition: 'width .4s ease' }} />
           </div>
@@ -340,7 +387,6 @@ function SpellingBeeModal({ onClose }: { onClose: () => void }) {
             <span>{correctCount} correct</span>
           </div>
 
-          {/* Message */}
           {message && (
             <div className={message.type === 'success' ? 'auth-success' : 'auth-error'} style={{ marginBottom: 14 }}>
               {message.text}
@@ -349,11 +395,8 @@ function SpellingBeeModal({ onClose }: { onClose: () => void }) {
 
           {!gameOver ? (
             <>
-              {/* Word card */}
               <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 16, padding: '24px 20px', textAlign: 'center', marginBottom: 16 }}>
-                <div style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 30, letterSpacing: 10, color: 'var(--sky)', marginBottom: 4 }}>
-                  {displayWord}
-                </div>
+                <div style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 30, letterSpacing: 10, color: 'var(--sky)', marginBottom: 4 }}>{displayWord}</div>
                 <div style={{ fontSize: 10, color: diffColors[currentWord.difficulty], marginTop: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em' }}>
                   Difficulty {currentWord.difficulty}/3
                 </div>
@@ -363,39 +406,22 @@ function SpellingBeeModal({ onClose }: { onClose: () => void }) {
                   </div>
                 )}
               </div>
-
               <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
                 <button className="btn btn-o btn-sm" onClick={playAudio}>🔊 Hear it</button>
                 <button className="btn btn-o btn-sm" onClick={() => { setShowHint(true); setHintUsed(true); }} disabled={hintUsed}>
                   💡 Hint {hintUsed ? '(−5 pts)' : ''}
                 </button>
               </div>
-
               <form onSubmit={e => { e.preventDefault(); checkSpelling(); }} style={{ display: 'flex', gap: 8 }}>
-                <input
-                  ref={inputRef}
-                  className="field-input"
-                  type="text"
-                  value={input}
+                <input ref={inputRef} className="field-input" type="text" value={input}
                   onChange={e => setInput(e.target.value.toUpperCase())}
-                  placeholder="Type the full word…"
-                  style={{ flex: 1 }}
-                  autoCapitalize="characters"
-                  autoComplete="off"
-                />
-                <button
-                  type="submit"
-                  className="auth-submit"
+                  placeholder="Type the full word…" style={{ flex: 1 }}
+                  autoCapitalize="characters" autoComplete="off" />
+                <button type="submit" className="auth-submit"
                   style={{ width: 'auto', padding: '11px 22px', marginTop: 0 }}
-                  disabled={!input.trim()}
-                >
-                  Submit
-                </button>
+                  disabled={!input.trim()}>Submit</button>
               </form>
-
-              <button className="btn btn-o btn-sm" style={{ marginTop: 12 }} onClick={startGame}>
-                New Game
-              </button>
+              <button className="btn btn-o btn-sm" style={{ marginTop: 12 }} onClick={startGame}>New Game</button>
             </>
           ) : (
             <div style={{ textAlign: 'center', padding: '28px 0' }}>
@@ -408,102 +434,333 @@ function SpellingBeeModal({ onClose }: { onClose: () => void }) {
               </div>
               <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
                 <button className="btn btn-v" onClick={startGame}>Play Again</button>
-                <button className="btn btn-o" onClick={onClose}>Close</button>
+                <button className="btn btn-o" onClick={() => onClose(score)}>Close</button>
               </div>
             </div>
           )}
-
         </div>
       </div>
     </div>
   );
 }
 
-// ── Hub page ─────────────────────────────────────────────────────
+// ── Leaderboard ──────────────────────────────────────────────────
 
-type ActiveGame = 'hangman' | 'spelling' | null;
+const LB_FILTERS = ['This Week', 'This Month', 'All Time'];
 
-const CHALLENGE_CARDS = [
-  {
-    id: 'hangman' as ActiveGame,
-    icon: '🔤',
-    iconBg: 'linear-gradient(135deg,rgba(59,191,255,.18),rgba(59,191,255,.05))',
-    name: 'Hangman',
-    desc: 'Guess the hidden word letter by letter before the figure is complete',
-    tip: 'Press A–Z on your keyboard to guess letters instantly',
-    diff: 'Medium',
-    diffStyle: { background: 'rgba(255,184,48,.12)', color: 'var(--amber)' },
-    xp: '+10–15 pts',
-  },
-  {
-    id: 'spelling' as ActiveGame,
-    icon: '🐝',
-    iconBg: 'linear-gradient(135deg,rgba(255,184,48,.2),rgba(255,184,48,.05))',
-    name: 'Spelling Bee',
-    desc: 'See the partial word, hear it spoken, then spell it out completely',
-    tip: 'Skip the hint for +5 bonus pts — difficulty rises every 3 correct answers',
-    diff: 'Easy → Hard',
-    diffStyle: { background: 'rgba(0,229,160,.1)', color: 'var(--mint)' },
-    xp: '+10–25 pts',
-  },
+const LB_ROWS = [
+  { rank: 4, me: false, initials: 'SA', bg: 'var(--v)',  name: 'Sara Ahmed',      badge: '🧬 Bio Master',   lessons: 12, quiz: '94%', streak: '🔥18', xp: '1,240' },
+  { rank: 4, me: true,  initials: 'SA', bg: 'var(--v)',  name: 'Sara Ahmed',      badge: '🧬 Bio Master',   lessons: 12, quiz: '94%', streak: '🔥18', xp: '1,240' },
+  { rank: 5, me: false, initials: 'NA', bg: '#00B87E',   name: 'Nada Amin',       badge: '⚡ Fast Learner', lessons: 10, quiz: '88%', streak: '🔥9',  xp: '990'   },
+  { rank: 6, me: false, initials: 'OT', bg: '#FF6B6B',   name: 'Omar Tarek',      badge: '🎯 Quiz Pro',     lessons: 9,  quiz: '82%', streak: '🔥6',  xp: '870'   },
 ];
 
+function Leaderboard() {
+  const [active, setActive] = useState(0);
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div>
+          <div className="card-title" style={{ fontSize: 18 }}>Class Leaderboard</div>
+          <div style={{ fontSize: 12, color: 'var(--g3)', marginTop: 3 }}>Class 9-A · Week of June 2</div>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {LB_FILTERS.map((f, i) => (
+            <button key={f} className="btn btn-o btn-sm"
+              style={i === active ? { background: 'rgba(91,33,245,.15)', color: 'var(--vl)' } : {}}
+              onClick={() => setActive(i)}>{f}</button>
+          ))}
+        </div>
+      </div>
+
+      <div className="lb-podium">
+        <div className="podium-card podium-2" style={{ height: 180 }}>
+          <div className="podium-avatar" style={{ background: '#3BBFFF', color: 'white', fontSize: 14 }}>MH</div>
+          <div className="podium-name">Mohamed Hassan</div>
+          <div className="podium-score" style={{ color: 'var(--sky)' }}>1,180</div>
+          <div className="podium-xplbl">XP · 🥈 2nd</div>
+        </div>
+        <div className="podium-card podium-1" style={{ height: 210 }}>
+          <div className="podium-crown">👑</div>
+          <div className="podium-avatar" style={{ background: 'linear-gradient(135deg,#FFB830,#E8A020)', color: 'var(--navy)', fontSize: 14 }}>KA</div>
+          <div className="podium-name">Karim Ali</div>
+          <div className="podium-score" style={{ color: 'var(--amber)' }}>1,420</div>
+          <div className="podium-xplbl">XP · 🥇 1st</div>
+        </div>
+        <div className="podium-card podium-3" style={{ height: 160 }}>
+          <div className="podium-avatar" style={{ background: '#FF6B6B', color: 'white', fontSize: 14 }}>LM</div>
+          <div className="podium-name">Layla Mostafa</div>
+          <div className="podium-score" style={{ color: 'var(--coral)' }}>1,020</div>
+          <div className="podium-xplbl">XP · 🥉 3rd</div>
+        </div>
+      </div>
+
+      <div className="lb-row" style={{ background: 'rgba(255,255,255,.04)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--g5)', cursor: 'default' }}>
+        <div style={{ textAlign: 'center' }}>Rank</div>
+        <div>Student</div>
+        <div style={{ textAlign: 'center' }}>Lessons</div>
+        <div style={{ textAlign: 'center' }}>Quiz Avg</div>
+        <div style={{ textAlign: 'center' }}>Streak</div>
+        <div style={{ textAlign: 'right' }}>XP</div>
+      </div>
+
+      {LB_ROWS.map((r, i) => (
+        <div key={i} className={`lb-row${r.me ? ' me' : ''}`}>
+          <div className="lb-num" style={r.me ? { color: 'var(--vl)' } : {}}>{r.rank}</div>
+          <div className="lb-user">
+            <div className="lb-av" style={{ background: r.bg, border: r.me ? '2px solid var(--mint)' : undefined }}>{r.initials}</div>
+            <div>
+              <div className="lb-uname" style={r.me ? { color: 'var(--mint)' } : {}}>
+                {r.name}{r.me && <span style={{ fontSize: 9 }}> (You)</span>}
+              </div>
+              <div className="lb-usub">{r.badge}</div>
+            </div>
+          </div>
+          <div className="lb-num-val" style={{ color: r.me ? 'var(--mint)' : undefined }}>{r.lessons}</div>
+          <div className="lb-num-val" style={{ color: r.me ? 'var(--mint)' : undefined }}>{r.quiz}</div>
+          <div className="lb-num-val" style={{ color: 'var(--amber)' }}>{r.streak}</div>
+          <div className="lb-xp">{r.xp}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Arcade game grid ─────────────────────────────────────────────
+
+const ARCADE_GAMES: Array<{
+  thumb: string;
+  thumbBg: string;
+  name: string;
+  desc: string;
+  game?: GameKey;
+  locked?: boolean;
+}> = [
+  { thumb: '🎯', thumbBg: 'linear-gradient(135deg,#0d2d1a,#1a4f2e)', name: 'Hangman',      desc: 'Guess the vocabulary word before running out of lives', game: 'hangman' },
+  { thumb: '🐝', thumbBg: 'linear-gradient(135deg,#2d1f00,#4a3500)', name: 'Spelling Bee', desc: 'Type the correct spelling of words you hear',            game: 'spelling' },
+  { thumb: '🚀', thumbBg: 'linear-gradient(135deg,#0a1a3d,#0e2a5c)', name: 'Space Blaster', desc: 'Answer questions to power your ship through space missions', locked: true },
+  { thumb: '⚡', thumbBg: 'linear-gradient(135deg,#2d0d1a,#4a1028)', name: 'Flash Cards',   desc: 'Flip and match terms with definitions against the clock',   locked: true },
+  { thumb: '🧩', thumbBg: 'linear-gradient(135deg,#0d2d2a,#0a3d38)', name: 'Word Builder',  desc: 'Arrange jumbled letters to form the correct science terms',  locked: true },
+  { thumb: '🗣️', thumbBg: 'rgba(255,255,255,.04)',                    name: 'Debate Arena',  desc: 'Coming soon — AI-powered debate practice mode',              locked: true },
+];
+
+// ── Page ─────────────────────────────────────────────────────────
+
+type Tab = 'challenges' | 'leaderboard';
+
 export default function ChallengesPage() {
-  const [activeGame, setActiveGame] = useState<ActiveGame>(null);
+  const [tab, setTab] = useState<Tab>('challenges');
+  const [activeGame, setActiveGame] = useState<GameKey | null>(null);
+  const [stats, setStats] = useState<AllStats>({ hangman: defaultStat(), spelling: defaultStat() });
+  const [userId, setUserId] = useState('');
+
+  useEffect(() => {
+    const user = auth.getUser();
+    const uid = user?.user_id ?? 'guest';
+    setUserId(uid);
+    setStats(loadStats(uid));
+  }, []);
+
+  function openGame(game: GameKey) {
+    const stat = stats[game];
+    if (playsLeft(stat) === 0) return;
+    const updated = { ...stats, [game]: recordPlay(stat) };
+    setStats(updated);
+    saveStats(userId, updated);
+    setActiveGame(game);
+  }
+
+  function closeGame(game: GameKey, score: number) {
+    setActiveGame(null);
+    if (score > 0) {
+      setStats(prev => {
+        const updated = { ...prev, [game]: recordScore(prev[game], score) };
+        saveStats(userId, updated);
+        return updated;
+      });
+    }
+  }
+
+  function renderPlayBtn(game: GameKey, className = 'btn btn-v btn-sm') {
+    const left = playsLeft(stats[game]);
+    return (
+      <button
+        className={className}
+        disabled={left === 0}
+        onClick={() => openGame(game)}
+        title={left === 0 ? 'Come back tomorrow for more plays' : `${left} play${left !== 1 ? 's' : ''} left today`}
+      >
+        {left === 0 ? 'Done for today' : '▶ Play'}
+      </button>
+    );
+  }
+
+  function renderGameMeta(game: GameKey) {
+    const s = stats[game];
+    const left = playsLeft(s);
+    return (
+      <div style={{ display: 'flex', gap: 14, fontSize: 11, color: 'var(--g3)', marginTop: 6, flexWrap: 'wrap' }}>
+        <span>🏆 Best: <strong style={{ color: 'var(--amber)' }}>{s.bestScore > 0 ? `${s.bestScore} pts` : '—'}</strong></span>
+        <span>📊 Total: <strong style={{ color: 'var(--mint)' }}>{s.totalScore > 0 ? `${s.totalScore} pts` : '—'}</strong></span>
+        {s.streak > 0 && <span>🔥 <strong style={{ color: 'var(--coral)' }}>{s.streak}-day streak</strong></span>}
+        <span style={{ color: left === 0 ? 'var(--coral)' : 'var(--g5)' }}>
+          {left}/{MAX_PLAYS_PER_DAY} plays left today
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className="page-enter">
 
-      {/* Top banner cards */}
-      <div className="g2" style={{ marginBottom: 24 }}>
-        <div className="card" style={{ background: 'linear-gradient(135deg,rgba(255,184,48,.12),rgba(255,184,48,.04))', borderColor: 'rgba(255,184,48,.2)' }}>
-          <div style={{ fontSize: 28, marginBottom: 8 }}>⚡</div>
-          <div className="card-title" style={{ fontSize: 16 }}>Daily Challenge</div>
-          <div style={{ fontSize: 13, color: 'var(--g3)', margin: '6px 0 14px' }}>
-            Play Hangman or Spelling Bee and beat your best score today
-          </div>
-          <button
-            className="btn btn-sm"
-            style={{ background: 'var(--amber)', color: 'var(--navy)', border: 'none', borderRadius: 999, padding: '7px 14px', fontFamily: 'var(--fd)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
-            onClick={() => setActiveGame('hangman')}
-          >
-            Start Hangman
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+        {(['challenges', 'leaderboard'] as Tab[]).map(t => (
+          <button key={t} className="btn btn-o btn-sm"
+            style={tab === t ? { background: 'rgba(91,33,245,.15)', color: 'var(--vl)', borderColor: 'rgba(91,33,245,.3)' } : {}}
+            onClick={() => setTab(t)}>
+            {t === 'challenges' ? '⚡ Challenges' : '🏆 Leaderboard'}
           </button>
-        </div>
-        <div className="card" style={{ background: 'linear-gradient(135deg,rgba(91,33,245,.15),rgba(91,33,245,.04))', borderColor: 'rgba(91,33,245,.2)' }}>
-          <div style={{ fontSize: 28, marginBottom: 8 }}>🐝</div>
-          <div className="card-title" style={{ fontSize: 16 }}>Spelling Bee</div>
-          <div style={{ fontSize: 13, color: 'var(--g3)', margin: '6px 0 14px' }}>
-            10 progressive words — difficulty climbs as you get them right
-          </div>
-          <button className="btn btn-v" onClick={() => setActiveGame('spelling')}>
-            Play Now
-          </button>
-        </div>
+        ))}
       </div>
 
-      <div className="card-title" style={{ marginBottom: 16 }}>Active Challenges</div>
-
-      {CHALLENGE_CARDS.map((ch, i) => (
-        <div key={ch.id} className="challenge-item" style={{ marginBottom: 10 }}>
-          <div className="ch-rank" style={{ color: i === 0 ? 'var(--amber)' : 'var(--g3)' }}>{i + 1}</div>
-          <div className="ch-icon" style={{ background: ch.iconBg }}>{ch.icon}</div>
-          <div className="ch-body">
-            <div className="ch-name">{ch.name}</div>
-            <div className="ch-desc">{ch.desc}</div>
-            <div style={{ fontSize: 10, color: 'var(--g5)', marginTop: 4 }}>💡 {ch.tip}</div>
+      {tab === 'leaderboard' ? <Leaderboard /> : (
+        <>
+          {/* Banner cards */}
+          <div className="g2" style={{ marginBottom: 24 }}>
+            <div className="card" style={{ background: 'linear-gradient(135deg,rgba(255,184,48,.12),rgba(255,184,48,.04))', borderColor: 'rgba(255,184,48,.2)' }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>⚡</div>
+              <div className="card-title" style={{ fontSize: 16 }}>Daily Challenge</div>
+              <div style={{ fontSize: 13, color: 'var(--g3)', margin: '6px 0 10px' }}>
+                Play Hangman or Spelling Bee and beat your best score today
+              </div>
+              {renderGameMeta('hangman')}
+              <div style={{ marginTop: 12 }}>
+                <button
+                  className="btn btn-sm"
+                  style={{ background: 'var(--amber)', color: 'var(--navy)', border: 'none', borderRadius: 999, padding: '7px 14px', fontFamily: 'var(--fd)', fontSize: 11, fontWeight: 700, cursor: playsLeft(stats.hangman) === 0 ? 'not-allowed' : 'pointer', opacity: playsLeft(stats.hangman) === 0 ? 0.5 : 1 }}
+                  disabled={playsLeft(stats.hangman) === 0}
+                  onClick={() => openGame('hangman')}
+                >
+                  {playsLeft(stats.hangman) === 0 ? 'Done for today' : 'Start Hangman'}
+                </button>
+              </div>
+            </div>
+            <div className="card" style={{ background: 'linear-gradient(135deg,rgba(91,33,245,.15),rgba(91,33,245,.04))', borderColor: 'rgba(91,33,245,.2)' }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>🐝</div>
+              <div className="card-title" style={{ fontSize: 16 }}>Spelling Bee</div>
+              <div style={{ fontSize: 13, color: 'var(--g3)', margin: '6px 0 10px' }}>
+                10 progressive words — difficulty climbs as you get them right
+              </div>
+              {renderGameMeta('spelling')}
+              <div style={{ marginTop: 12 }}>
+                <button className="btn btn-v"
+                  disabled={playsLeft(stats.spelling) === 0}
+                  style={{ opacity: playsLeft(stats.spelling) === 0 ? 0.5 : 1, cursor: playsLeft(stats.spelling) === 0 ? 'not-allowed' : 'pointer' }}
+                  onClick={() => openGame('spelling')}>
+                  {playsLeft(stats.spelling) === 0 ? 'Done for today' : 'Play Now'}
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="ch-right">
-            <div className="ch-xp">{ch.xp}</div>
-            <div className="ch-xpl">per word</div>
-            <div className="ch-diff" style={ch.diffStyle}>{ch.diff}</div>
-          </div>
-          <button className="btn btn-v btn-sm" onClick={() => setActiveGame(ch.id)}>▶ Play</button>
-        </div>
-      ))}
 
-      {activeGame === 'hangman' && <HangmanModal onClose={() => setActiveGame(null)} />}
-      {activeGame === 'spelling' && <SpellingBeeModal onClose={() => setActiveGame(null)} />}
+          {/* Active Challenges */}
+          <div className="card-title" style={{ marginBottom: 16 }}>Active Challenges</div>
+
+          {([
+            {
+              id: 'hangman' as GameKey,
+              icon: '🔤', iconBg: 'linear-gradient(135deg,rgba(59,191,255,.18),rgba(59,191,255,.05))',
+              name: 'Hangman', desc: 'Guess the hidden word letter by letter before the figure is complete',
+              tip: 'Press A–Z on your keyboard to guess letters instantly',
+              diff: 'Medium', diffStyle: { background: 'rgba(255,184,48,.12)', color: 'var(--amber)' },
+              xp: '+10–15 pts',
+            },
+            {
+              id: 'spelling' as GameKey,
+              icon: '🐝', iconBg: 'linear-gradient(135deg,rgba(255,184,48,.2),rgba(255,184,48,.05))',
+              name: 'Spelling Bee', desc: 'See the partial word, hear it spoken, then spell it out completely',
+              tip: 'Skip the hint for +5 bonus pts — difficulty rises every 3 correct answers',
+              diff: 'Easy → Hard', diffStyle: { background: 'rgba(0,229,160,.1)', color: 'var(--mint)' },
+              xp: '+10–25 pts',
+            },
+          ]).map((ch, i) => (
+            <div key={ch.id} className="challenge-item" style={{ marginBottom: 10 }}>
+              <div className="ch-rank" style={{ color: i === 0 ? 'var(--amber)' : 'var(--g3)' }}>{i + 1}</div>
+              <div className="ch-icon" style={{ background: ch.iconBg }}>{ch.icon}</div>
+              <div className="ch-body">
+                <div className="ch-name">{ch.name}</div>
+                <div className="ch-desc">{ch.desc}</div>
+                <div style={{ fontSize: 10, color: 'var(--g5)', marginTop: 4 }}>💡 {ch.tip}</div>
+                {renderGameMeta(ch.id)}
+              </div>
+              <div className="ch-right">
+                <div className="ch-xp">{ch.xp}</div>
+                <div className="ch-xpl">per word</div>
+                <div className="ch-diff" style={ch.diffStyle}>{ch.diff}</div>
+              </div>
+              {renderPlayBtn(ch.id)}
+            </div>
+          ))}
+
+          {/* Games grid */}
+          <div style={{ marginTop: 32, marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div className="card-title">🎮 Games</div>
+            <div style={{ display: 'flex', gap: 24 }}>
+              {([
+                ['Total XP', (stats.hangman.totalScore + stats.spelling.totalScore).toLocaleString(), 'var(--amber)'],
+                ['Hangman Streak', stats.hangman.streak > 0 ? `🔥${stats.hangman.streak}d` : '—', 'var(--coral)'],
+                ['Spelling Streak', stats.spelling.streak > 0 ? `🔥${stats.spelling.streak}d` : '—', 'var(--mint)'],
+              ] as const).map(([l, v, c]) => (
+                <div key={l} style={{ textAlign: 'center' }}>
+                  <div style={{ fontFamily: 'var(--fd)', fontSize: 16, fontWeight: 800, color: c }}>{v}</div>
+                  <div style={{ fontSize: 10, color: 'var(--g3)' }}>{l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--g3)', marginBottom: 16 }}>
+            {MAX_PLAYS_PER_DAY} plays per game per day · streaks grow each day you play
+          </div>
+
+          <div className="game-grid">
+            {ARCADE_GAMES.map(g => {
+              const left = g.game ? playsLeft(stats[g.game]) : 0;
+              const stat = g.game ? stats[g.game] : null;
+              return (
+                <div key={g.name} className="game-card" style={g.locked || left === 0 ? { opacity: g.locked ? .55 : .7 } : {}}>
+                  <div className="gc-thumb" style={{ background: g.thumbBg }}>{g.thumb}</div>
+                  <div className="gc-body">
+                    <div className="gc-name">{g.name}</div>
+                    <div className="gc-desc">{g.desc}</div>
+                    {stat && (
+                      <div style={{ fontSize: 10, color: 'var(--g3)', marginTop: 4 }}>
+                        Best: <span style={{ color: 'var(--amber)' }}>{stat.bestScore > 0 ? `${stat.bestScore} pts` : '—'}</span>
+                        {stat.streak > 0 && <span style={{ marginLeft: 8, color: 'var(--coral)' }}>🔥{stat.streak}d</span>}
+                      </div>
+                    )}
+                    <div className="gc-bottom">
+                      <div className="gc-hi">
+                        {g.locked ? 'Coming soon' : left === 0 ? 'No plays left today' : `${left} play${left !== 1 ? 's' : ''} left`}
+                      </div>
+                      <button
+                        className="btn btn-v btn-sm"
+                        disabled={g.locked || left === 0}
+                        onClick={() => g.game && openGame(g.game)}
+                      >
+                        {g.locked ? 'Soon' : left === 0 ? '✓' : 'Play'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {activeGame === 'hangman'  && <HangmanModal    onClose={score => closeGame('hangman', score)} />}
+      {activeGame === 'spelling' && <SpellingBeeModal onClose={score => closeGame('spelling', score)} />}
     </div>
   );
 }

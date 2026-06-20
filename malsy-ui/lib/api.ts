@@ -195,10 +195,15 @@ export const api = {
 
   // AI teacher session (single-student in-memory)
   session: {
-    start: (studentId: string, chapterId: string) =>
+    start: (studentId: string, chapterId: string, lessonTitle = '', lessonDescription = '') =>
       request<SessionStartResponse>('/session/start', {
         method: 'POST',
-        body: JSON.stringify({ student_id: studentId, chapter_id: chapterId }),
+        body: JSON.stringify({
+          student_id: studentId,
+          chapter_id: chapterId,
+          lesson_title: lessonTitle,
+          lesson_description: lessonDescription,
+        }),
       }),
     answer: (studentId: string, studentAnswer: string) =>
       request<SessionAnswerResponse>('/session/answer', {

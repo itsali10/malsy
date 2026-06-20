@@ -1,0 +1,53 @@
+{
+  "objectives": [
+    "Identify key historical events that have had a significant impact on the world",
+    "Understand the causes and effects of these historical events",
+    "Recognize the importance of learning about history to better understand the present and future"
+  ],
+  "units": [
+    {
+      "unit_id": "u1",
+      "title": "Exploring Ancient Civilizations",
+      "keywords": [
+        "civilizations",
+        "ancient",
+        "culture",
+        "society"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u2",
+      "title": "Age of Exploration",
+      "keywords": [
+        "exploration",
+        "discovery",
+        "trade",
+        "navigation"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u3",
+      "title": "American Revolution",
+      "keywords": [
+        "revolution",
+        "independence",
+        "colonies",
+        "freedom"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u4",
+      "title": "World Wars",
+      "keywords": [
+        "war",
+        "conflict",
+        "alliances",
+        "peace"
+      ],
+      "minutes": 90
+    }
+  ]
+}

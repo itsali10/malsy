@@ -8,11 +8,7 @@ const NAV = [
   { href: '/',            icon: '🏠', label: 'Dashboard' },
   { href: '/lessons',     icon: '📖', label: 'Lessons' },
   { href: '/challenges',  icon: '⚡', label: 'Challenges' },
-  { href: '/leaderboard', icon: '🏆', label: 'Leaderboard' },
   { href: '/schedule',    icon: '📅', label: 'Schedule' },
-  { href: '/arcade',      icon: '🎮', label: 'Arcade' },
-  { href: '/lab',         icon: '🔬', label: 'Lab' },
-  { href: '/inbox',       icon: '💬', label: 'Inbox', badge: 3 },
   { href: '/profile',     icon: '👤', label: 'Profile' },
   { href: '/settings',    icon: '⚙️', label: 'Settings' },
 ];
@@ -55,9 +51,6 @@ export default function Sidebar() {
             >
               <span className="ni">{item.icon}</span>
               <span className="nl">{item.label}</span>
-              {item.badge != null && (
-                <span className="nav-badge">{item.badge}</span>
-              )}
             </Link>
           );
         })}

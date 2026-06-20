@@ -9,15 +9,15 @@ from .session_config import SESSION_UNIT_MINUTES
 
 llm = get_teacher_llm()
 
-def build_chapter_plan(chapter_id: str) -> Dict[str, Any]:
+def build_chapter_plan(chapter_id: str, lesson_title: str = "", lesson_description: str = "") -> Dict[str, Any]:
     # chapter_id might be "english_g6:unit_01" (a unit) or "english_g6" (a book)
     # Extract book_id: if it contains ":", take the part before ":"
     book_id = chapter_id.split(":")[0] if ":" in chapter_id else chapter_id
-    
+
     # Get REAL units from manifest/Chroma for this book (not hallucinated)
     all_units = list_units()
     real_units = [u for u in all_units if u.get("book_id") == book_id]
-    
+
     # Sort by unit number (unit_01, unit_02, ...)
     def extract_unit_num(unit_id: str) -> int:
         try:
@@ -27,16 +27,25 @@ def build_chapter_plan(chapter_id: str) -> Dict[str, Any]:
         except:
             pass
         return 0
-    
+
     real_units.sort(key=lambda u: extract_unit_num(u.get("unit_id", "")))
-    
-    # If no real units found, fall back to LLM generation (but warn)
+
+    # If no real units found, generate a plan from the provided lesson metadata.
+    # Do NOT call retrieve_for_chapter here — Chroma only has content for ingested books,
+    # so querying it for an unknown book_id returns empty results, and the LLM would
+    # receive zero context and generate generic filler content.
     if not real_units:
-        chunks = retrieve_for_chapter(chapter_id, "outline headings main topics key definitions", k=16)
-        context = "\n\n".join(c["text"] for c in chunks)
+        subject_name = book_id.replace("_", " ").title()
+        lines = [f"Subject: {subject_name}"]
+        if lesson_title:
+            lines.append(f"Lesson topic: {lesson_title}")
+        if lesson_description:
+            lines.append(f"Lesson overview: {lesson_description}")
+        lines.append("\nCreate a focused, child-friendly unit plan for this exact lesson topic.")
+        context = "\n".join(lines)
         msg = llm.invoke([
             {"role": "system", "content": LESSON_PLAN_PROMPT},
-            {"role": "user", "content": f"Chapter context:\n{context}\n\nCreate the unit plan."}
+            {"role": "user", "content": context}
         ])
         text = msg.content.strip()
         start = text.find("{")

@@ -84,10 +84,12 @@ def _ffmpeg_wav_to_mp3(wav: Path, mp3: Path) -> bool:
         return False
 
 
-def _synthesize_audio_bytes(*, text: str, voice: str, speed: float, response_format: str) -> bytes:
+def _synthesize_audio_bytes(*, text: str, voice: str, speed: float, response_format: str) -> tuple[bytes, str]:
+    """Returns (audio_bytes, actual_format) where actual_format may differ from response_format
+    if a fallback was needed (e.g. WAV when ffmpeg is unavailable for MP3 conversion)."""
     fmt = (response_format or "mp3").lower().strip()
     if _tts_backend() == "openai":
-        return _openai_synthesize_bytes(text=text, voice=voice, speed=speed, response_format=fmt)
+        return _openai_synthesize_bytes(text=text, voice=voice, speed=speed, response_format=fmt), fmt
 
     import tempfile
 
@@ -102,16 +104,13 @@ def _synthesize_audio_bytes(*, text: str, voice: str, speed: float, response_for
     try:
         synthesize_offline_wav(wav_path, safe, voice, speed)
         if fmt == "wav":
-            return wav_path.read_bytes()
+            return wav_path.read_bytes(), "wav"
         if fmt == "mp3":
             mp3_path = wav_path.with_suffix(".mp3")
             if _ffmpeg_wav_to_mp3(wav_path, mp3_path):
-                return mp3_path.read_bytes()
-            raise HTTPException(
-                status_code=503,
-                detail="Offline TTS produced WAV but ffmpeg is required to make MP3; "
-                "install ffmpeg or use format=wav in /tts request.",
-            )
+                return mp3_path.read_bytes(), "mp3"
+            # ffmpeg not installed — serve WAV directly; all modern browsers support it
+            return wav_path.read_bytes(), "wav"
         raise HTTPException(status_code=400, detail=f"format {fmt} not supported for offline TTS (use wav or mp3)")
     finally:
         try:
@@ -162,13 +161,13 @@ def post_tts(req: TtsRequest) -> Dict[str, Any]:
         fmt = "mp3"
     voice = _normalize_voice(req.voice_id)
     try:
-        data = _synthesize_audio_bytes(text=req.text, voice=voice, speed=req.speed, response_format=fmt)
+        data, actual_fmt = _synthesize_audio_bytes(text=req.text, voice=voice, speed=req.speed, response_format=fmt)
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"TTS failed: {e!s}") from e
 
-    suffix = f".{fmt}"
+    suffix = f".{actual_fmt}"
     audio_url = _save_audio(data, suffix)
     out: Dict[str, Any] = {"audio_url": audio_url, "voice_id": voice}
     if req.return_base64:
