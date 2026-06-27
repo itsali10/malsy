@@ -10,12 +10,20 @@ export async function POST(req: NextRequest) {
     lessonTitle?: string;
     lessonDescription?: string;
     outputFilename?: string;
+    preGeneratedScript?: string;
+    isSoraPrompt?: boolean;
+    narrationScript?: string;
+    unitId?: string;
   };
 
-  const subject         = String(body.subject         ?? 'history').toLowerCase();
-  const lessonTitle     = String(body.lessonTitle     ?? 'Lesson').trim();
-  const lessonDescription = String(body.lessonDescription ?? '').trim();
-  const outputFilename  = String(body.outputFilename  ?? `${subject}_lesson.mp4`).replace(/[^a-z0-9_.-]/gi, '_');
+  const subject             = String(body.subject             ?? 'history').toLowerCase();
+  const lessonTitle         = String(body.lessonTitle         ?? 'Lesson').trim();
+  const lessonDescription   = String(body.lessonDescription   ?? '').trim();
+  const outputFilename      = String(body.outputFilename      ?? `${subject}_lesson.mp4`).replace(/[^a-z0-9_.-]/gi, '_');
+  const preGeneratedScript  = body.preGeneratedScript?.trim() ?? '';
+  const isSoraPrompt        = Boolean(body.isSoraPrompt);
+  const narrationScript     = body.narrationScript?.trim() ?? '';
+  const unitId                = body.unitId?.trim() ?? '';
 
   if (!lessonTitle) {
     return NextResponse.json({ error: 'lessonTitle is required' }, { status: 400 });
@@ -27,11 +35,21 @@ export async function POST(req: NextRequest) {
   // Fire-and-forget — Sora can take several minutes
   (async () => {
     try {
-      const result = await generateLessonVideo({ subject, lessonTitle, lessonDescription, outputFilename });
+      const result = await generateLessonVideo({
+        subject,
+        lessonTitle,
+        lessonDescription,
+        outputFilename,
+        preGeneratedScript,
+        isSoraPrompt,
+        narrationScript,
+        unitId,
+      });
       updateJob(jobId, {
         status: 'completed',
-        videoPath: result.videoPath,
-        script: result.script,
+        videoPath: result.videoPath ?? null,
+        videoUrl: result.videoUrl,
+        script: narrationScript || result.script,
         lessonTitle: result.lessonTitle,
       });
     } catch (err) {

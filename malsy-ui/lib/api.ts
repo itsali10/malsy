@@ -104,6 +104,52 @@ export interface Quiz {
   question: string;
   type?: string;
   options?: string[];
+  expected_points?: string[];
+}
+
+export interface HistoryLessonCard {
+  id: string;
+  lessonNumber: number;
+  unit_id: string;
+  title: string;
+  shortDescription: string;
+  videoFilename?: string | null;
+  videoType?: string | null;
+  videoUrl?: string | null;
+  metaJsonUrl?: string | null;
+}
+
+export interface HistoryLessonsResponse {
+  book_id: string;
+  subject: string;
+  grade: number;
+  unit: string;
+  lessons: HistoryLessonCard[];
+  validation: { valid: boolean; errors: string[] };
+}
+
+export interface BookLessonProgress {
+  book_id: string;
+  student_id: string;
+  max_unlocked_lesson_index: number;
+  completed_lesson_numbers: number[];
+}
+
+export interface InteractiveImageCard {
+  id?: string;
+  tap_label: string;
+  title: string;
+  description?: string;
+  labels: string[];
+  image_url?: string | null;
+}
+
+export interface InteractiveImagesResponse {
+  book_id: string;
+  unit_id: string;
+  lesson_title?: string;
+  lesson_number?: number;
+  images: InteractiveImageCard[];
 }
 
 export interface SessionStartResponse {
@@ -113,11 +159,13 @@ export interface SessionStartResponse {
   next_action?: string;
   session_units?: unknown[];
   unit_part?: number;
+  max_unlocked_part?: number;
   course_week?: number;
   course_month?: number;
   evaluation_summary?: unknown;
   auto_advanced_from?: string;
   error?: string;
+  need_restart?: boolean;
   message?: string;
 }
 
@@ -129,6 +177,9 @@ export interface SessionAnswerResponse {
   remediation_text?: string;
   advance_text?: string;
   next_action?: string;
+  max_unlocked_part?: number;
+  max_unlocked_lesson_index?: number;
+  completed_lesson_numbers?: number[];
   quiz?: Quiz;
   unit_completed?: boolean;
   completed_unit_id?: string;
@@ -205,21 +256,80 @@ export const api = {
           lesson_description: lessonDescription,
         }),
       }),
-    answer: (studentId: string, studentAnswer: string) =>
+    answer: (studentId: string, studentAnswer: string, optionIndex?: number) =>
       request<SessionAnswerResponse>('/session/answer', {
         method: 'POST',
-        body: JSON.stringify({ student_id: studentId, student_answer: studentAnswer }),
+        body: JSON.stringify({
+          student_id: studentId,
+          student_answer: studentAnswer,
+          option_index: optionIndex != null && optionIndex >= 0 ? optionIndex : undefined,
+        }),
       }),
     continuePart2: (studentId: string) =>
       request<SessionStartResponse>('/session/continue_part2', {
         method: 'POST',
         body: JSON.stringify({ student_id: studentId }),
       }),
+    switchPart: (studentId: string, targetPart: 0 | 1) =>
+      request<SessionStartResponse>('/session/switch_part', {
+        method: 'POST',
+        body: JSON.stringify({ student_id: studentId, target_part: targetPart }),
+      }),
     nextUnit: (studentId: string) =>
       request<SessionStartResponse>('/session/next_unit', {
         method: 'POST',
         body: JSON.stringify({ student_id: studentId }),
       }),
+  },
+
+  // Textbook lesson catalogs (History G6, etc.)
+  books: {
+    lessons: (bookId: string) =>
+      request<HistoryLessonsResponse>(`/books/${bookId}/lessons`),
+    lessonProgress: (bookId: string, studentId: string) =>
+      request<BookLessonProgress>(
+        `/books/${encodeURIComponent(bookId)}/lesson-progress?student_id=${encodeURIComponent(studentId)}`,
+      ),
+  },
+
+  lesson: {
+    interactiveImagesSaved: async (unitId: string): Promise<InteractiveImagesResponse> => {
+      const res = await fetch(`/api/interactive-images?unitId=${encodeURIComponent(unitId)}`);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(body.error ?? 'Failed to load interactive images');
+      }
+      const data = await res.json() as InteractiveImagesResponse & { ready?: boolean };
+      if (!data.ready) {
+        return { book_id: '', unit_id: unitId, images: [] };
+      }
+      return {
+        book_id: data.book_id ?? '',
+        unit_id: data.unit_id ?? unitId,
+        lesson_title: data.lesson_title,
+        lesson_number: data.lesson_number,
+        images: data.images ?? [],
+      };
+    },
+    interactiveImages: async (unitId: string, teacherText: string, force = false): Promise<InteractiveImagesResponse> => {
+      const res = await fetch('/api/interactive-images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ unitId, teacherText, force }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(body.error ?? 'Failed to generate interactive images');
+      }
+      const data = await res.json() as InteractiveImagesResponse;
+      return {
+        book_id: data.book_id ?? '',
+        unit_id: data.unit_id ?? unitId,
+        lesson_title: data.lesson_title,
+        lesson_number: data.lesson_number,
+        images: data.images ?? [],
+      };
+    },
   },
 
   // Available content units from Chroma
@@ -251,10 +361,10 @@ export const api = {
 
   // Text-to-speech
   tts: {
-    speak: (text: string, voiceId?: string) =>
+    speak: (text: string, voiceId?: string, format = 'wav') =>
       request<{ audio_url: string }>('/tts', {
         method: 'POST',
-        body: JSON.stringify({ text, voice_id: voiceId }),
+        body: JSON.stringify({ text, voice_id: voiceId, format }),
       }),
   },
 };

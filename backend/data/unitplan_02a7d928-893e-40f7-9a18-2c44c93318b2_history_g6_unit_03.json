@@ -1,0 +1,97 @@
+{
+  "unit_title": "Ancient Egypt Social Hierarchy",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Ancient Egypt Social Hierarchy",
+      "must_cover": true,
+      "keywords": [
+        "social system",
+        "Ancient Egypt",
+        "social hierarchy"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Social Classes in Ancient Egypt",
+      "must_cover": true,
+      "keywords": [
+        "slaves",
+        "labourers",
+        "peasants",
+        "craftsmen",
+        "officials",
+        "scribes",
+        "high priests",
+        "nobles",
+        "viziers",
+        "pharaohs"
+      ]
+    },
+    {
+      "id": "reading_2",
+      "type": "reading",
+      "title": "Role of Pharaohs in Ancient Egypt",
+      "must_cover": true,
+      "keywords": [
+        "pharaohs",
+        "king",
+        "queen",
+        "government",
+        "religion",
+        "pyramids",
+        "Valley of the Kings",
+        "Tutankhamun",
+        "treasures"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions on Ancient Egypt Social Hierarchy",
+      "must_cover": true,
+      "keywords": [
+        "social classes",
+        "pharaohs",
+        "social structure",
+        "role in society"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visuals of Ancient Egypt Social Hierarchy",
+      "must_cover": true,
+      "keywords": [
+        "pyramids",
+        "Valley of the Kings",
+        "Tutankhamun's tomb",
+        "treasures"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises on Ancient Egypt Social Hierarchy",
+      "must_cover": true,
+      "keywords": [
+        "fill-in-the-blank activities",
+        "discussion prompts",
+        "role-play scenarios"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Wrap Up: Understanding Ancient Egypt Social Hierarchy",
+      "must_cover": true,
+      "keywords": [
+        "summary",
+        "key points",
+        "reflection"
+      ]
+    }
+  ]
+}

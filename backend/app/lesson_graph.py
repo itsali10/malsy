@@ -11,8 +11,10 @@ from .recommendations import build_recommendations
 from .prompts import (
     UNIT_PLAN_PROMPT,
     TEACH_ITEM_PROMPT,
+    HISTORY_TEACHER_PROMPT,
     COVERAGE_GUARD_PROMPT,
     QUIZ_PROMPT,
+    MCQ_QUIZ_PROMPT,
     EVAL_PROMPT,
     HINT_PROMPT,
     REMEDIAL_PROMPT,
@@ -45,6 +47,7 @@ class LessonState(TypedDict):
     # passed in by /session/answer so we grade the SAME quiz
     provided_quiz: Optional[Dict[str, Any]]
     student_answer: str
+    option_index: Optional[int]
     unit_plan: Dict[str, Any]
     progress: Dict[str, Any]
     current_item: Dict[str, Any]
@@ -65,6 +68,18 @@ class LessonState(TypedDict):
 # -------------------------
 # HELPERS
 # -------------------------
+
+def _is_history_chapter(chapter_id: str) -> bool:
+    return "history" in (chapter_id or "").lower()
+
+
+def _safe_prompt(template: str, **kwargs: str) -> str:
+    """Fill {placeholders} without breaking JSON braces in prompt templates."""
+    out = template
+    for key, val in kwargs.items():
+        out = out.replace("{" + key + "}", val)
+    return out
+
 
 def retrieve_for_item(unit_id: str, query: str, k: int = 8, unit_part: Optional[int] = None, unit_pages: Optional[Dict[str, Any]] = None):
     """
@@ -159,7 +174,7 @@ def _generate_guided_teacher_text(*, context: str, unit_title: str = "") -> str:
     """
     analysis = _invoke_json(
         MASTER_SYSTEM_PROMPT,
-        LESSON_ANALYSIS_PROMPT.format(book_text=context),
+        _safe_prompt(LESSON_ANALYSIS_PROMPT, book_text=context),
     )
 
     steps = ["intro", "explain", "example", "question", "summary"]
@@ -167,7 +182,8 @@ def _generate_guided_teacher_text(*, context: str, unit_title: str = "") -> str:
     for step in steps:
         turn_obj = _invoke_json(
             MASTER_SYSTEM_PROMPT,
-            TURN_GENERATOR_PROMPT.format(
+            _safe_prompt(
+                TURN_GENERATOR_PROMPT,
                 analysis_json=_format_json_for_prompt(analysis),
                 step_type=step,
                 student_state="first_turn",
@@ -179,7 +195,8 @@ def _generate_guided_teacher_text(*, context: str, unit_title: str = "") -> str:
 
         val = _invoke_json(
             MASTER_SYSTEM_PROMPT,
-            VALIDATION_PROMPT.format(
+            _safe_prompt(
+                VALIDATION_PROMPT,
                 book_text=context,
                 teacher_turn=teacher_turn,
             ),
@@ -199,6 +216,59 @@ def _generate_guided_teacher_text(*, context: str, unit_title: str = "") -> str:
 
     # Keep result concise and speech-friendly.
     return "\n\n".join(turns[:8]).strip()
+
+
+_HISTORY_DISCUSSION_BLOCK = re.compile(
+    r"(?im)^\s*(?:discussion questions?|comprehension questions?|class activities?|"
+    r"your turn|activities?|think and discuss|exercises?|worksheet)\b.*$"
+)
+
+
+def _strip_history_workbook_content(text: str) -> str:
+    """Remove printed question/activity blocks from textbook excerpts."""
+    if not text:
+        return text
+    lines = text.split("\n")
+    out: List[str] = []
+    skipping = False
+    for line in lines:
+        stripped = line.strip()
+        if _HISTORY_DISCUSSION_BLOCK.match(stripped):
+            skipping = True
+            continue
+        if skipping:
+            if stripped.endswith("?") or re.match(r"^\d+[\).:-]\s", stripped):
+                continue
+            if not stripped:
+                skipping = False
+                continue
+            skipping = False
+        if stripped.endswith("?") and len(stripped) < 200 and "?" in stripped[:80]:
+            if re.match(r"(?i)^(what|why|how|when|where|who|which|can you|do you)\b", stripped):
+                continue
+        out.append(line)
+    cleaned = re.sub(r"\n{3,}", "\n\n", "\n".join(out)).strip()
+    return cleaned or text
+
+
+def _polish_history_teacher_text(text: str) -> str:
+    """Light cleanup for history lessons — preserve personality, never inject questions."""
+    raw = str(text or "").strip()
+    if not raw:
+        return raw
+    cleaned = re.sub(r"[*_`#>]", "", raw)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    lines = []
+    for line in cleaned.split("\n"):
+        ls = line.strip()
+        if re.match(r"(?i)^discussion questions?\s*:?\s*$", ls):
+            continue
+        if re.match(r"(?i)^what do you think(?: so far)?\??\s*$", ls):
+            continue
+        lines.append(line)
+    cleaned = "\n".join(lines).strip()
+    cleaned = re.sub(r"(?i)\bwhat do you think so far\?\s*", "", cleaned)
+    return cleaned.strip()
 
 
 def _enforce_kid_friendly_delivery(text: str) -> str:
@@ -491,33 +561,47 @@ def teach_item(state: LessonState):
         part_end = end_page
         pages_desc = f"pages {part_start} to {part_end} (second half)"
     
-    # Retrieve chunks (20 chunks for half a unit instead of 40 for full)
-    # IMPORTANT: Always use the specific unit_id to ensure each unit gets unique content
+    # Retrieve chunks — history uses lesson-scoped RAG; English uses unit page halves
+    is_history_unit = _is_history_chapter(str(state.get("chapter_id", ""))) or _is_history_chapter(str(unit_id))
     print(f"[DEBUG] teach_item: Retrieving chunks for unit_id={unit_id}, unit_title='{unit_title}', item_type={item_type}, query={query[:100]}...")
-    chunks = retrieve_for_item(unit_id, query, k=20, unit_part=unit_part, unit_pages=unit_pages)
-    print(f"[DEBUG] teach_item: Retrieved {len(chunks)} chunks with unit_part filter for unit {unit_id}")
-    
-    # If no chunks found, try retrieving without unit_part filter (but still for this unit)
-    if not chunks or len(chunks) == 0:
-        print(f"[DEBUG] teach_item: No chunks with filter, trying without unit_part filter for unit {unit_id}")
-        chunks = retrieve_for_item(unit_id, query, k=20, unit_part=None, unit_pages=None)
-        print(f"[DEBUG] teach_item: Retrieved {len(chunks)} chunks without filter for unit {unit_id}")
-    
-    # For specific item types, also retrieve broader context to ensure we get all relevant content
-    # This helps find visual elements, exercises, and discussion questions that might be in adjacent chunks
-    if item_type in ["visual", "discussion", "exercises"] or item_id in ["visual_elements", "discussion_questions", "exercises"]:
-        # Get additional chunks with a broader query to catch related content
-        broader_query = f"{unit_title} {base_query}" if unit_title and base_query else (unit_title or base_query)
-        additional_chunks = retrieve_for_item(unit_id, broader_query, k=10, unit_part=unit_part, unit_pages=unit_pages)
-        # Merge chunks, avoiding duplicates (by text content)
-        existing_texts = {c["text"][:100] for c in chunks}  # Use first 100 chars as key
-        for chunk in additional_chunks:
-            if chunk["text"][:100] not in existing_texts:
-                chunks.append(chunk)
-                existing_texts.add(chunk["text"][:100])
-        # CRITICAL: Re-sort by page number after merging to maintain sequential order
-        chunks.sort(key=lambda c: c["meta"].get("pdf_page", 0))
-        print(f"[DEBUG] teach_item: After adding broader context, total chunks: {len(chunks)}")
+
+    if is_history_unit:
+        from .history_rag import HistoryRagError, retrieve_history_chunks
+        from .history_lessons import get_lesson_by_unit_id
+
+        hist_lesson = get_lesson_by_unit_id(str(unit_id))
+        # No parts for History: always retrieve the WHOLE lesson, strictly by lessonId.
+        try:
+            chunks = retrieve_history_chunks(
+                str(unit_id), query, k=12, lesson=hist_lesson, strict=True
+            )
+        except HistoryRagError as exc:
+            print(f"[history] teach_item RAG error: {exc}")
+            state["retrieved_chunks"] = []
+            state["unit_part"] = unit_part
+            state["teacher_text"] = str(exc)
+            state["quiz"] = {}
+            return state
+        print(f"[history] teach_item: {len(chunks)} lesson-scoped chunks for {unit_id}")
+    else:
+        chunks = retrieve_for_item(unit_id, query, k=20, unit_part=unit_part, unit_pages=unit_pages)
+        print(f"[DEBUG] teach_item: Retrieved {len(chunks)} chunks with unit_part filter for unit {unit_id}")
+
+        if not chunks or len(chunks) == 0:
+            print(f"[DEBUG] teach_item: No chunks with filter, trying without unit_part filter for unit {unit_id}")
+            chunks = retrieve_for_item(unit_id, query, k=20, unit_part=None, unit_pages=None)
+            print(f"[DEBUG] teach_item: Retrieved {len(chunks)} chunks without filter for unit {unit_id}")
+
+        if item_type in ["visual", "discussion", "exercises"] or item_id in ["visual_elements", "discussion_questions", "exercises"]:
+            broader_query = f"{unit_title} {base_query}" if unit_title and base_query else (unit_title or base_query)
+            additional_chunks = retrieve_for_item(unit_id, broader_query, k=10, unit_part=unit_part, unit_pages=unit_pages)
+            existing_texts = {c["text"][:100] for c in chunks}
+            for chunk in additional_chunks:
+                if chunk["text"][:100] not in existing_texts:
+                    chunks.append(chunk)
+                    existing_texts.add(chunk["text"][:100])
+            chunks.sort(key=lambda c: c["meta"].get("pdf_page", 0))
+            print(f"[DEBUG] teach_item: After adding broader context, total chunks: {len(chunks)}")
     
     # DO NOT fallback to chapter_id - this causes all units to get the same content
     # If no chunks found for this specific unit, that's an error, not a reason to use generic content
@@ -543,7 +627,12 @@ def teach_item(state: LessonState):
 You MUST teach in this EXACT order - do NOT reorganize or jump between sections.
 Follow the sequence: first section first, second section second, etc.
 
+SKIP ALL QUESTIONS: Workbook discussion questions and activities have been removed. Do NOT invent question lists. TEACH the facts and explanations only.
+
 {context}"""
+    
+    if _is_history_chapter(str(state.get("chapter_id", ""))) or _is_history_chapter(str(unit_id)):
+        context = _strip_history_workbook_content(context)
     
     # Debug: Log what chunks we retrieved (first 200 chars of each)
     print(f"[DEBUG] teach_item: Unit title = '{unit_title}'")
@@ -589,20 +678,78 @@ If the context contains content about other topics, IGNORE those parts and focus
         )
     
     try:
-        generated_text = _generate_guided_teacher_text(
-            context=context,
-            unit_title=unit_title or "",
-        )
-        if not generated_text:
-            # Fallback to legacy prompt if new pipeline returns empty.
-            msg = llm.invoke([
-                {"role": "system", "content": TEACH_ITEM_PROMPT},
-                {"role": "user", "content": user_content}
-            ])
-            generated_text = msg.content if msg and msg.content else "Error: LLM returned empty response."
+        is_history = _is_history_chapter(str(state.get("chapter_id", ""))) or _is_history_chapter(str(unit_id))
+        history_scope = ""
+        history_lesson = None
+        if is_history:
+            from .history_lessons import (
+                get_lesson_by_unit_id,
+                build_teaching_scope_block,
+                validate_teacher_lesson,
+                part_count,
+            )
+            history_lesson = get_lesson_by_unit_id(str(unit_id))
+            if history_lesson:
+                if not unit_title or unit_title != history_lesson.get("title"):
+                    unit_title = history_lesson.get("title") or unit_title
+                # No parts: teach the whole lesson, one script, allowedTopics only.
+                history_scope = build_teaching_scope_block(history_lesson)
+                user_content = f"""{history_scope}
+
+═══════════════════════════════════════════════════════════════════════════════
+LESSON TITLE: {unit_title}
+═══════════════════════════════════════════════════════════════════════════════
+
+Item to teach:
+{item}
+
+Context from book (THIS lesson only — ignore anything outside allowedTopics):
+{context}
+
+Remember: explain ONLY this lesson's allowedTopics. Sound like Jassmine — warm, enthusiastic, storytelling — NOT a textbook. At least 80% explanation. Child-friendly Grade 6 language.
+"""
+            generated_text = ""
+            validation: Dict[str, Any] = {"valid": False, "errors": ["not generated"]}
+            prompt_user = user_content
+            for attempt in range(3):
+                msg = llm.invoke([
+                    {"role": "system", "content": HISTORY_TEACHER_PROMPT},
+                    {"role": "user", "content": prompt_user},
+                ])
+                generated_text = msg.content if msg and msg.content else ""
+                if history_lesson:
+                    validation = validate_teacher_lesson(
+                        generated_text, history_lesson, part_index=0
+                    )
+                    if validation.get("valid"):
+                        print(
+                            f"[history] lesson OK: {validation.get('word_count')} words, "
+                            f"{validation.get('explanation_ratio', 0):.0%} explanation"
+                        )
+                        break
+                    print(f"[WARN] History teacher attempt {attempt + 1} failed: {validation.get('errors')}")
+                    prompt_user = (
+                        user_content
+                        + "\n\nREGENERATE. You failed validation:\n- "
+                        + "\n- ".join(validation.get("errors") or [])
+                        + "\n\nWrite like an enthusiastic classroom teacher: storytelling, warmth, encouragement — not a textbook. Fewer questions, more teaching."
+                    )
+                else:
+                    break
+        else:
+            generated_text = _generate_guided_teacher_text(
+                context=context,
+                unit_title=unit_title or "",
+            )
+            if not generated_text:
+                msg = llm.invoke([
+                    {"role": "system", "content": TEACH_ITEM_PROMPT},
+                    {"role": "user", "content": user_content}
+                ])
+                generated_text = msg.content if msg and msg.content else "Error: LLM returned empty response."
         
-        # Validation: Check if generated text mentions wrong unit titles
-        if unit_title:
+        # Validation: Check if generated text mentions wrong unit titles (English units only)
+        if unit_title and not is_history:
             generated_lower = generated_text.lower()
             unit_title_lower = unit_title.lower()
             
@@ -654,7 +801,10 @@ REMINDER: The Unit Title is "{unit_title}". Your entire lesson must be about thi
                         ])
                         generated_text = msg_retry.content if msg_retry and msg_retry.content else generated_text
         
-        state["teacher_text"] = _enforce_kid_friendly_delivery(generated_text)
+        if is_history:
+            state["teacher_text"] = _polish_history_teacher_text(generated_text)
+        else:
+            state["teacher_text"] = _enforce_kid_friendly_delivery(generated_text)
     except Exception as e:
         import traceback
         print(f"[ERROR] Failed to generate teacher_text: {e}")
@@ -665,6 +815,12 @@ REMINDER: The Unit Title is "{unit_title}". Your entire lesson must be about thi
 
 
 def coverage_guard(state: LessonState):
+    # History lessons are validated in teach_item; English coverage guard would rewrite with question-heavy prompts.
+    chapter_id = str(state.get("chapter_id", ""))
+    unit_id = str((state.get("current_unit") or {}).get("unit_id", ""))
+    if _is_history_chapter(chapter_id) or _is_history_chapter(unit_id):
+        return state
+
     # Check if current_item exists
     if "current_item" not in state or not state.get("current_item"):
         return state
@@ -718,11 +874,120 @@ Context:
     return state
 
 
+def _norm_mcq_text(s: str) -> str:
+    return re.sub(r"[^\w\s]", "", str(s)).lower().strip()
+
+
+def _quiz_has_mcq_options(quiz: Dict[str, Any]) -> bool:
+    opts = quiz.get("options")
+    return isinstance(opts, list) and len([o for o in opts if str(o).strip()]) >= 2
+
+
+def ensure_mcq_integrity(quiz_data: Dict[str, Any], *, shuffle: bool = True) -> Dict[str, Any]:
+    import random as _random
+
+    quiz = dict(quiz_data)
+    options = [str(o).strip() for o in (quiz.get("options") or []) if str(o).strip()]
+    if len(options) < 2:
+        return quiz
+
+    correct = str(quiz.get("correct_answer", "")).strip()
+    correct_opt = None
+    if correct:
+        for opt in options:
+            if _norm_mcq_text(opt) == _norm_mcq_text(correct):
+                correct_opt = opt
+                break
+    if not correct_opt:
+        correct_opt = options[0]
+
+    if shuffle:
+        _random.shuffle(options)
+    quiz["options"] = options
+    for opt in options:
+        if _norm_mcq_text(opt) == _norm_mcq_text(correct_opt):
+            quiz["correct_answer"] = opt
+            break
+    return quiz
+
+
+def grade_mcq_answer(
+    quiz: Dict[str, Any],
+    student_answer: str,
+    option_index: Optional[int] = None,
+) -> Dict[str, Any]:
+    q = ensure_mcq_integrity(quiz, shuffle=False)
+    options = [str(o).strip() for o in (q.get("options") or []) if str(o).strip()]
+    correct = str(q.get("correct_answer", "")).strip()
+
+    selected: Optional[str] = None
+    if option_index is not None and 0 <= int(option_index) < len(options):
+        selected = options[int(option_index)]
+    if not selected and student_answer:
+        for opt in options:
+            if _norm_mcq_text(opt) == _norm_mcq_text(student_answer):
+                selected = opt
+                break
+
+    correct_opt = next(
+        (opt for opt in options if _norm_mcq_text(opt) == _norm_mcq_text(correct)),
+        correct,
+    )
+    is_correct = bool(selected and _norm_mcq_text(selected) == _norm_mcq_text(correct_opt))
+    if is_correct:
+        feedback = f"That's correct! \"{correct_opt}\" is the right answer."
+    else:
+        shown = selected or student_answer or "?"
+        feedback = f"Not quite. You chose \"{shown}\". The correct answer is \"{correct_opt}\"."
+
+    return {
+        "correct": is_correct,
+        "feedback": feedback,
+        "missing": [] if is_correct else [correct_opt],
+        "quiz": q,
+    }
+
+
+def _get_book_context_for_quiz(state: LessonState) -> str:
+    chunks = state.get("retrieved_chunks") or []
+    if chunks:
+        return "\n\n".join(c["text"] for c in chunks[:8])
+
+    current_unit = state.get("current_unit") if isinstance(state.get("current_unit"), dict) else {}
+    unit_id = str(current_unit.get("unit_id") or current_unit.get("real_unit_id") or state.get("chapter_id") or "")
+    if not unit_id:
+        return ""
+
+    if _is_history_chapter(unit_id) or _is_history_chapter(str(state.get("chapter_id", ""))):
+        from .history_rag import HistoryRagError, retrieve_history_chunks
+        from .history_lessons import get_lesson_by_unit_id
+
+        hist_lesson = get_lesson_by_unit_id(unit_id)
+        try:
+            chunks = retrieve_history_chunks(
+                unit_id, "key facts concepts summary educational", k=8,
+                lesson=hist_lesson, strict=True,
+            )
+        except HistoryRagError:
+            chunks = []
+        if chunks:
+            return "\n\n".join(c["text"] for c in chunks[:8])
+
+    chunks = retrieve_for_item(unit_id, "key facts concepts summary educational", k=8)
+    if chunks:
+        return "\n\n".join(c["text"] for c in chunks[:8])
+    return ""
+
+
 def make_quiz(state: LessonState):
     # If we were given a quiz (e.g. /session/answer), reuse it so we grade the same question.
     provided = state.get("provided_quiz")
     if provided:
-        state["quiz"] = provided
+        q = dict(provided)
+        if _quiz_has_mcq_options(q):
+            state["quiz"] = ensure_mcq_integrity(q, shuffle=False)
+        else:
+            state["quiz"] = q
         return state
 
     # NEW quiz being generated - reset hint_count to 0 for this new quiz
@@ -737,37 +1002,114 @@ def make_quiz(state: LessonState):
         state["quiz"] = {"question": "No quiz available - teaching content was not generated.", "expected_points": []}
         return state
 
+    chapter_id = str(state.get("chapter_id") or "")
+    current_unit = state.get("current_unit") if isinstance(state.get("current_unit"), dict) else {}
+    unit_title = str(current_unit.get("title") or current_unit.get("name") or "").strip()
+    use_mcq = _is_history_chapter(chapter_id) or _is_history_chapter(
+        str(current_unit.get("unit_id") or current_unit.get("real_unit_id") or "")
+    )
+
     try:
-        msg = llm.invoke([
-            {"role": "system", "content": QUIZ_PROMPT},
-            {"role": "user", "content": teacher_text}
-        ])
-        if msg and msg.content:
-            state["quiz"] = json_safe(msg.content)
+        if use_mcq:
+            from .history_lessons import get_lesson_by_unit_id, build_teaching_scope_block, part_count
+            uid = str(current_unit.get("unit_id") or current_unit.get("real_unit_id") or chapter_id)
+            hist_lesson = get_lesson_by_unit_id(uid)
+            quiz_part = int(state.get("unit_part", current_unit.get("unit_part", 0)) or 0)
+            if hist_lesson:
+                unit_title = hist_lesson.get("title") or unit_title
+            book_context = _get_book_context_for_quiz(state)
+            scope = (
+                build_teaching_scope_block(hist_lesson, part_index=quiz_part)
+                if hist_lesson
+                else ""
+            )
+            part_note = (
+                f"Part {quiz_part + 1} of {part_count(hist_lesson)} — quiz on THIS part only"
+                if hist_lesson
+                else ""
+            )
+            user_content = f"""{scope}
+
+LESSON TOPIC (quiz MUST be about this only):
+{unit_title or chapter_id}
+SESSION: {part_note}
+
+TEXTBOOK CONTENT (ground truth — use ONLY this):
+{book_context or teacher_text[:4000]}
+
+TEACHER LESSON (this part only — quiz must test ownedTopics for this part):
+{teacher_text[:4000]}
+"""
+            msg = llm.invoke([
+                {"role": "system", "content": MCQ_QUIZ_PROMPT},
+                {"role": "user", "content": user_content},
+            ])
+            if msg and msg.content:
+                quiz_data = json_safe(msg.content)
+                if _quiz_has_mcq_options(quiz_data):
+                    state["quiz"] = ensure_mcq_integrity(quiz_data, shuffle=True)
+                else:
+                    state["quiz"] = {
+                        "question": "Please summarize what you learned from this history lesson.",
+                        "expected_points": ["Understanding of the main concepts"],
+                    }
+            else:
+                state["quiz"] = {
+                    "question": "Please summarize what you learned from this history lesson.",
+                    "expected_points": ["Understanding of the main concepts"],
+                }
         else:
-            state["quiz"] = {"question": "Please summarize what you learned from this lesson.", "expected_points": ["Understanding of the main concepts"]}
+            msg = llm.invoke([
+                {"role": "system", "content": QUIZ_PROMPT},
+                {"role": "user", "content": teacher_text},
+            ])
+            if msg and msg.content:
+                state["quiz"] = json_safe(msg.content)
+            else:
+                state["quiz"] = {
+                    "question": "Please summarize what you learned from this lesson.",
+                    "expected_points": ["Understanding of the main concepts"],
+                }
     except Exception as e:
         import traceback
         print(f"[ERROR] Failed to generate quiz: {e}")
         traceback.print_exc()
-        # Fallback quiz if generation fails
-        state["quiz"] = {"question": "Please summarize what you learned from this lesson.", "expected_points": ["Understanding of the main concepts"]}
+        state["quiz"] = {
+            "question": "Please summarize what you learned from this lesson.",
+            "expected_points": ["Understanding of the main concepts"],
+        }
     
     return state
 
 
 def evaluate_answer(state: LessonState):
-    msg = llm.invoke([
-        {"role": "system", "content": EVAL_PROMPT},
-        {"role": "user", "content": f"""
+    quiz = state.get("quiz", {})
+    student_answer = (state.get("student_answer", "") or "").strip()
+    raw_index = state.get("option_index")
+    option_index: Optional[int] = None
+    if raw_index is not None and int(raw_index) >= 0:
+        option_index = int(raw_index)
+
+    if _quiz_has_mcq_options(quiz):
+        graded = grade_mcq_answer(quiz, student_answer, option_index=option_index)
+        state["quiz"] = graded.get("quiz") or quiz
+        state["evaluation"] = {
+            "correct": graded["correct"],
+            "feedback": graded["feedback"],
+            "missing": graded.get("missing") or [],
+        }
+    else:
+        msg = llm.invoke([
+            {"role": "system", "content": EVAL_PROMPT},
+            {"role": "user", "content": f"""
 Quiz:
-{state["quiz"]}
+{quiz}
 
 Student answer:
-{state.get("student_answer", "")}
-"""}
-    ])
-    state["evaluation"] = json_safe(msg.content)
+{student_answer}
+"""},
+        ])
+        state["evaluation"] = json_safe(msg.content)
     p = state["progress"]
     attempt = {
         "ts": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
@@ -811,11 +1153,18 @@ Student answer:
         hint_count = p.get("hint_count", 0)
         
         if hint_count < 2:
-            # Provide hint (1st or 2nd attempt)
             hint_number = hint_count + 1
-            hint = llm.invoke([
-                {"role": "system", "content": HINT_PROMPT.format(hint_number=hint_number)},
-                {"role": "user", "content": f"""
+            is_history_mcq = (
+                _is_history_chapter(state.get("chapter_id", ""))
+                and _quiz_has_mcq_options(state.get("quiz", {}))
+            )
+            if is_history_mcq:
+                hint_user = f"""Question: {state["quiz"].get("question", "")}
+Options: {", ".join(state["quiz"].get("options", []))}
+Student's wrong answer: {state.get("student_answer", "")}
+Hint number: {hint_number} of 2"""
+            else:
+                hint_user = f"""
 Teacher explanation:
 {state["teacher_text"]}
 
@@ -826,7 +1175,10 @@ Student's incorrect answer:
 {state.get("student_answer", "")}
 
 This is hint number {hint_number} of 2.
-"""}
+"""
+            hint = llm.invoke([
+                {"role": "system", "content": HINT_PROMPT.format(hint_number=hint_number)},
+                {"role": "user", "content": hint_user},
             ])
             state["hint_text"] = hint.content
             state["remediation_text"] = ""  # No remediation yet

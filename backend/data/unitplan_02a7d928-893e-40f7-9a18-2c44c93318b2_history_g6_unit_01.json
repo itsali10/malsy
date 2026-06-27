@@ -1,0 +1,87 @@
+{
+  "unit_title": "Ancient Egyptian Life",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Ancient Egyptian Life",
+      "must_cover": true,
+      "keywords": [
+        "research project",
+        "Ancient Egyptians",
+        "reading",
+        "sections",
+        "encouragement",
+        "discussion"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Where and who were the Ancient Egyptians?",
+      "must_cover": true,
+      "keywords": [
+        "Egypt",
+        "civilization",
+        "monuments",
+        "Pharaohs",
+        "River Nile",
+        "settlement",
+        "population",
+        "importance",
+        "flood",
+        "kingdoms",
+        "pharaoh Narmer",
+        "Memphis",
+        "land division"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions on Ancient Egyptian Life",
+      "must_cover": true,
+      "keywords": [
+        "life today",
+        "key points",
+        "similarities",
+        "differences"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements of Ancient Egyptian Life",
+      "must_cover": true,
+      "keywords": [
+        "pictures",
+        "illustrations",
+        "diagrams",
+        "charts"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises on Ancient Egyptian Life",
+      "must_cover": true,
+      "keywords": [
+        "reading comprehension",
+        "discussion",
+        "comparison",
+        "analysis"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Wrap Up of Ancient Egyptian Life",
+      "must_cover": true,
+      "keywords": [
+        "summary",
+        "key points",
+        "reflection"
+      ]
+    }
+  ]
+}

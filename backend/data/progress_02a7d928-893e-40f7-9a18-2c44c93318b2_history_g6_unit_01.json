@@ -1,0 +1,361 @@
+{
+  "student_id": "02a7d928-893e-40f7-9a18-2c44c93318b2",
+  "chapter_id": "history_g6:unit_01",
+  "current_item_index": 0,
+  "done_items": [],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [
+    {
+      "ts": "2026-06-23T17:30:51.154846Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What do the terms BC and AD stand for in historical context?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T17:33:02.032092Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What will we be exploring in the Parkside Academy History Project unit?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T17:34:04.112145Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What will we be exploring in the Parkside Academy History Project unit?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:01:22.347607Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Where did the Ancient Egyptians settle and why was the River Nile important to them?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:07:43.810625Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the significance of the Nile River for the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:08:25.924530Z",
+      "item_id": "reading_1",
+      "quiz_question": "What was the significance of the River Nile to the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:13:43.871880Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Why was the River Nile important to the Ancient Egyptians?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:14:45.719982Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the capital established by King Narmer to unite Upper and Lower Egypt?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:16:12.513546Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the capital established by King Narmer to unite Upper and Lower Egypt?",
+      "correct": false,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": true
+    },
+    {
+      "ts": "2026-06-23T18:21:25.074162Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the capital established by King Narmer to unite Upper and Lower Egypt?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:34:50.766381Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Why was the Nile River so important to the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:45:48.312127Z",
+      "item_id": "reading_1",
+      "quiz_question": "What was the significance of the River Nile for the Ancient Egyptians?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:46:12.555781Z",
+      "item_id": "reading_1",
+      "quiz_question": "What was the significance of the River Nile for the Ancient Egyptians?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:46:48.686646Z",
+      "item_id": "reading_1",
+      "quiz_question": "What was the significance of the River Nile for the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T17:58:27.245355Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "Where did the Ancient Egyptians live primarily?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T17:58:37.434159Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "Where did the Ancient Egyptians live primarily?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:24:44.932048Z",
+      "item_id": "visual_elements",
+      "quiz_question": "Why did the Ancient Egyptians settle along the banks of the River Nile?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:38:28.293112Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Why did the Ancient Egyptians depend on the River Nile?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:43:27.687312Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Why was the Nile River important to the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:44:51.447236Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What did the ancient Egyptians refer to as the black land?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:50:09.449114Z",
+      "item_id": "reading_1",
+      "quiz_question": "What did the ancient Egyptians refer to as the black land?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T19:22:20.346071Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "Where did the Ancient Egyptians live primarily?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T19:23:43.857695Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Where did the Ancient Egyptians live?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T19:27:47.457849Z",
+      "item_id": "reading_1",
+      "quiz_question": "Why was the River Nile so important to the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T19:45:40.184575Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "What was the significance of the River Nile to the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T19:49:49.615689Z",
+      "item_id": "visual_elements",
+      "quiz_question": "Where did the Ancient Egyptians live and why was the Nile important to them?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T19:53:50.664825Z",
+      "item_id": "exercises",
+      "quiz_question": "Where did the Ancient Egyptians settle primarily for their civilization to thrive?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T20:02:20.151955Z",
+      "item_id": "wrap_up",
+      "quiz_question": "Where did the Ancient Egyptians live primarily?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T20:05:05.398514Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Who is credited with the unification of Upper and Lower Egypt around 3200 BC?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T20:10:32.836640Z",
+      "item_id": "reading_1",
+      "quiz_question": "Who was the pharaoh that united Upper and Lower Egypt around 3200 BC?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:01:20.172047Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Who was the pharaoh who united Upper and Lower Egypt around 3200 BC?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:07:25.631012Z",
+      "item_id": "reading_1",
+      "quiz_question": "Where did the Ancient Egyptians live and why was the Nile important to them?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:08:23.929667Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What were the two kingdoms along the River Nile in Ancient Egypt known as?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:11:59.669903Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What were the two kingdoms along the River Nile in Ancient Egypt known as?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:21:50.294624Z",
+      "item_id": "reading_1",
+      "quiz_question": "Where did the Ancient Egyptians live and why was the Nile important to them?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:22:44.169835Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What were the two kingdoms in Ancient Egypt along the River Nile?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:33:43.753113Z",
+      "item_id": "reading_1",
+      "quiz_question": "Where did the Ancient Egyptians live and what river was crucial to their civilization?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:34:28.137193Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Who was the pharaoh who united Upper and Lower Egypt around 3200 BC?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:36:38.930632Z",
+      "item_id": "reading_1",
+      "quiz_question": "Where did the Ancient Egyptians live?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ]
+}

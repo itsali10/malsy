@@ -1,15 +1,16 @@
 import asyncio
 import json
+import os
 import re
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi import WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from fastapi import Query
 from .avatar_lipsync import (
     STRICT_THRESHOLDS_MS,
@@ -25,10 +26,13 @@ from .session_engine import (
     progress_book_id,
     progress_matches_book,
     plan_index_for_real_unit,
+    is_lesson_unlocked,
+    record_lesson_passed,
 )
 from .active_session_store import load_active_session, save_active_session, clear_active_session
 from fastapi.middleware.cors import CORSMiddleware
-from .lesson_graph import lesson_graph, retrieve_for_chapter
+from .llm import get_teacher_llm
+from .lesson_graph import lesson_graph, retrieve_for_chapter, ensure_mcq_integrity, _quiz_has_mcq_options
 from .chapters_service import next_unit_id, list_units, get_unit_content
 from .student_timeline_store import (
     ensure_student_start,
@@ -49,6 +53,8 @@ from .exam_store import load_exam
 from .evaluation_engine import weekly_evaluation, monthly_evaluation
 from .evaluation_store import eval_summary, unit_breakdown, reset_student_eval
 from .tts_api import mount_tts_static, router as tts_router
+from .history_interactive_images import DATA_DIR as INTERACTIVE_IMAGES_DIR
+from fastapi.staticfiles import StaticFiles
 from .speech_api import router as speech_router
 from .pronunciation_api import router as pronunciation_router
 from .routers import auth as auth_router
@@ -116,6 +122,12 @@ async def generic_error_handler(request: Request, exc: Exception):
 
 
 mount_tts_static(app)
+INTERACTIVE_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+app.mount(
+    "/interactive-images/static",
+    StaticFiles(directory=str(INTERACTIVE_IMAGES_DIR)),
+    name="interactive_images_static",
+)
 app.include_router(tts_router)
 app.include_router(speech_router)
 app.include_router(pronunciation_router)
@@ -156,6 +168,8 @@ def root():
             "next_unit": "POST /session/next_unit",
             "continue_part2": "POST /session/continue_part2",
             "list_units": "GET /units",
+            "book_lessons": "GET /books/{book_id}/lessons",
+            "lesson_script": "POST /lesson/script",
             "get_unit": "GET /unit/{unit_id}",
             "start_weekly_exam": "POST /exam/weekly/start",
             "start_monthly_exam": "POST /exam/monthly/start",
@@ -188,9 +202,14 @@ class NextUnitReq(BaseModel):
 class ContinuePart2Req(BaseModel):
     student_id: str
 
+class SwitchPartReq(BaseModel):
+    student_id: str
+    target_part: int = 0
+
 class AnswerReq(BaseModel):
     student_id: str
     student_answer: str
+    option_index: Optional[int] = None
 
 class WeeklyExamStartReq(BaseModel):
     student_id: str
@@ -211,6 +230,19 @@ class ExamFinishReq(BaseModel):
 
 class EvaluationResetReq(BaseModel):
     student_id: str
+
+
+class LessonScriptReq(BaseModel):
+    unit_id: str
+    part_number: int = 1
+    previous_scripts: List[str] = []
+
+
+HISTORY_SCRIPT_SYSTEM = """
+You write short educational video narration scripts for Grade 6 history lessons.
+Return plain text only. No JSON. No markdown.
+Follow part scope and ownedTopics exactly. Never mention topics owned by another part.
+""".strip()
 
 
 class AvatarLipSyncPrepareReq(BaseModel):
@@ -248,14 +280,238 @@ def _ensure_session_in_memory() -> Dict[str, Any] | None:
 
     return None
 
+
+def _quiz_for_client(quiz: Dict[str, Any] | None) -> Dict[str, Any] | None:
+    if not quiz:
+        return quiz
+    q = dict(quiz)
+    q.pop("correct_answer", None)
+    q.pop("source_quote", None)
+    return q
+
+
+def _prepare_stored_quiz(quiz: Dict[str, Any] | None) -> Dict[str, Any] | None:
+    if not quiz:
+        return quiz
+    q = dict(quiz)
+    if _quiz_has_mcq_options(q):
+        return ensure_mcq_integrity(q, shuffle=False)
+    return q
+
+
+@app.get("/books/{book_id}/lessons")
+def book_lessons(book_id: str):
+    """Canonical lesson catalog for textbook-segmented books (e.g. history_g6)."""
+    from .history_lessons import get_lessons_api_response
+    try:
+        return get_lessons_api_response(book_id)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"No lesson catalog for book: {book_id}")
+
+
+@app.get("/books/{book_id}/lesson-progress")
+def book_lesson_progress(book_id: str, student_id: str):
+    """Sequential lesson unlock state for a student on one book."""
+    from .session_engine import load_book_lesson_progress
+    prog = load_book_lesson_progress(student_id, book_id)
+    return {
+        "book_id": book_id,
+        "student_id": student_id,
+        "max_unlocked_lesson_index": int(prog.get("max_unlocked_lesson_index", 0)),
+        "completed_lesson_numbers": list(prog.get("completed_lesson_numbers") or []),
+    }
+
+
+class InteractiveImagesReq(BaseModel):
+    unit_id: str
+    teacher_text: str = ""
+    force: bool = False
+
+
+def _interactive_images_response(payload: Dict[str, Any]) -> Dict[str, Any]:
+    base = str(os.getenv("PUBLIC_API_BASE", "")).rstrip("/")
+    if base:
+        for img in payload.get("images") or []:
+            if img.get("image_url") and not str(img["image_url"]).startswith("http"):
+                img["image_url"] = f"{base}{img['image_url']}"
+    return payload
+
+
+@app.get("/lesson/interactive-images")
+def lesson_interactive_images_saved(unit_id: str):
+    """Return saved interactive images only — never generates new ones."""
+    from .history_interactive_images import get_saved_interactive_images
+
+    uid = (unit_id or "").strip()
+    if not uid:
+        raise HTTPException(status_code=400, detail="unit_id is required")
+    book_id = progress_book_id(uid)
+    if "history" not in book_id.lower():
+        raise HTTPException(status_code=400, detail="Interactive images are only for History lessons")
+
+    try:
+        payload = get_saved_interactive_images(uid, book_id=book_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to load interactive images: {exc}")
+
+    if not payload:
+        return {"book_id": book_id, "unit_id": uid, "images": []}
+    return _interactive_images_response(payload)
+
+
+@app.post("/lesson/interactive-images")
+def lesson_interactive_images(req: InteractiveImagesReq):
+    """Generate or return cached interactive images for one History lesson (2 per lesson)."""
+    from .history_interactive_images import get_or_create_interactive_images
+
+    unit_id = (req.unit_id or "").strip()
+    if not unit_id:
+        raise HTTPException(status_code=400, detail="unit_id is required")
+    book_id = progress_book_id(unit_id)
+    if "history" not in book_id.lower():
+        raise HTTPException(status_code=400, detail="Interactive images are only for History lessons")
+
+    try:
+        payload = get_or_create_interactive_images(
+            unit_id,
+            teacher_text=req.teacher_text or "",
+            book_id=book_id,
+            force=bool(req.force),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to generate interactive images: {exc}")
+
+    return _interactive_images_response(payload)
+
+
+@app.get("/books/{book_id}/lessons/{unit_id}/validate")
+def validate_lesson_endpoint(book_id: str, unit_id: str):
+    """Pre-publish validation for one history lesson."""
+    from .history_lessons import get_lesson_by_unit_id, validate_publish_lesson, validate_lesson_catalog
+    lesson = get_lesson_by_unit_id(unit_id, book_id)
+    if not lesson:
+        raise HTTPException(status_code=404, detail=f"Lesson not found: {unit_id}")
+    return {
+        "lesson": validate_publish_lesson(lesson, book_id),
+        "catalog": validate_lesson_catalog(book_id),
+    }
+
+
+@app.post("/lesson/script")
+def generate_lesson_script(req: LessonScriptReq):
+    """Generate a validated video script for one history lesson part."""
+    from .history_lessons import (
+        get_lesson_by_unit_id,
+        build_script_prompt_context,
+        validate_script,
+        get_lesson_parts,
+        get_owned_topics,
+        part_count,
+    )
+    from .history_rag import HistoryRagError, get_lesson_chunk_text
+    from .chapters_service import get_unit_content
+    from .prompts import HISTORY_VIDEO_SCRIPT_PROMPT
+
+    unit_id = (req.unit_id or "").strip()
+    if not unit_id:
+        raise HTTPException(status_code=400, detail="unit_id is required")
+
+    lesson = get_lesson_by_unit_id(unit_id)
+    if not lesson:
+        raise HTTPException(status_code=404, detail=f"Lesson not found: {unit_id}")
+
+    part_number = max(1, int(req.part_number or 1))
+    part_index = part_number - 1
+    total_parts = part_count(lesson)
+    if part_index >= total_parts:
+        raise HTTPException(
+            status_code=400,
+            detail=f"part_number {part_number} invalid — lesson has {total_parts} parts",
+        )
+
+    full_id = lesson.get("id") or unit_id
+
+    try:
+        excerpt = get_lesson_chunk_text(full_id, part_index=part_index)
+    except HistoryRagError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    prompt = build_script_prompt_context(lesson, excerpt, part_index=part_index)
+    script_llm = get_teacher_llm()
+
+    validation: Dict[str, Any] = {"valid": False, "errors": ["generation failed"]}
+    script = ""
+    prompt_user = prompt
+    for attempt in range(3):
+        msg = script_llm.invoke([
+            {"role": "system", "content": HISTORY_VIDEO_SCRIPT_PROMPT},
+            {"role": "user", "content": prompt_user},
+        ])
+        script = (msg.content or "").strip()
+        validation = validate_script(script, lesson, part_index=part_index)
+        if validation.get("valid"):
+            break
+        prompt_user = (
+            prompt
+            + "\n\nREGENERATE. Fix these errors:\n- "
+            + "\n- ".join(validation.get("errors") or [])
+            + "\n\nExplain ONLY this part's ownedTopics. Do NOT mention other parts' topics."
+        )
+
+    if not validation.get("valid"):
+        raise HTTPException(
+            status_code=422,
+            detail={"message": "Script validation failed", "errors": validation.get("errors")},
+        )
+
+    parts_meta = get_lesson_parts(lesson)
+    return {
+        "unit_id": lesson.get("id"),
+        "lessonTitle": lesson.get("title"),
+        "part_number": part_number,
+        "part_title": parts_meta[part_index].get("title") if parts_meta else f"Part {part_number}",
+        "total_parts": total_parts,
+        "ownedTopics": get_owned_topics(lesson, part_index),
+        "script": script,
+        "validation": validation,
+    }
+
 @app.post("/session/start")
 def start_session(req: StartSessionReq):
     global ACTIVE_SESSION
+    req_book = progress_book_id(req.chapter_id)
+    disk = load_active_session()
+    if disk and disk.get("student_id") == req.student_id:
+        disk_book = disk.get("book_id") or progress_book_id(disk.get("chapter_id", ""))
+        if disk_book != req_book:
+            clear_active_session()
+            ACTIVE_SESSION = None
+    elif ACTIVE_SESSION and ACTIVE_SESSION.get("student_id") == req.student_id:
+        mem_book = ACTIVE_SESSION.get("book_id") or progress_book_id(ACTIVE_SESSION.get("chapter_id", ""))
+        if mem_book != req_book:
+            clear_active_session()
+            ACTIVE_SESSION = None
     ensure_student_start(req.student_id)
 
     # Step A: try to start requested chapter
     def _start_chapter(chapter_id: str):
         book_id = progress_book_id(chapter_id)
+        is_history_book = "history" in str(book_id).lower()
+
+        # Block locked History lessons (sequential unlock).
+        if is_history_book and ":" in chapter_id and "unit_" in chapter_id:
+            from .history_lessons import lesson_number_from_unit_id
+            lesson_num = lesson_number_from_unit_id(chapter_id)
+            if lesson_num > 0 and not is_lesson_unlocked(req.student_id, book_id, lesson_num):
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Lesson {lesson_num} is locked. Pass the previous lesson quiz to unlock it.",
+                )
+
         plan = get_or_create_plan(book_id, lesson_title=req.lesson_title, lesson_description=req.lesson_description)
         progress = load_progress(req.student_id)
 
@@ -281,15 +537,20 @@ def start_session(req: StartSessionReq):
 
         # Check if we're resuming a unit part (0 = first half, 1 = second half)
         unit = session_units[0]
-        unit_part = 0  # Default to first half
-        if progress_matches_book(progress.get("chapter_id"), book_id):
+        unit_part = 0
+        max_unlocked_part = 0
+        # History has NO lesson parts: every lesson is a single unit (one part).
+        is_history_lesson = "history" in str(book_id).lower()
+        if not is_history_lesson and progress_matches_book(progress.get("chapter_id"), book_id):
             unit_part = int(progress.get("unit_part", 0))
+            max_unlocked_part = int(progress.get("max_unlocked_part", 0))
+            if unit_part > max_unlocked_part:
+                max_unlocked_part = unit_part
 
-        # unit_index = plan index of the unit we are teaching (next /session/start with same book_id resumes here)
-        save_progress(req.student_id, book_id, start_index, unit_part)
+        save_progress(req.student_id, book_id, start_index, unit_part, max_unlocked_part=max_unlocked_part)
 
         real_unit_id = unit.get("real_unit_id") or unit.get("unit_id")
-        graph_chapter_id = real_unit_id
+        graph_chapter_id = chapter_id if "history" in book_id.lower() and ":" in chapter_id else real_unit_id
 
         # Create single active session
         ACTIVE_SESSION = {
@@ -338,7 +599,9 @@ def start_session(req: StartSessionReq):
             return {"error": f"Failed to start lesson: {str(e)}"}
 
         # store last quiz so /answer grades the SAME quiz
-        ACTIVE_SESSION["last_quiz"] = out.get("quiz")
+        ACTIVE_SESSION["last_quiz"] = _prepare_stored_quiz(out.get("quiz"))
+        ACTIVE_SESSION["last_teacher_text"] = out.get("teacher_text", "")
+        _cache_part(ACTIVE_SESSION, unit_part, ACTIVE_SESSION["last_teacher_text"], ACTIVE_SESSION["last_quiz"])
         save_active_session(ACTIVE_SESSION)
 
         timeline = load_timeline(req.student_id)
@@ -349,9 +612,10 @@ def start_session(req: StartSessionReq):
             "chapter_id": chapter_id,
             "session_units": session_units,
             "current_unit_index_in_session": 0,
-            "unit_part": unit_part,  # 0 = first half (pages 1-5), 1 = second half (pages 6-10)
+            "unit_part": unit_part,
+            "max_unlocked_part": max_unlocked_part,
             "teacher_text": out.get("teacher_text"),
-            "quiz": out.get("quiz"),
+            "quiz": _quiz_for_client(ACTIVE_SESSION.get("last_quiz")),
             "course_week": course_week,
             "course_month": course_month,
             "evaluation_summary": evaluation_summary,
@@ -444,7 +708,8 @@ def next_unit(req: NextUnitReq):
         "student_answer": "",
         "provided_quiz": None,
     })
-    sess["last_quiz"] = out.get("quiz")
+    sess["last_quiz"] = _prepare_stored_quiz(out.get("quiz"))
+    sess["last_teacher_text"] = out.get("teacher_text", "")
     save_active_session(sess)
 
     timeline = load_timeline(req.student_id)
@@ -456,7 +721,7 @@ def next_unit(req: NextUnitReq):
         "current_unit_index_in_session": pos,
         "unit_part": unit_part,
         "teacher_text": out.get("teacher_text"),
-        "quiz": out.get("quiz"),
+        "quiz": _quiz_for_client(sess.get("last_quiz")),
         "course_week": course_week,
         "course_month": course_month,
     }
@@ -496,7 +761,9 @@ def answer(req: AnswerReq):
         "current_unit": unit_for_teaching,
         # grade the SAME quiz we served last time
         "provided_quiz": sess.get("last_quiz"),
-        "student_answer": req.student_answer
+        "teacher_text": sess.get("last_teacher_text", ""),
+        "student_answer": req.student_answer,
+        "option_index": req.option_index,
     })
 
 
@@ -518,7 +785,7 @@ def answer(req: AnswerReq):
                 "hint": hint_text,
                 "hint_count": hint_count,
                 "remediation_text": "",
-                "quiz": sess.get("last_quiz"),  # Keep same quiz
+                "quiz": _quiz_for_client(sess.get("last_quiz")),
                 "next_action": "answer_again",
                 "recommendations": recommendations,
                 "evaluation_summary": evaluation_summary,
@@ -531,7 +798,7 @@ def answer(req: AnswerReq):
                 "hint": "",
                 "hint_count": 2,
                 "remediation_text": remediation_text,
-                "quiz": sess.get("last_quiz"),  # Keep same quiz
+                "quiz": _quiz_for_client(sess.get("last_quiz")),
                 "next_action": "answer_again",
                 "recommendations": recommendations,
                 "evaluation_summary": evaluation_summary,
@@ -543,22 +810,26 @@ def answer(req: AnswerReq):
                 "evaluation": evaluation,
                 "hint": "Try again! Think about what we learned.",
                 "remediation_text": "",
-                "quiz": sess.get("last_quiz"),
+                "quiz": _quiz_for_client(sess.get("last_quiz")),
                 "next_action": "answer_again",
                 "recommendations": recommendations,
                 "evaluation_summary": evaluation_summary,
             }
 
-    # Correct answer - check if we need to move to part 2 or next unit
-    if unit_part == 0:
-        # Finished part 1, move to part 2 of same unit
-        sess["unit_part"] = 1
+    # Correct answer - check if we need to move to part 2 or next unit.
+    # History has NO parts: passing the quiz completes the whole lesson.
+    is_history_lesson = "history" in str(chapter_id).lower() or "history" in str(
+        sess.get("book_id") or ""
+    ).lower()
+    if unit_part == 0 and not is_history_lesson:
         book_id = sess.get("book_id") or progress_book_id(chapter_id)
         plan = get_or_create_plan(book_id)
         uidx = plan_index_for_real_unit(plan, real_unit_id)
         if uidx is None:
             uidx = int(sess.get("current_pos", 0))
-        save_progress(req.student_id, book_id, uidx, 1)
+        progress = load_progress(req.student_id)
+        max_unlocked = max(int(progress.get("max_unlocked_part", 0)), 1)
+        save_progress(req.student_id, book_id, uidx, unit_part=0, max_unlocked_part=max_unlocked)
         save_active_session(sess)
         timeline = load_timeline(req.student_id)
         course_week, course_month = course_week_month(timeline)
@@ -566,8 +837,9 @@ def answer(req: AnswerReq):
             "correct": True,
             "evaluation": evaluation,
             "advance_text": out.get("advance_text"),
-            "next_action": "continue_unit_part2",  # Signal to start part 2
-            "message": "Great job! You've finished the first half (pages 1-5). Ready for the second half (pages 6-10)?",
+            "next_action": "continue_unit_part2",
+            "max_unlocked_part": max_unlocked,
+            "message": "Great job! Part 2 is now unlocked.",
             "course_week": course_week,
             "course_month": course_month,
             "recommendations": recommendations,
@@ -603,6 +875,26 @@ def answer(req: AnswerReq):
             plan_units = plan.get("units") or []
             clear_active_session()
             ACTIVE_SESSION = None
+
+            if is_history_lesson:
+                from .history_lessons import lesson_number_from_unit_id
+                lesson_num = lesson_number_from_unit_id(real_unit_id)
+                book_prog = record_lesson_passed(req.student_id, book_id, lesson_num)
+                total_lessons = len(plan_units) or 6
+                unlock_msg = (
+                    f"Lesson {lesson_num} complete! Lesson {lesson_num + 1} is now unlocked."
+                    if lesson_num < total_lessons
+                    else f"Lesson {lesson_num} complete! You finished all lessons."
+                )
+                save_progress(req.student_id, book_id, min(next_idx, max(0, total_lessons - 1)), 0)
+                return {
+                    **base,
+                    "next_action": "lesson_complete",
+                    "max_unlocked_lesson_index": int(book_prog.get("max_unlocked_lesson_index", 0)),
+                    "completed_lesson_numbers": list(book_prog.get("completed_lesson_numbers") or []),
+                    "message": unlock_msg,
+                }
+
             if next_idx >= len(plan_units):
                 return {
                     **base,
@@ -621,65 +913,137 @@ def answer(req: AnswerReq):
         save_active_session(sess)
         return {**base, "next_action": "next_unit"}
 
-@app.post("/session/continue_part2")
-def continue_part2(req: ContinuePart2Req):
-    """Continue to part 2 (pages 6-10) of the current unit after completing part 1."""
-    sess = _ensure_session_in_memory()
-    if not sess:
-        return {"error": "No active session. Call /session/start first."}
+def _cache_part(sess: Dict[str, Any], part: int, teacher_text: str, stored_quiz: Dict[str, Any] | None) -> None:
+    cache = sess.get("part_cache")
+    if not isinstance(cache, dict):
+        cache = {}
+    cache[str(int(part))] = {"teacher_text": teacher_text or "", "quiz": stored_quiz}
+    sess["part_cache"] = cache
 
-    # single-student safety
-    if req.student_id != sess.get("student_id"):
-        return {"error": "This server is in single-student mode. Student_id mismatch."}
 
+def _get_cached_part(sess: Dict[str, Any], part: int) -> Dict[str, Any] | None:
+    cache = sess.get("part_cache")
+    if isinstance(cache, dict):
+        return cache.get(str(int(part)))
+    return None
+
+
+def _part_response(sess: Dict[str, Any], student_id: str, target_part: int, max_unlocked: int) -> Dict[str, Any]:
+    timeline = load_timeline(student_id)
+    course_week, course_month = course_week_month(timeline)
+    return {
+        "done": False,
+        "chapter_id": sess["chapter_id"],
+        "session_units": sess["session_units"],
+        "current_unit_index_in_session": sess["current_pos"],
+        "unit_part": target_part,
+        "max_unlocked_part": max_unlocked,
+        "teacher_text": sess.get("last_teacher_text", ""),
+        "quiz": _quiz_for_client(sess.get("last_quiz")),
+        "course_week": course_week,
+        "course_month": course_month,
+    }
+
+
+def _teach_unit_part(
+    sess: Dict[str, Any],
+    student_id: str,
+    target_part: int,
+    *,
+    use_cache: bool = True,
+) -> Dict[str, Any]:
+    """Run lesson_graph for one unit part (or serve cached part) and update the active session."""
     chapter_id = sess["chapter_id"]
     unit = sess["session_units"][sess["current_pos"]]
-    
-    # Move to part 2
-    sess["unit_part"] = 1
-    save_active_session(sess)
-    
-    # CRITICAL: Reset progress for part 2 so it starts from the beginning
-    # Part 2 should teach all items again, but with content from pages 6-10
-    from .progress_store import reset_unit_progress
     real_unit_id = unit.get("real_unit_id") or unit.get("unit_id")
-    reset_unit_progress(req.student_id, real_unit_id)
-    print(f"[DEBUG] continue_part2: Reset progress for part 2 - will start from item 0 with pages 6-10")
-    
-    # Get unit page info
+    target_part = max(0, min(1, int(target_part)))
+
+    book_id = sess.get("book_id") or progress_book_id(chapter_id)
+    plan = get_or_create_plan(book_id)
+    uidx = plan_index_for_real_unit(plan, real_unit_id)
+    if uidx is None:
+        uidx = int(sess.get("current_pos", 0))
+    progress = load_progress(student_id)
+    max_unlocked = int(progress.get("max_unlocked_part", 0))
+    if target_part == 1:
+        max_unlocked = max(max_unlocked, 1)
+
+    # Serve cached part instantly (no LLM re-run) for snappy, reliable navigation.
+    cached = _get_cached_part(sess, target_part) if use_cache else None
+    if cached:
+        sess["unit_part"] = target_part
+        sess["last_quiz"] = cached.get("quiz")
+        sess["last_teacher_text"] = cached.get("teacher_text", "")
+        save_active_session(sess)
+        save_progress(student_id, book_id, uidx, target_part, max_unlocked_part=max_unlocked)
+        return _part_response(sess, student_id, target_part, max_unlocked)
+
     from .chapters_service import get_unit_content
     unit_info = get_unit_content(real_unit_id)
     unit_pages = {
         "start_page": unit_info.get("start_page", 0),
-        "end_page": unit_info.get("end_page", 0)
+        "end_page": unit_info.get("end_page", 0),
     }
-    
-    unit_for_teaching = {**unit, "unit_id": real_unit_id, "unit_part": 1, "unit_pages": unit_pages}
+
+    if target_part == 1:
+        from .progress_store import reset_unit_progress
+        reset_unit_progress(student_id, real_unit_id)
+
+    unit_for_teaching = {**unit, "unit_id": real_unit_id, "unit_part": target_part, "unit_pages": unit_pages}
     graph_chapter_id = sess.get("graph_chapter_id") or real_unit_id
     out = lesson_graph.invoke({
-        "student_id": req.student_id,
+        "student_id": student_id,
         "chapter_id": graph_chapter_id,
         "current_unit": unit_for_teaching,
         "student_answer": "",
         "provided_quiz": None,
     })
-    
-    sess["last_quiz"] = out.get("quiz")
+
+    sess["unit_part"] = target_part
+    sess["last_quiz"] = _prepare_stored_quiz(out.get("quiz"))
+    sess["last_teacher_text"] = out.get("teacher_text", "")
+    _cache_part(sess, target_part, sess["last_teacher_text"], sess["last_quiz"])
     save_active_session(sess)
-    timeline = load_timeline(req.student_id)
-    course_week, course_month = course_week_month(timeline)
-    
-    return {
-        "done": False,
-        "chapter_id": chapter_id,
-        "session_units": sess["session_units"],
-        "current_unit_index_in_session": sess["current_pos"],
-        "unit_part": 1,  # Second half (pages 6-10)
-        "teacher_text": out.get("teacher_text"),
-        "quiz": out.get("quiz"),
-        "course_week": course_week,
-        "course_month": course_month,
-    }
+    save_progress(student_id, book_id, uidx, target_part, max_unlocked_part=max_unlocked)
+
+    return _part_response(sess, student_id, target_part, max_unlocked)
+
+
+@app.post("/session/continue_part2")
+def continue_part2(req: ContinuePart2Req):
+    """Continue to part 2 of the current unit after completing part 1 quiz."""
+    sess = _ensure_session_in_memory()
+    if not sess:
+        return {"error": "No active session. Call /session/start first.", "need_restart": True}
+    if req.student_id != sess.get("student_id"):
+        return {"error": "This server is in single-student mode. Student_id mismatch."}
+
+    progress = load_progress(req.student_id)
+    if int(progress.get("max_unlocked_part", 0)) < 1:
+        return {"error": "Part 2 is locked. Pass the Part 1 quiz first."}
+
+    return _teach_unit_part(sess, req.student_id, 1)
+
+
+@app.post("/session/switch_part")
+def switch_part(req: SwitchPartReq):
+    """Switch between unlocked parts (0 = Part 1, 1 = Part 2)."""
+    sess = _ensure_session_in_memory()
+    if not sess:
+        return {"error": "No active session. Call /session/start first.", "need_restart": True}
+    if req.student_id != sess.get("student_id"):
+        return {"error": "This server is in single-student mode. Student_id mismatch."}
+
+    target = max(0, min(1, int(req.target_part)))
+    progress = load_progress(req.student_id)
+    max_unlocked = int(progress.get("max_unlocked_part", 0))
+    if target > max_unlocked:
+        return {"error": f"Part {target + 1} is locked. Pass the previous part quiz first."}
+
+    if int(sess.get("unit_part", 0)) == target and sess.get("last_teacher_text"):
+        return _part_response(sess, req.student_id, target, max_unlocked)
+
+    return _teach_unit_part(sess, req.student_id, target)
 
 @app.get("/units")
 def get_units(book_id: str | None = Query(default=None)):

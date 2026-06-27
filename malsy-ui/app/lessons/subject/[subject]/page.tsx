@@ -1,8 +1,17 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { learningConfig, Lesson, LinearSubject, SectionsSubject } from '../../../../lib/learning-config';
+import { api, HistoryLessonCard } from '../../../../lib/api';
+import { auth } from '../../../../lib/auth';
+
+/** Lesson card with optional backend catalog fields (History G6). */
+interface CatalogLesson extends Lesson {
+  fullUnitId?: string;
+  videoFilename?: string | null;
+  videoType?: string | null;
+}
 
 // ── Shared card styles ─────────────────────────────────────────────
 
@@ -25,10 +34,14 @@ function DetailPanel({
   lesson,
   sectionKey,
   onStartAI,
+  locked,
+  completed,
 }: {
-  lesson: Lesson | null;
+  lesson: CatalogLesson | null;
   sectionKey: string;
   onStartAI: () => void;
+  locked?: boolean;
+  completed?: boolean;
 }) {
   if (!lesson) {
     return (
@@ -43,17 +56,86 @@ function DetailPanel({
     <div style={sideboxStyle}>
       <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--g4)', marginBottom: 6 }}>
         {sectionKey.toUpperCase()} · LESSON {lesson.id}
+        {completed && <span style={{ marginLeft: 8, color: 'var(--mint)' }}>✓ Done</span>}
       </div>
       <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--w)', marginBottom: 8, lineHeight: 1.4 }}>{lesson.name}</div>
       <div style={{ fontSize: 12, color: 'var(--g3)', marginBottom: 20, lineHeight: 1.6 }}>{lesson.description}</div>
 
+      {locked ? (
+        <div style={{ fontSize: 12, color: 'var(--g4)', lineHeight: 1.6, marginBottom: 16 }}>
+          🔒 Pass the previous lesson quiz to unlock this lesson.
+        </div>
+      ) : (
       <button
         className="auth-submit"
         onClick={onStartAI}
-        style={{ marginBottom: 0, padding: '11px 16px', fontSize: 13 }}
+        style={{ marginBottom: 16, padding: '11px 16px', fontSize: 13 }}
       >
         Start with AI Teacher →
       </button>
+      )}
+
+      {lesson.fullUnitId && lesson.videoType === 'lessonVideo' && !sectionKey.includes('history') && (
+        <LessonVideoPanel unitId={lesson.fullUnitId} videoFilename={lesson.videoFilename} />
+      )}
+      {lesson.fullUnitId && !lesson.videoFilename && !sectionKey.includes('history') && (
+        <div style={{ fontSize: 11, color: 'var(--g4)', marginTop: 8 }}>
+          No video uploaded for this lesson yet.
+        </div>
+      )}
+      {sectionKey.includes('history') && (
+        <div style={{ fontSize: 11, color: 'var(--g4)', marginTop: 8, lineHeight: 1.5 }}>
+          Open the lesson to watch or generate its video.
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LessonVideoPanel({ unitId, videoFilename }: { unitId: string; videoFilename?: string | null }) {
+  const [state, setState] = useState<{ loading: boolean; exists: boolean; videoUrl?: string; narration?: string }>({
+    loading: true,
+    exists: false,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/lesson-video-check?unitId=${encodeURIComponent(unitId)}`)
+      .then(r => r.json())
+      .then((d: { exists?: boolean; videoUrl?: string; narration?: string }) => {
+        if (!cancelled) {
+          setState({
+            loading: false,
+            exists: Boolean(d.exists),
+            videoUrl: d.videoUrl,
+            narration: d.narration,
+          });
+        }
+      })
+      .catch(() => { if (!cancelled) setState({ loading: false, exists: false }); });
+    return () => { cancelled = true; };
+  }, [unitId]);
+
+  if (state.loading) {
+    return <div style={{ fontSize: 11, color: 'var(--g4)' }}>Checking for saved video…</div>;
+  }
+  if (!state.exists || !state.videoUrl) {
+    return (
+      <div style={{ fontSize: 11, color: 'var(--g4)' }}>
+        Video slot: {videoFilename ?? 'none'} — not uploaded yet.
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,.08)' }}>
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+      <video src={state.videoUrl} controls style={{ width: '100%', display: 'block', background: '#000' }} />
+      {state.narration && (
+        <div style={{ padding: '10px 12px', fontSize: 11, color: 'var(--g3)', lineHeight: 1.5, borderTop: '1px solid rgba(255,255,255,.06)' }}>
+          {state.narration}
+        </div>
+      )}
     </div>
   );
 }
@@ -212,20 +294,41 @@ function LessonCard({
   sectionKey,
   selected,
   onClick,
+  hasVideo,
+  locked,
+  completed,
 }: {
-  lesson: Lesson;
+  lesson: CatalogLesson;
   index: number;
   sectionKey: string;
   selected: boolean;
   onClick: () => void;
+  hasVideo?: boolean;
+  locked?: boolean;
+  completed?: boolean;
 }) {
   return (
-    <button onClick={onClick} style={card(selected)}>
-      <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: selected ? 'var(--vl)' : 'var(--g5)', marginBottom: 5 }}>
-        {sectionKey} · Lesson {index + 1}
+    <button
+      onClick={locked ? undefined : onClick}
+      disabled={locked}
+      style={{
+        ...card(selected && !locked),
+        opacity: locked ? 0.55 : 1,
+        cursor: locked ? 'not-allowed' : 'pointer',
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
+        <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: selected ? 'var(--vl)' : 'var(--g5)' }}>
+          {locked ? '🔒 ' : completed ? '✓ ' : ''}{sectionKey} · Lesson {index + 1}
+        </div>
+        {hasVideo && !locked && (
+          <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--mint)', textTransform: 'uppercase' }}>Video</span>
+        )}
       </div>
       <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--w)', marginBottom: 4, lineHeight: 1.35 }}>{lesson.name}</div>
-      <div style={{ fontSize: 11, color: 'var(--g4)', lineHeight: 1.4 }}>{lesson.description}</div>
+      <div style={{ fontSize: 11, color: 'var(--g4)', lineHeight: 1.4 }}>
+        {locked ? 'Pass the previous lesson quiz to unlock.' : lesson.description}
+      </div>
     </button>
   );
 }
@@ -268,19 +371,83 @@ function LinearView({ cfg, subject, onStartAI }: { cfg: LinearSubject; subject: 
 
 // ── Sections layout (History / Social Studies) ─────────────────────
 
-function SectionsView({ cfg, subject, onStartAI }: { cfg: SectionsSubject; subject: string; onStartAI: (lesson: Lesson, sectionKey: string) => void }) {
-  const [selected, setSelected] = useState<{ lesson: Lesson; sectionKey: string } | null>(null);
+function SectionsView({ cfg, subject, onStartAI }: { cfg: SectionsSubject; subject: string; onStartAI: (lesson: CatalogLesson, sectionKey: string) => void }) {
+  const [selected, setSelected] = useState<{ lesson: CatalogLesson; sectionKey: string } | null>(null);
+  const [catalogLessons, setCatalogLessons] = useState<Record<string, CatalogLesson[]>>({});
+  const [bookProgress, setBookProgress] = useState<Record<string, { max_unlocked_lesson_index: number; completed_lesson_numbers: number[] }>>({});
+  const studentId = auth.getUser()?.user_id ?? 'student';
+
+  useEffect(() => {
+    cfg.sections
+      .filter(s => s.key === 'history_g6' || s.key.endsWith('_g6'))
+      .forEach((section) => {
+        api.books.lessons(section.key)
+          .then((data) => {
+            setCatalogLessons(prev => ({
+              ...prev,
+              [section.key]: data.lessons.map((l: HistoryLessonCard) => ({
+                id: l.lessonNumber,
+                name: l.title,
+                description: l.shortDescription,
+                fullUnitId: l.id,
+                videoFilename: l.videoFilename,
+                videoType: l.videoType,
+              })),
+            }));
+          })
+          .catch(() => { /* fallback to learning-config */ });
+
+        api.books.lessonProgress(section.key, studentId)
+          .then((prog) => {
+            setBookProgress(prev => ({
+              ...prev,
+              [section.key]: {
+                max_unlocked_lesson_index: prog.max_unlocked_lesson_index ?? 0,
+                completed_lesson_numbers: prog.completed_lesson_numbers ?? [],
+              },
+            }));
+          })
+          .catch(() => { /* default: lesson 1 only */ });
+      });
+  }, [cfg, studentId]);
+
+  function lessonsForSection(sectionKey: string, fallback: Lesson[]): CatalogLesson[] {
+    return catalogLessons[sectionKey]?.length ? catalogLessons[sectionKey] : fallback;
+  }
+
+  function isLessonUnlocked(sectionKey: string, lessonNumber: number): boolean {
+    const prog = bookProgress[sectionKey];
+    if (!prog) return lessonNumber <= 1;
+    return lessonNumber - 1 <= prog.max_unlocked_lesson_index;
+  }
+
+  function isLessonCompleted(sectionKey: string, lessonNumber: number): boolean {
+    const prog = bookProgress[sectionKey];
+    return Boolean(prog?.completed_lesson_numbers?.includes(lessonNumber));
+  }
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 24, alignItems: 'start' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
-        {cfg.sections.map((section) => (
+        {cfg.sections.map((section) => {
+          const lessons = lessonsForSection(section.key, section.lessons);
+          const isHistoryG6 = section.key === 'history_g6';
+          return (
           <div key={section.key}>
             <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--w)', marginBottom: 14 }}>
               {section.icon} {section.title}
+              {isHistoryG6 && catalogLessons[section.key]?.length === 6 && (
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--g4)', marginLeft: 10 }}>
+                  Ancient Egypt · 6 lessons
+                </span>
+              )}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
-              {section.lessons.map((lesson, i) => (
+              {lessons.map((lesson, i) => {
+                const lessonNum = typeof lesson.id === 'number' ? lesson.id : i + 1;
+                const locked = isHistoryG6 && !isLessonUnlocked(section.key, lessonNum);
+                const completed = isHistoryG6 && isLessonCompleted(section.key, lessonNum);
+                return (
                 <LessonCard
                   key={`${section.key}-${lesson.id}`}
                   lesson={lesson}
@@ -288,21 +455,37 @@ function SectionsView({ cfg, subject, onStartAI }: { cfg: SectionsSubject; subje
                   sectionKey={section.title}
                   selected={selected?.lesson.id === lesson.id && selected?.sectionKey === section.key}
                   onClick={() => setSelected({ lesson, sectionKey: section.key })}
+                  hasVideo={Boolean(lesson.videoFilename)}
+                  locked={locked}
+                  completed={completed}
                 />
-              ))}
+              );})}
             </div>
-            <VideoSection
-              title={section.title} icon={section.icon}
-              subject={subject} sectionKey={section.key}
-              lessons={section.lessons}
-            />
+            {!isHistoryG6 && (
+              <VideoSection
+                title={section.title} icon={section.icon}
+                subject={subject} sectionKey={section.key}
+                lessons={lessons}
+              />
+            )}
           </div>
-        ))}
+          );
+        })}
       </div>
       <DetailPanel
         lesson={selected?.lesson ?? null}
         sectionKey={selected?.sectionKey ?? ''}
         onStartAI={() => selected && onStartAI(selected.lesson, selected.sectionKey)}
+        locked={
+          selected
+            ? !isLessonUnlocked(selected.sectionKey, typeof selected.lesson.id === 'number' ? selected.lesson.id : 1)
+            : false
+        }
+        completed={
+          selected
+            ? isLessonCompleted(selected.sectionKey, typeof selected.lesson.id === 'number' ? selected.lesson.id : 1)
+            : false
+        }
       />
     </div>
   );
@@ -322,15 +505,15 @@ export default function SubjectPage() {
       <div className="page-enter">
         <div className="auth-error">Subject "{subject}" not found.</div>
         <button className="btn btn-o" onClick={() => router.push('/lessons')} style={{ marginTop: 16 }}>
-          ← Back to Lessons
+          ← Back to Subjects
         </button>
       </div>
     );
   }
 
-  function startAI(lesson: Lesson, sectionKey?: string) {
+  function startAI(lesson: CatalogLesson, sectionKey?: string) {
     const bookKey = sectionKey ?? subject;
-    const chapter = bookKey + ':unit_' + String(lesson.id).padStart(2, '0');
+    const chapter = lesson.fullUnitId ?? (bookKey + ':unit_' + String(lesson.id).padStart(2, '0'));
     const params = new URLSearchParams({
       chapter,
       lesson_title: lesson.name,
@@ -347,7 +530,7 @@ export default function SubjectPage() {
           className="btn btn-o btn-sm"
           onClick={() => router.push('/lessons')}
         >
-          ← Lessons
+          ← Back to Subjects
         </button>
         <span style={{ color: 'var(--g5)', fontSize: 13 }}>/</span>
         <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--w)' }}>{cfg.title}</span>

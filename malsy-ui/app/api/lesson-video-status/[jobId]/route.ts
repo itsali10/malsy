@@ -13,7 +13,7 @@ export async function GET(
 
   return NextResponse.json({
     status:     job.status,
-    videoUrl:   job.videoPath ? `/api/lesson-video/${path.basename(job.videoPath)}` : null,
+    videoUrl:   job.videoUrl ?? (job.videoPath ? `/api/lesson-video/${path.basename(job.videoPath)}` : null),
     script:     job.script    ?? null,
     lessonTitle: job.lessonTitle ?? null,
     error:      job.error     ?? null,

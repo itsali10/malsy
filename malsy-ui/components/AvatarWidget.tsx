@@ -71,6 +71,7 @@ const MOUTH_SHAPES = [
 export default function AvatarWidget() {
   const containerRef  = useRef<HTMLDivElement>(null);
   const isTalkingRef  = useRef(false);   // set by malsy-tts custom event
+  const amplitudeRef  = useRef(0);       // real audio amplitude (0..1)
 
   useEffect(() => {
     const container = containerRef.current;
@@ -84,8 +85,14 @@ export default function AvatarWidget() {
     const H = container.clientHeight;
 
     // ── Talking state (driven by custom events) ───────────────────
+    // Lip-sync follows REAL audio only: `speaking` gates animation, and
+    // `amplitude` (when provided) drives the jaw so the mouth never moves
+    // during silence, loading, or part transitions.
     function onTTSEvent(e: Event) {
-      isTalkingRef.current = (e as CustomEvent<{ speaking: boolean }>).detail.speaking;
+      const detail = (e as CustomEvent<{ speaking: boolean; amplitude?: number }>).detail;
+      isTalkingRef.current = detail.speaking;
+      if (!detail.speaking) amplitudeRef.current = 0;
+      else if (typeof detail.amplitude === 'number') amplitudeRef.current = detail.amplitude;
     }
     window.addEventListener('malsy-tts', onTTSEvent);
 
@@ -213,23 +220,26 @@ export default function AvatarWidget() {
         spineBone.rotation.x = Math.sin(idleTime * 1.25) * 0.006;
       }
 
-      // ── Lip sync / jaw animation ──────────────────────────
-      if (isTalkingRef.current) {
+      // ── Lip sync / jaw animation (REAL audio amplitude) ────
+      // The mouth only opens when audio is actually playing AND its
+      // amplitude is above a small threshold — never during silence,
+      // loading, pauses, or part transitions.
+      const AMP_THRESHOLD = 0.04;
+      const amp = isTalkingRef.current ? amplitudeRef.current : 0;
+      if (isTalkingRef.current && amp > AMP_THRESHOLD) {
         talkTime += dt;
-        // Compound sine waves → irregular jaw movement that mimics speech rhythm
-        const raw =
-          Math.sin(talkTime * 9.1)  * 0.50 +
-          Math.sin(talkTime * 14.3) * 0.28 +
-          Math.abs(Math.sin(talkTime * 5.7 + 1.0)) * 0.22;
-        const jaw = Math.max(0, Math.min(0.85, raw));
+        // Map measured amplitude → jaw opening, with a subtle sine flutter
+        // for natural micro-movement (still gated by real amplitude).
+        const flutter = 0.85 + 0.15 * Math.sin(talkTime * 22);
+        const jaw = Math.max(0, Math.min(0.85, amp * 1.6 * flutter));
         setMorph('viseme_aa', jaw * 0.95);
         setMorph('viseme_O',  jaw * 0.50);
         setMorph('mouthOpen', jaw * 0.80);
         setMorph('jawOpen',   jaw * 0.70);
         setMorph('Mouth_Open', jaw * 0.80);
         setMorph('jaw_open',   jaw * 0.70);
-      } else if (talkTime > 0) {
-        // Mouth just stopped — snap closed
+      } else if (talkTime > 0 || amp <= AMP_THRESHOLD) {
+        // Silence / paused / transitioning → mouth closed.
         talkTime = 0;
         closeMouth();
       }

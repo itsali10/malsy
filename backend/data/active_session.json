@@ -1,27 +1,51 @@
 {
-  "student_id": "ab1693dd-931f-4872-9626-a39f39e73af8",
-  "chapter_id": "history:unit_02",
-  "book_id": "history",
-  "graph_chapter_id": "u1",
+  "student_id": "02a7d928-893e-40f7-9a18-2c44c93318b2",
+  "chapter_id": "history_g6:unit_01",
+  "book_id": "history_g6",
+  "graph_chapter_id": "history_g6:unit_01",
   "session_units": [
     {
-      "unit_id": "u1",
-      "title": "Exploring Ancient Civilizations",
-      "keywords": [
-        "civilizations",
-        "ancient",
-        "society",
-        "culture"
-      ],
-      "minutes": 90
+      "unit_id": "unit_01",
+      "title": "Where and Who Were the Ancient Egyptians?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_01"
     }
   ],
   "current_pos": 0,
   "unit_part": 0,
   "last_quiz": {
-    "question": "Can you name one societal role in ancient civilizations and explain its importance in society?",
+    "question": "Where did the Ancient Egyptians live?",
+    "options": [
+      "Near the River Nile",
+      "Near the Red Sea",
+      "Near the Sahara Desert",
+      "Near the Indian Ocean"
+    ],
+    "correct_answer": "Near the River Nile",
     "expected_points": [
-      "Name one societal role (e.g., ruler, priest, artisan, farmer, slave) and explain its importance in the functioning of the civilization."
-    ]
+      "The Ancient Egyptians lived along the banks of the River Nile in Egypt."
+    ],
+    "source_quote": "The Ancient Egyptians lived along the banks of the River Nile in Egypt."
+  },
+  "last_teacher_text": "Hook\nImagine living in a place where a river is like a lifeline, providing everything you need to survive. Today, we'll dive into the world of the Ancient Egyptians and their special relationship with the Nile River.\n\n Explanation\nEgypt is a country in northeast Africa where the River Nile flows into the Mediterranean Sea. The Ancient Egyptians settled along the Nile around 5000 BC because Egypt is mostly hot deserts with little rain. The Nile was crucial to them for water, food, and transportation. They called it the 'gift of the Nile' because its floods created fertile land for farming and raising animals.\n\nThe Nile was not just a river to the Ancient Egyptians; it was their source of life. Without it, they wouldn't have had the fertile land to grow crops like wheat and barley, or the water to drink and bathe. The Nile also served as a natural highway for transportation, making it easier for people to travel and trade goods.\n\nIn Ancient Egypt, two kingdoms developed along the Nile: Upper Egypt in the south with the white crown, and Lower Egypt in the north with the red crown. Around 3200 BC, King Narmer or Menes united the two kingdoms, becoming the first pharaoh of a united Egypt. He established a new capital called Memphis, which symbolized the balance of the two lands - the red land (deserted areas) and the black land (close to the Nile, providing food and water).\n\n Historical Example\n1. The Ancient Egyptians settled along the banks of the River Nile around 5000 BC.\n2. King Narmer or Menes, around 3200 BC, united Upper and Lower Egypt, becoming the first pharaoh of a united Egypt.\n3. Memphis, the new capital established by King Narmer, symbolized the balance of the red and black lands.\n\n Real-Life Connection\nJust like how the Nile was essential for the Ancient Egyptians' survival, think about how important water sources are in your daily life. Water isn't just for drinking; it helps grow the food we eat and supports many other activities we do every day.\n\n Quick Recap\nToday, we learned about how the Ancient Egyptians settled along the Nile for its water, food, and transportation. King Narmer united Upper and Lower Egypt, establishing Memphis as the new capital.\n\n Transition to Quiz\nAre you ready to test your knowledge about the Ancient Egyptians and their special relationship with the Nile River? Let's dive into a fun quiz to see how much you've learned!",
+  "part_cache": {
+    "0": {
+      "teacher_text": "Hook\nImagine living in a place where a river is like a lifeline, providing everything you need to survive. Today, we'll dive into the world of the Ancient Egyptians and their special relationship with the Nile River.\n\n Explanation\nEgypt is a country in northeast Africa where the River Nile flows into the Mediterranean Sea. The Ancient Egyptians settled along the Nile around 5000 BC because Egypt is mostly hot deserts with little rain. The Nile was crucial to them for water, food, and transportation. They called it the 'gift of the Nile' because its floods created fertile land for farming and raising animals.\n\nThe Nile was not just a river to the Ancient Egyptians; it was their source of life. Without it, they wouldn't have had the fertile land to grow crops like wheat and barley, or the water to drink and bathe. The Nile also served as a natural highway for transportation, making it easier for people to travel and trade goods.\n\nIn Ancient Egypt, two kingdoms developed along the Nile: Upper Egypt in the south with the white crown, and Lower Egypt in the north with the red crown. Around 3200 BC, King Narmer or Menes united the two kingdoms, becoming the first pharaoh of a united Egypt. He established a new capital called Memphis, which symbolized the balance of the two lands - the red land (deserted areas) and the black land (close to the Nile, providing food and water).\n\n Historical Example\n1. The Ancient Egyptians settled along the banks of the River Nile around 5000 BC.\n2. King Narmer or Menes, around 3200 BC, united Upper and Lower Egypt, becoming the first pharaoh of a united Egypt.\n3. Memphis, the new capital established by King Narmer, symbolized the balance of the red and black lands.\n\n Real-Life Connection\nJust like how the Nile was essential for the Ancient Egyptians' survival, think about how important water sources are in your daily life. Water isn't just for drinking; it helps grow the food we eat and supports many other activities we do every day.\n\n Quick Recap\nToday, we learned about how the Ancient Egyptians settled along the Nile for its water, food, and transportation. King Narmer united Upper and Lower Egypt, establishing Memphis as the new capital.\n\n Transition to Quiz\nAre you ready to test your knowledge about the Ancient Egyptians and their special relationship with the Nile River? Let's dive into a fun quiz to see how much you've learned!",
+      "quiz": {
+        "question": "Where did the Ancient Egyptians live?",
+        "options": [
+          "Near the River Nile",
+          "Near the Red Sea",
+          "Near the Sahara Desert",
+          "Near the Indian Ocean"
+        ],
+        "correct_answer": "Near the River Nile",
+        "expected_points": [
+          "The Ancient Egyptians lived along the banks of the River Nile in Egypt."
+        ],
+        "source_quote": "The Ancient Egyptians lived along the banks of the River Nile in Egypt."
+      }
+    }
   }
 }

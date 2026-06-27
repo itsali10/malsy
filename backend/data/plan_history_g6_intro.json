@@ -1,0 +1,49 @@
+{
+  "objectives": [
+    "Teach 6 units from history_g6 in order"
+  ],
+  "units": [
+    {
+      "unit_id": "unit_01",
+      "title": "Where and Who Were the Ancient Egyptians?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_01"
+    },
+    {
+      "unit_id": "unit_02",
+      "title": "Religion and Gods of Ancient Egypt",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_02"
+    },
+    {
+      "unit_id": "unit_03",
+      "title": "Egyptian Society, Pharaohs and the Social Hierarchy",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_03"
+    },
+    {
+      "unit_id": "unit_04",
+      "title": "Mummification and the Afterlife",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_04"
+    },
+    {
+      "unit_id": "unit_05",
+      "title": "Fashion, Dress and Daily Life in Ancient Egypt",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_05"
+    },
+    {
+      "unit_id": "unit_06",
+      "title": "Hieroglyphics, Scribes and Ancient Egyptian Writing",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_06"
+    }
+  ]
+}

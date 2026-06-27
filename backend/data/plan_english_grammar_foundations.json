@@ -1,0 +1,44 @@
+{
+  "objectives": [
+    "Identify and define the eight parts of speech",
+    "Understand basic sentence structure",
+    "Recognize and correctly use common punctuation marks"
+  ],
+  "units": [
+    {
+      "unit_id": "u1",
+      "title": "Exploring Parts of Speech",
+      "keywords": [
+        "parts of speech",
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u2",
+      "title": "Building Sentences",
+      "keywords": [
+        "sentence structure",
+        "subject",
+        "predicate",
+        "simple sentences"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u3",
+      "title": "Mastering Punctuation",
+      "keywords": [
+        "punctuation marks",
+        "period",
+        "comma",
+        "question mark",
+        "exclamation point"
+      ],
+      "minutes": 90
+    }
+  ]
+}

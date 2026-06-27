@@ -71,14 +71,16 @@ export const learningConfig: Record<string, SubjectConfig> = {
     color: 'var(--amber)',
     sections: [
       {
-        key: 'history',
+        key: 'history_g6',
         title: 'History',
         icon: '🏛️',
         lessons: [
-          { id: 1, name: 'Ancient Civilizations',       description: 'Early societies and how they developed.' },
-          { id: 2, name: 'Important Historical Events',  description: 'Events that changed the world.' },
-          { id: 3, name: 'Leaders and Reformers',        description: 'People who shaped modern society.' },
-          { id: 4, name: 'Local and National History',   description: 'Connecting history to present-day life.' },
+          { id: 1, name: 'Where and Who Were the Ancient Egyptians?',     description: 'Location of Egypt, the Nile, settlement, Upper and Lower Egypt, and unification.' },
+          { id: 2, name: 'Religion and Gods of Ancient Egypt',            description: 'Egyptian gods, animal-headed deities, and what each god represented.' },
+          { id: 3, name: 'Egyptian Society and the Pharaohs',             description: 'Social hierarchy, pharaohs, pyramids, Valley of the Kings, and Tutankhamun.' },
+          { id: 4, name: 'Mummification and the Afterlife',               description: 'Why bodies were preserved, the 70-day process, and afterlife beliefs.' },
+          { id: 5, name: 'Fashion and Daily Life in Ancient Egypt',       description: 'Clothing, linen, jewellery, makeup, and daily dress in Ancient Egypt.' },
+          { id: 6, name: 'Hieroglyphics and Ancient Writing',             description: 'Picture writing, scribes, papyrus, and the Rosetta Stone.' },
         ],
       },
       {
@@ -108,3 +110,26 @@ export const learningConfig: Record<string, SubjectConfig> = {
     ],
   },
 };
+
+/** Resolve /lessons/subject/{key} from a chapter id like history_g6:unit_01 */
+export function subjectPathFromChapter(chapter: string): string {
+  const bookKey = (chapter.split(':')[0] ?? '').toLowerCase();
+  if (!bookKey) return '/lessons';
+
+  for (const [subjectKey, cfg] of Object.entries(learningConfig)) {
+    if (cfg.kind === 'sections') {
+      if (cfg.sections.some(s => bookKey === s.key || bookKey.startsWith(s.key))) {
+        return `/lessons/subject/${subjectKey}`;
+      }
+    }
+    if (bookKey === subjectKey || bookKey.startsWith(`${subjectKey}_`)) {
+      return `/lessons/subject/${subjectKey}`;
+    }
+  }
+
+  const fallback = bookKey.split('_')[0];
+  if (fallback && learningConfig[fallback]) {
+    return `/lessons/subject/${fallback}`;
+  }
+  return '/lessons';
+}

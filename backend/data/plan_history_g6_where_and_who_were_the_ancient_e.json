@@ -1,0 +1,49 @@
+{
+  "objectives": [
+    "Teach 6 units from history_g6 in order"
+  ],
+  "units": [
+    {
+      "unit_id": "unit_01",
+      "title": "Where and Who Were the Ancient Egyptians?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_01"
+    },
+    {
+      "unit_id": "unit_02",
+      "title": "How Religious Were the Ancient Egyptians?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_02"
+    },
+    {
+      "unit_id": "unit_03",
+      "title": "What Was the Social System Like?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_03"
+    },
+    {
+      "unit_id": "unit_04",
+      "title": "Why Did Egyptians Make Mummies?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_04"
+    },
+    {
+      "unit_id": "unit_05",
+      "title": "How Did Ancient Egyptians Dress?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_05"
+    },
+    {
+      "unit_id": "unit_06",
+      "title": "Could Egyptians Read and Write?",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_06"
+    }
+  ]
+}

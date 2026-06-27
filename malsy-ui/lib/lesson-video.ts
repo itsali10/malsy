@@ -6,6 +6,14 @@
 import { existsSync } from 'fs';
 import { mkdir, writeFile, readFile, rm, stat } from 'fs/promises';
 import path from 'path';
+import {
+  getLessonVideoFromSupabase,
+  isSupabaseStorageConfigured,
+  uploadLessonVideoToSupabase,
+} from './supabase-storage';
+import { unitVideoFilename } from './unit-video';
+
+export { unitVideoFilename };
 
 const OPENAI_API_KEY   = (process.env.OPENAI_API_KEY ?? '').trim();
 const OPENAI_MODEL     = process.env.OPENAI_MODEL ?? 'gpt-4o-mini';
@@ -15,8 +23,6 @@ const OPENAI_VIDEO_SIZE    = process.env.OPENAI_VIDEO_SIZE ?? '1280x720';
 const OPENAI_API_BASE  = 'https://api.openai.com/v1';
 
 export const VIDEO_DIR = path.join(process.cwd(), 'output', 'lesson-videos');
-
-// ── Helpers ────────────────────────────────────────────────────────────────────
 
 async function ensureDir(dirPath: string) {
   try {
@@ -30,12 +36,21 @@ export function friendlyError(err: unknown): string {
   const msg =
     (err as { message?: string })?.message ??
     String(err);
+  if (!OPENAI_API_KEY) {
+    return 'OPENAI_API_KEY is missing in malsy-ui/.env.local. Copy it from backend/.env, then restart npm run dev.';
+  }
   if (msg.includes('fetch failed') || msg.includes('ECONNREFUSED') || msg.includes('ETIMEDOUT'))
     return 'Network error — check internet connection.';
-  if (msg.includes('quota') || msg.includes('API key') || msg.includes('401') || msg.includes('429'))
-    return 'API error — check OPENAI_API_KEY and Sora access on your account.';
+  if (msg.includes('Incorrect API key') || msg.includes('invalid_api_key'))
+    return 'Invalid OPENAI_API_KEY in malsy-ui/.env.local.';
+  if (msg.includes('quota') || msg.includes('429'))
+    return 'OpenAI quota exceeded — check billing at platform.openai.com.';
+  if (msg.includes('401'))
+    return 'OpenAI rejected the API key — verify OPENAI_API_KEY in malsy-ui/.env.local.';
   if (msg.includes('403') || msg.includes('model_not_found') || msg.includes('not have access'))
     return 'Sora access not enabled on this OpenAI account. Enable it at platform.openai.com.';
+  if (msg.includes('API key'))
+    return 'API error — check OPENAI_API_KEY in malsy-ui/.env.local and Sora access on your account.';
   return msg;
 }
 
@@ -151,7 +166,7 @@ async function pollAndDownloadSoraVideo(videoId: string): Promise<Buffer> {
   throw new Error('Sora timed out after 30 minutes');
 }
 
-async function createSoraVideo(prompt: string, outputPath: string): Promise<void> {
+async function createSoraVideo(prompt: string): Promise<Buffer> {
   const sec = ['4','8','12'].includes(OPENAI_VIDEO_SECONDS) ? OPENAI_VIDEO_SECONDS : '12';
   const allowedSizes = ['720x1280','1280x720','1024x1792','1792x1024'];
   const size = allowedSizes.includes(OPENAI_VIDEO_SIZE) ? OPENAI_VIDEO_SIZE : '1280x720';
@@ -174,14 +189,15 @@ async function createSoraVideo(prompt: string, outputPath: string): Promise<void
   if (!videoId) throw new Error('Sora did not return a video id');
 
   const buf = await pollAndDownloadSoraVideo(videoId);
-  await writeFile(outputPath, buf);
-  console.log(`[LessonVideo] Saved: ${outputPath}`);
+  console.log(`[LessonVideo] Sora download complete (${buf.length} bytes)`);
+  return buf;
 }
 
 // ── Public API ─────────────────────────────────────────────────────────────────
 
 export interface LessonVideoResult {
-  videoPath: string;
+  videoPath?: string;
+  videoUrl: string;
   script: string;
   lessonTitle: string;
 }
@@ -191,34 +207,143 @@ export async function generateLessonVideo(opts: {
   lessonTitle: string;
   lessonDescription: string;
   outputFilename: string;
+  preGeneratedScript?: string;
+  /** When true, preGeneratedScript is used directly as the Sora visual prompt (not re-wrapped). */
+  isSoraPrompt?: boolean;
+  /** Spoken narration shown in UI (separate from Sora visual prompt). */
+  narrationScript?: string;
+  unitId?: string;
 }): Promise<LessonVideoResult> {
+  if (!OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY is missing in malsy-ui/.env.local');
+  }
   await ensureDir(VIDEO_DIR);
 
-  console.log(`[LessonVideo] Generating script for: ${opts.lessonTitle}`);
-  const script = await generateScript(opts.lessonTitle, opts.lessonDescription, opts.subject);
-  console.log(`[LessonVideo] Script ready (${script.split(/\s+/).length} words)`);
+  let script: string;
+  let soraPrompt: string;
 
-  const soraPrompt = buildSoraPrompt(opts.subject, opts.lessonTitle, script);
+  if (opts.preGeneratedScript && opts.preGeneratedScript.trim()) {
+    const pre = opts.preGeneratedScript.trim();
+    if (opts.isSoraPrompt) {
+      soraPrompt = pre;
+      script = (opts.narrationScript?.trim() || pre);
+      console.log(`[LessonVideo] Using RAG Sora prompt (${pre.split(/\s+/).length} words)`);
+    } else {
+      script = pre;
+      soraPrompt = buildSoraPrompt(opts.subject, opts.lessonTitle, script);
+      console.log(`[LessonVideo] Using pre-generated narration (${script.split(/\s+/).length} words)`);
+    }
+  } else {
+    console.log(`[LessonVideo] Generating script for: ${opts.lessonTitle}`);
+    script = await generateScript(opts.lessonTitle, opts.lessonDescription, opts.subject);
+    soraPrompt = buildSoraPrompt(opts.subject, opts.lessonTitle, script);
+    console.log(`[LessonVideo] Script ready (${script.split(/\s+/).length} words)`);
+  }
+
+  const videoBuffer = await createSoraVideo(soraPrompt);
+  const meta = {
+    lessonTitle: opts.lessonTitle,
+    script,
+    narration: opts.narrationScript?.trim() || script,
+    keyConcept: opts.lessonDescription,
+    unitId: opts.unitId,
+    savedAt: new Date().toISOString(),
+  };
+
+  if (isSupabaseStorageConfigured()) {
+    const videoUrl = await uploadLessonVideoToSupabase(opts.outputFilename, videoBuffer, meta);
+    console.log(`[LessonVideo] Saved to Supabase: ${videoUrl}`);
+    return { videoUrl, script, lessonTitle: opts.lessonTitle };
+  }
+
   const outputPath = path.join(VIDEO_DIR, opts.outputFilename);
-  await createSoraVideo(soraPrompt, outputPath);
-
-  // Save metadata alongside the video
+  await writeFile(outputPath, videoBuffer);
   const metaPath = outputPath.replace('.mp4', '.meta.json');
-  await writeFile(metaPath, JSON.stringify({ lessonTitle: opts.lessonTitle, script, savedAt: new Date().toISOString() }));
+  await writeFile(metaPath, JSON.stringify(meta));
+  console.log(`[LessonVideo] Saved locally: ${outputPath}`);
 
-  return { videoPath: outputPath, script, lessonTitle: opts.lessonTitle };
+  return {
+    videoPath: outputPath,
+    videoUrl: `/api/lesson-video/${path.basename(outputPath)}`,
+    script,
+    lessonTitle: opts.lessonTitle,
+  };
 }
 
-export async function getExistingLessonVideo(filename: string): Promise<{ ready: boolean; script?: string; lessonTitle?: string }> {
+async function migrateLocalVideoToSupabase(filename: string): Promise<{
+  ready: boolean;
+  videoUrl?: string;
+  script?: string;
+  narration?: string;
+  keyConcept?: string;
+  lessonTitle?: string;
+  savedAt?: string;
+}> {
   const videoPath = path.join(VIDEO_DIR, filename);
   if (!existsSync(videoPath)) return { ready: false };
 
   const metaPath = videoPath.replace('.mp4', '.meta.json');
+  let meta: Record<string, unknown> = { savedAt: new Date().toISOString() };
   if (existsSync(metaPath)) {
     try {
-      const meta = JSON.parse(await readFile(metaPath, 'utf-8') as string);
-      return { ready: true, script: meta.script, lessonTitle: meta.lessonTitle };
+      meta = JSON.parse(await readFile(metaPath, 'utf-8') as string) as Record<string, unknown>;
     } catch { /* ignore corrupt meta */ }
   }
-  return { ready: true };
+
+  const videoBuffer = await readFile(videoPath);
+  await uploadLessonVideoToSupabase(filename, videoBuffer, meta);
+  console.log(`[LessonVideo] Migrated local file to Supabase: ${filename}`);
+  return getLessonVideoFromSupabase(filename);
+}
+
+export async function getExistingLessonVideo(filename: string): Promise<{
+  ready: boolean;
+  videoUrl?: string;
+  script?: string;
+  narration?: string;
+  keyConcept?: string;
+  lessonTitle?: string;
+  savedAt?: string;
+}> {
+  if (isSupabaseStorageConfigured()) {
+    const cloud = await getLessonVideoFromSupabase(filename);
+    if (cloud.ready) return cloud;
+
+    try {
+      const migrated = await migrateLocalVideoToSupabase(filename);
+      if (migrated.ready) return migrated;
+    } catch (err) {
+      console.warn(
+        '[LessonVideo] Supabase migration failed:',
+        err instanceof Error ? err.message : err,
+      );
+    }
+  }
+
+  const videoPath = path.join(VIDEO_DIR, filename);
+  if (!existsSync(videoPath)) return { ready: false };
+
+  const videoUrl = `/api/lesson-video/${path.basename(videoPath)}`;
+  const metaPath = videoPath.replace('.mp4', '.meta.json');
+  if (existsSync(metaPath)) {
+    try {
+      const meta = JSON.parse(await readFile(metaPath, 'utf-8') as string) as {
+        script?: string;
+        narration?: string;
+        keyConcept?: string;
+        lessonTitle?: string;
+        savedAt?: string;
+      };
+      return {
+        ready: true,
+        videoUrl,
+        script: meta.script,
+        narration: meta.narration ?? meta.script,
+        keyConcept: meta.keyConcept,
+        lessonTitle: meta.lessonTitle,
+        savedAt: meta.savedAt,
+      };
+    } catch { /* ignore corrupt meta */ }
+  }
+  return { ready: true, videoUrl };
 }

@@ -1,0 +1,83 @@
+{
+  "unit_title": "Ancient Egyptians",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Ancient Egyptians",
+      "must_cover": true,
+      "keywords": [
+        "Ancient Egyptians",
+        "research project",
+        "civilisation",
+        "monuments",
+        "Pharaohs",
+        "River Nile"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Where and who were the Ancient Egyptians?",
+      "must_cover": true,
+      "keywords": [
+        "Egypt",
+        "River Nile",
+        "Sudan",
+        "Nile valley",
+        "farming",
+        "Narmer",
+        "Menes",
+        "Memphis",
+        "Two Lands"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "similarities",
+        "differences",
+        "Ancient Egyptian life",
+        "life today"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "maps",
+        "illustrations",
+        "diagrams",
+        "River Nile",
+        "Egyptian kingdoms"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Reading Comprehension Exercises",
+      "must_cover": true,
+      "keywords": [
+        "comprehension questions",
+        "key points",
+        "Ancient Egyptian life"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Unit Wrap-Up",
+      "must_cover": true,
+      "keywords": [
+        "Ancient Egyptians",
+        "River Nile",
+        "Egyptian kingdoms"
+      ]
+    }
+  ]
+}

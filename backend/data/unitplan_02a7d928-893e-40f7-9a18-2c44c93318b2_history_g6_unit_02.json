@@ -1,0 +1,72 @@
+{
+  "unit_title": "Ancient Egyptian Gods and Goddesses",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Ancient Egyptian Gods and Goddesses",
+      "must_cover": true,
+      "keywords": [
+        "Ancient Egypt",
+        "Gods",
+        "Goddesses"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Religious Beliefs of Ancient Egyptians",
+      "must_cover": true,
+      "keywords": [
+        "Religion",
+        "Ancient Egypt",
+        "Gods",
+        "Goddesses"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Representation of Egyptian Gods and Goddesses",
+      "must_cover": true,
+      "keywords": [
+        "Images",
+        "Egyptian gods",
+        "Goddesses",
+        "Visuals"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions on Ancient Egyptian Religious Practices",
+      "must_cover": true,
+      "keywords": [
+        "Discussion",
+        "Religious practices",
+        "Ancient Egypt"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises on Egyptian Gods and Goddesses",
+      "must_cover": true,
+      "keywords": [
+        "Exercises",
+        "Practice tasks",
+        "Ancient Egyptian Gods"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Wrapping Up Ancient Egyptian Religious Beliefs",
+      "must_cover": true,
+      "keywords": [
+        "Conclusion",
+        "Ancient Egyptian religion"
+      ]
+    }
+  ]
+}

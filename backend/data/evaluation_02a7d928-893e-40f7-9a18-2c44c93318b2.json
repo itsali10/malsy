@@ -1,0 +1,903 @@
+{
+  "student_id": "02a7d928-893e-40f7-9a18-2c44c93318b2",
+  "updated_at": "2026-06-24T22:36:39.970106Z",
+  "totals": {
+    "attempts": 51,
+    "correct": 30,
+    "accuracy": 58.82
+  },
+  "recent_attempts": [
+    {
+      "ts": "2026-06-23T17:33:02.821737Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What will we be exploring in the Parkside Academy History Project unit?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T17:34:04.981756Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What will we be exploring in the Parkside Academy History Project unit?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:01:23.189949Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Where did the Ancient Egyptians settle and why was the River Nile important to them?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:07:44.722774Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the significance of the Nile River for the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:08:26.592829Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "What was the significance of the River Nile to the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:13:45.533995Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Why was the River Nile important to the Ancient Egyptians?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:14:46.720379Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the capital established by King Narmer to unite Upper and Lower Egypt?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:16:14.107486Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the capital established by King Narmer to unite Upper and Lower Egypt?",
+      "correct": false,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": true
+    },
+    {
+      "ts": "2026-06-23T18:21:26.121631Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the capital established by King Narmer to unite Upper and Lower Egypt?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:34:52.708193Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Why was the Nile River so important to the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:45:49.437156Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "What was the significance of the River Nile for the Ancient Egyptians?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:46:13.399467Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "What was the significance of the River Nile for the Ancient Egyptians?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:46:49.497474Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "What was the significance of the River Nile for the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:48:26.400451Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "unit_opening",
+      "quiz_question": "Which Ancient Egyptian god was associated with the head of a cat?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:48:50.397121Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "unit_opening",
+      "quiz_question": "Which Ancient Egyptian god was associated with the head of a cat?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:49:20.868150Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "unit_opening",
+      "quiz_question": "Which Ancient Egyptian god was associated with the head of a cat?",
+      "correct": false,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": true
+    },
+    {
+      "ts": "2026-06-23T19:04:06.863695Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "unit_opening",
+      "quiz_question": "Why was Ra, the sun god, depicted with a falcon head?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T19:07:16.180066Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "reading_1",
+      "quiz_question": "Why did the Ancient Egyptians depict their gods and goddesses with human bodies and animal heads?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T19:10:54.914814Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "visual_elements",
+      "quiz_question": "Which Egyptian god was often depicted with the head of a falcon?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T17:58:29.844842Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "discussion_questions",
+      "quiz_question": "Where did the Ancient Egyptians live primarily?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T17:58:37.445993Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "discussion_questions",
+      "quiz_question": "Where did the Ancient Egyptians live primarily?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:24:44.939051Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "visual_elements",
+      "quiz_question": "Why did the Ancient Egyptians settle along the banks of the River Nile?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:38:29.616864Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Why did the Ancient Egyptians depend on the River Nile?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:43:27.697308Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Why was the Nile River important to the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:44:51.463155Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What did the ancient Egyptians refer to as the black land?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:50:09.461068Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "What did the ancient Egyptians refer to as the black land?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:56:21.226789Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "discussion_questions",
+      "quiz_question": "No quiz available - teaching content was not generated.",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:57:00.417208Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "discussion_questions",
+      "quiz_question": "No quiz available - teaching content was not generated.",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:57:06.894657Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "discussion_questions",
+      "quiz_question": "No quiz available - teaching content was not generated.",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:57:14.873654Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "discussion_questions",
+      "quiz_question": "No quiz available - teaching content was not generated.",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:57:24.390706Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "discussion_questions",
+      "quiz_question": "No quiz available - teaching content was not generated.",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:57:55.839960Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "discussion_questions",
+      "quiz_question": "No quiz available - teaching content was not generated.",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T19:22:21.120082Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "discussion_questions",
+      "quiz_question": "Where did the Ancient Egyptians live primarily?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T19:23:44.960491Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Where did the Ancient Egyptians live?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T19:27:48.346184Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Why was the River Nile so important to the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T19:45:41.036581Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "discussion_questions",
+      "quiz_question": "What was the significance of the River Nile to the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T19:49:50.306879Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "visual_elements",
+      "quiz_question": "Where did the Ancient Egyptians live and why was the Nile important to them?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T19:53:51.560939Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "exercises",
+      "quiz_question": "Where did the Ancient Egyptians settle primarily for their civilization to thrive?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T20:02:21.325044Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "wrap_up",
+      "quiz_question": "Where did the Ancient Egyptians live primarily?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T20:05:06.844104Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Who is credited with the unification of Upper and Lower Egypt around 3200 BC?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T20:10:33.587142Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Who was the pharaoh that united Upper and Lower Egypt around 3200 BC?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:01:21.040043Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Who was the pharaoh who united Upper and Lower Egypt around 3200 BC?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:07:26.392152Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Where did the Ancient Egyptians live and why was the Nile important to them?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:08:24.967723Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What were the two kingdoms along the River Nile in Ancient Egypt known as?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:12:00.363041Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What were the two kingdoms along the River Nile in Ancient Egypt known as?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:21:51.242776Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Where did the Ancient Egyptians live and why was the Nile important to them?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:22:45.155668Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What were the two kingdoms in Ancient Egypt along the River Nile?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:33:44.430556Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Where did the Ancient Egyptians live and what river was crucial to their civilization?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:34:28.895109Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Who was the pharaoh who united Upper and Lower Egypt around 3200 BC?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T22:36:39.970106Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Where did the Ancient Egyptians live?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ],
+  "by_unit": {
+    "history_g6:unit_01": {
+      "attempts": 39,
+      "correct": 27,
+      "accuracy": 69.23
+    },
+    "history_g6:unit_02": {
+      "attempts": 12,
+      "correct": 3,
+      "accuracy": 25.0
+    }
+  },
+  "by_item": {
+    "history_g6:unit_01:unit_opening": {
+      "attempts": 20,
+      "incorrect": 9,
+      "remediation_used": 1
+    },
+    "history_g6:unit_01:reading_1": {
+      "attempts": 11,
+      "incorrect": 2,
+      "remediation_used": 0
+    },
+    "history_g6:unit_02:unit_opening": {
+      "attempts": 4,
+      "incorrect": 3,
+      "remediation_used": 1
+    },
+    "history_g6:unit_02:reading_1": {
+      "attempts": 1,
+      "incorrect": 0,
+      "remediation_used": 0
+    },
+    "history_g6:unit_02:visual_elements": {
+      "attempts": 1,
+      "incorrect": 0,
+      "remediation_used": 0
+    },
+    "history_g6:unit_01:discussion_questions": {
+      "attempts": 4,
+      "incorrect": 1,
+      "remediation_used": 0
+    },
+    "history_g6:unit_01:visual_elements": {
+      "attempts": 2,
+      "incorrect": 0,
+      "remediation_used": 0
+    },
+    "history_g6:unit_02:discussion_questions": {
+      "attempts": 6,
+      "incorrect": 6,
+      "remediation_used": 0
+    },
+    "history_g6:unit_01:exercises": {
+      "attempts": 1,
+      "incorrect": 0,
+      "remediation_used": 0
+    },
+    "history_g6:unit_01:wrap_up": {
+      "attempts": 1,
+      "incorrect": 0,
+      "remediation_used": 0
+    }
+  },
+  "tutor_quality_events": [
+    {
+      "ts": "2026-06-23T17:30:51.972186Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of the unit purpose and goals",
+          "Overview of the topics to be covered"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 52,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T17:33:02.821737Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of the unit purpose or goals",
+          "Overview of what will be covered in the unit"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 52,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T17:34:04.981756Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of the unit purpose or goals",
+          "Introduction to the topics or themes that will be covered",
+          "Overview of what students will learn"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 52,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:01:23.189949Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Introduction to Ancient Egyptian Life section is missing",
+          "Encouragement for discussion with family member/carer is missing",
+          "Encouragement for comparison of Ancient Egyptian life with life today is missing"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 52,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:07:44.722774Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Introduction to the unit",
+          "Explanation of the research project on Ancient Egyptians",
+          "Encouragement for the reading on different sections of Ancient Egyptian life",
+          "Discussion prompts for comparing Ancient Egyptian life to today"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 52,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:08:26.592829Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [],
+        "coverage_fix_applied": false,
+        "teacher_text_len": 52,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:13:45.533995Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Introduction to Ancient Egyptian Life title is not explicitly mentioned",
+          "Encouragement for a research project is not addressed",
+          "Discussion about key points of each section and comparison to life today is not discussed"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 52,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:14:46.720379Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of the unit's title and purpose",
+          "Encouragement for the research project",
+          "Discussion prompts related to Ancient Egyptian life",
+          "Guidance on how to approach the reading sections"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 52,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:16:14.107486Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of the unit's purpose or goals",
+          "Encouragement for students to engage in the research project",
+          "Guidance on how to approach the reading sections",
+          "Discussion prompts related to the key points of each section and their relevance to modern life"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 52,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:21:26.121631Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of the research project based on Ancient Egyptians",
+          "Encouragement for reading sections on Ancient Egyptian life",
+          "Discussion prompts for comparing Ancient Egyptian life to today",
+          "Guidance on sharing findings with family members/caregivers"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 1472,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:34:52.708193Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Encouragement to read aloud to a family member/carer and discuss key points",
+          "Encouragement to share findings with a family member/carer",
+          "Encouragement to think about similarities/differences to life today",
+          "Discussion prompts related to Ancient Egyptian life sections"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 1858,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:45:49.437156Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [],
+        "coverage_fix_applied": false,
+        "teacher_text_len": 2449,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:46:13.399467Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [],
+        "coverage_fix_applied": false,
+        "teacher_text_len": 2210,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:46:49.497474Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [],
+        "coverage_fix_applied": false,
+        "teacher_text_len": 1594,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:48:26.400451Z",
+      "unit_id": "history_g6:unit_02",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Introduction to the unit 'Introduction to Ancient Egyptian Gods and Goddesses'",
+          "Explanation of the importance of studying Ancient Egyptian gods and goddesses",
+          "Engagement with the students about the topic",
+          "Summary of what will be covered in the unit",
+          "Transition to the quiz"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 2218,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:48:50.397121Z",
+      "unit_id": "history_g6:unit_02",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Introduction to the unit topic 'Ancient Egyptian Gods and Goddesses'",
+          "Explanation of the significance of learning about Ancient Egyptian gods and goddesses",
+          "Engagement with the idea of exploring religion in Ancient Egypt",
+          "Connection to the daily lives and beliefs of ancient Egyptians",
+          "Mention of the number of gods and goddesses in Ancient Egypt",
+          "Explanation of the importance of Ra, the God of the sun",
+          "Discussion about the visual representations of gods and goddesses",
+          "Guidance on understanding the reasons for worshipping specific gods and goddesses"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 1531,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T18:49:20.868150Z",
+      "unit_id": "history_g6:unit_02",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Introduction to the unit titled 'Introduction to Ancient Egyptian Gods and Goddesses'",
+          "Overview of what will be covered in the unit",
+          "Connection to the students' prior knowledge or experiences",
+          "Engagement with the unit content",
+          "Transition to the first lesson or activity"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 2237,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T19:04:06.863695Z",
+      "unit_id": "history_g6:unit_02",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Introduction to the unit and its objectives",
+          "Engagement with the visual elements such as the table showing Egyptian gods and goddesses",
+          "Discussion prompts related to the content",
+          "Checking understanding through exercises or questions"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 1926,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-23T19:07:16.180066Z",
+      "unit_id": "history_g6:unit_02",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of the significance of animals representing the powers of the gods",
+          "Clarification on the daily cycle of Ra and his journey through the underworld",
+          "Connection between the gods and their respective animals",
+          "Discussion on the reasons for worshipping specific gods and goddesses"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 2018,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-24T19:22:21.120082Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Discussion questions on ancient Egyptian life",
+          "Comparing ancient Egyptian life to life today",
+          "Identifying key points about ancient Egyptian life",
+          "Discussing similarities between ancient Egyptian life and life today",
+          "Discussing differences between ancient Egyptian life and life today"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 52,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-24T19:23:44.960491Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Introduction to the unit",
+          "Encouragement for further research on Ancient Egyptian life",
+          "Discussion prompts related to Ancient Egyptian life"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 52,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-24T19:27:48.346184Z",
+      "unit_id": "history_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [],
+        "coverage_fix_applied": false,
+        "teacher_text_len": 2033,
+        "mentions_page_ranges": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "student_id": "02a7d928-893e-40f7-9a18-2c44c93318b2",
+  "chapter_id": "history_g6:unit_02",
+  "current_item_index": 3,
+  "done_items": [
+    "unit_opening",
+    "reading_1",
+    "visual_elements"
+  ],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [
+    {
+      "ts": "2026-06-23T18:48:25.495245Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Which Ancient Egyptian god was associated with the head of a cat?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:48:49.357815Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Which Ancient Egyptian god was associated with the head of a cat?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T18:49:18.455636Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Which Ancient Egyptian god was associated with the head of a cat?",
+      "correct": false,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": true
+    },
+    {
+      "ts": "2026-06-23T19:04:05.507318Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Why was Ra, the sun god, depicted with a falcon head?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T19:07:15.145671Z",
+      "item_id": "reading_1",
+      "quiz_question": "Why did the Ancient Egyptians depict their gods and goddesses with human bodies and animal heads?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-23T19:10:54.901059Z",
+      "item_id": "visual_elements",
+      "quiz_question": "Which Egyptian god was often depicted with the head of a falcon?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:56:20.498108Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "No quiz available - teaching content was not generated.",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:56:59.277731Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "No quiz available - teaching content was not generated.",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:57:06.053338Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "No quiz available - teaching content was not generated.",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:57:13.961036Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "No quiz available - teaching content was not generated.",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:57:23.367863Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "No quiz available - teaching content was not generated.",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T18:57:55.001252Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "No quiz available - teaching content was not generated.",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    }
+  ]
+}

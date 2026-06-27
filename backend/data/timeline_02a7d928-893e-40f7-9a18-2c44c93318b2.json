@@ -1,0 +1,71 @@
+{
+  "student_id": "02a7d928-893e-40f7-9a18-2c44c93318b2",
+  "student_start_at": "2026-06-23T16:53:04.030987Z",
+  "taught_units": [
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-23T18:07:44.816983Z",
+      "completed_parts": 2
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-23T18:34:52.737363Z",
+      "completed_parts": 1
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-23T18:46:49.541232Z",
+      "completed_parts": 1
+    },
+    {
+      "unit_id": "history_g6:unit_02",
+      "taught_at": "2026-06-23T19:04:06.976476Z",
+      "completed_parts": 1
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-24T17:58:37.518907Z",
+      "completed_parts": 1
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-24T18:44:51.560099Z",
+      "completed_parts": 2
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-24T19:23:45.069618Z",
+      "completed_parts": 2
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-24T19:45:41.123302Z",
+      "completed_parts": 2
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-24T20:05:06.968375Z",
+      "completed_parts": 2
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-24T22:01:21.144028Z",
+      "completed_parts": 2
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-24T22:12:00.450127Z",
+      "completed_parts": 2
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-24T22:22:45.275943Z",
+      "completed_parts": 2
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-24T22:34:29.054854Z",
+      "completed_parts": 2
+    }
+  ]
+}

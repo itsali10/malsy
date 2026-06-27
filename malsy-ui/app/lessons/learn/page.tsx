@@ -4,6 +4,12 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api, Quiz, SessionAnswerResponse, SessionStartResponse } from '../../../lib/api';
 import { auth } from '../../../lib/auth';
+import LessonPartVideoPanel from '../../../components/LessonPartVideoPanel';
+import HistoryInteractiveImages from '../../../components/HistoryInteractiveImages';
+import { unitVideoFilename } from '../../../lib/unit-video';
+import { subjectPathFromChapter } from '../../../lib/learning-config';
+import { useLessonAudioPlayer } from '../../../hooks/useLessonAudioPlayer';
+import { attachLipSync, dispatchSpeaking } from '../../../lib/lesson-audio';
 
 // ── Types ─────────────────────────────────────────────────────────
 
@@ -14,6 +20,15 @@ interface Feedback {
   kind: 'hint' | 'remediation' | 'correct';
   hintCount?: number;
   nextAction?: string;
+}
+
+const LESSON_SECTION_HEADING = /^\d+\.\s*(Hook|Explanation|Historical Example|Real-Life Connection|Quick Recap|Transition to Quiz)\s*$/i;
+
+function lessonParagraphs(text: string): string[] {
+  return text
+    .split(/\n+/)
+    .map(p => p.trim())
+    .filter(p => p && !LESSON_SECTION_HEADING.test(p));
 }
 
 // ── Lesson page ────────────────────────────────────────────────────
@@ -31,13 +46,17 @@ function LessonLearn() {
   const [teacherText, setTeacherText] = useState('');
   const [quiz,        setQuiz]        = useState<Quiz | null>(null);
   const [unitPart,    setUnitPart]    = useState<0 | 1>(0);
+  const [maxUnlocked, setMaxUnlocked] = useState<0 | 1>(0);
+  const [switching,   setSwitching]   = useState(false);
   const [answer,      setAnswer]      = useState('');
+  const [answerIndex, setAnswerIndex] = useState(-1);
   const [feedback,    setFeedback]    = useState<Feedback | null>(null);
   const [errorMsg,    setErrorMsg]    = useState('');
-  const [speaking,    setSpeaking]    = useState(false);
-  const [ttsError,    setTtsError]    = useState('');
+  const [completeMsg, setCompleteMsg] = useState('');
+  const [feedbackSpeaking, setFeedbackSpeaking] = useState(false);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const feedbackAudioRef = useRef<HTMLAudioElement | null>(null);
+  const feedbackTokenRef = useRef(0);
 
   // Labels for breadcrumb: prefer explicit lesson_title param, fall back to chapter ID parsing
   const [subjectLabel, unitLabel] = (() => {
@@ -50,63 +69,85 @@ function LessonLearn() {
     return [cap(p[0] ?? 'Lesson'), cap(p[1] ?? chapter)];
   })();
 
-  // ── audio ─────────────────────────────────────────────────────
+  // ── lesson audio (Listen / Pause / Continue / Restart) ─────────
 
-  function stopAudio() {
-    audioRef.current?.pause();
-    audioRef.current = null;
-    setSpeaking(false);
-    window.dispatchEvent(new CustomEvent('malsy-tts', { detail: { speaking: false } }));
-  }
+  const lessonAudio = useLessonAudioPlayer(chapter, teacherText);
 
-  async function playTTS(text: string) {
+  async function playFeedbackTTS(text: string) {
     if (!text.trim()) return;
-    stopAudio();
-    setSpeaking(true);
-    setTtsError('');
+    lessonAudio.pauseAndSave();
+    feedbackTokenRef.current += 1;
+    const token = feedbackTokenRef.current;
+    feedbackAudioRef.current?.pause();
+    setFeedbackSpeaking(true);
     try {
       const { audio_url } = await api.tts.speak(text);
+      if (token !== feedbackTokenRef.current) return;
       const base = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000').replace(/\/$/, '');
-      const src  = audio_url.startsWith('http') ? audio_url : `${base}${audio_url}`;
-      const el   = new Audio(src);
-      audioRef.current = el;
-      el.onplay = () => {
-        window.dispatchEvent(new CustomEvent('malsy-tts', { detail: { speaking: true } }));
+      const src = audio_url.startsWith('http') ? audio_url : `${base}${audio_url}`;
+      const el = new Audio(src);
+      feedbackAudioRef.current = el;
+      let stopLipSync: (() => void) | null = null;
+      el.onplaying = () => { if (!stopLipSync) stopLipSync = attachLipSync(el); };
+      const stop = () => {
+        setFeedbackSpeaking(false);
+        stopLipSync?.();
+        stopLipSync = null;
+        dispatchSpeaking(false, 0);
       };
-      el.onended = () => {
-        setSpeaking(false);
-        window.dispatchEvent(new CustomEvent('malsy-tts', { detail: { speaking: false } }));
-      };
-      el.onerror = () => {
-        setSpeaking(false);
-        setTtsError('Audio playback failed — check that the backend is running.');
-        window.dispatchEvent(new CustomEvent('malsy-tts', { detail: { speaking: false } }));
-      };
-      el.play().catch(err => {
-        console.error('[TTS] play() rejected:', err);
-        setSpeaking(false);
-        setTtsError(err instanceof Error ? err.message : 'Playback blocked by browser.');
-        window.dispatchEvent(new CustomEvent('malsy-tts', { detail: { speaking: false } }));
-      });
-    } catch (err) {
-      console.error('[TTS] API error:', err);
-      setSpeaking(false);
-      setTtsError(err instanceof Error ? err.message : 'TTS service unavailable.');
-      window.dispatchEvent(new CustomEvent('malsy-tts', { detail: { speaking: false } }));
+      el.onended = stop;
+      el.onerror = stop;
+      el.play().catch(stop);
+    } catch {
+      if (token === feedbackTokenRef.current) setFeedbackSpeaking(false);
     }
   }
 
+  const avatarSpeaking = lessonAudio.isSpeaking || feedbackSpeaking;
+
   // ── session ───────────────────────────────────────────────────
+
+  const isHistory = chapter.toLowerCase().includes('history');
+  const videoFilename = isHistory ? unitVideoFilename(chapter) : null;
+  const lessonsBackPath = subjectPathFromChapter(chapter);
 
   function applySession(res: SessionStartResponse) {
     setTeacherText(res.teacher_text ?? '');
     setQuiz(res.quiz ?? null);
     setUnitPart((res.unit_part ?? 0) as 0 | 1);
+    setMaxUnlocked(Math.min(1, Math.max(0, res.max_unlocked_part ?? 0)) as 0 | 1);
     setFeedback(null);
     setAnswer('');
+    setAnswerIndex(-1);
     setPhase('active');
-    // Auto-play is browser-blocked when triggered without a direct user gesture;
-    // the user clicks 🔊 Listen to hear the lesson.
+  }
+
+  async function goToPart(target: 0 | 1) {
+    if (target > maxUnlocked || target === unitPart || switching) return;
+    lessonAudio.pauseAndSave();
+    setSwitching(true);
+    setPhase('loading');
+    try {
+      let res = await api.session.switchPart(studentId, target);
+      // Session was lost (e.g. server reload) — restart the chapter, then retry the switch.
+      if ((res as { need_restart?: boolean }).need_restart) {
+        await api.session.start(studentId, chapter, lessonTitle, lessonDesc);
+        res = await api.session.switchPart(studentId, target);
+      }
+      if ((res as { error?: string }).error) {
+        setErrorMsg((res as { error?: string }).error ?? 'Could not switch part');
+        setPhase('error');
+        return;
+      }
+      applySession(res);
+      // Switching parts stays within the same unit, so unlock state must never regress.
+      setMaxUnlocked(prev => Math.max(prev, res.max_unlocked_part ?? 0) as 0 | 1);
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : 'Could not switch part');
+      setPhase('error');
+    } finally {
+      setSwitching(false);
+    }
   }
 
   useEffect(() => {
@@ -123,22 +164,34 @@ function LessonLearn() {
 
   async function submitAnswer() {
     if (!answer.trim()) return;
-    stopAudio();
+    lessonAudio.pauseAndSave();
     setPhase('answering');
     try {
-      const res: SessionAnswerResponse = await api.session.answer(studentId, answer);
+      const res: SessionAnswerResponse = await api.session.answer(
+        studentId,
+        answer,
+        quiz?.options?.length ? answerIndex : undefined,
+      );
       setAnswer('');
+      setAnswerIndex(-1);
       if (res.correct) {
-        setFeedback({ text: res.advance_text ?? 'Great job!', kind: 'correct', nextAction: res.next_action });
+        const unlocked = Math.min(1, Math.max(maxUnlocked, res.max_unlocked_part ?? 0)) as 0 | 1;
+        setMaxUnlocked(unlocked);
+        if (res.message) setCompleteMsg(res.message);
+        setFeedback({
+          text: res.message ?? res.advance_text ?? 'Great job!',
+          kind: 'correct',
+          nextAction: res.next_action,
+        });
         setPhase('correct');
       } else if (res.hint) {
         setFeedback({ text: res.hint, kind: 'hint', hintCount: res.hint_count });
         setPhase('hint');
-        playTTS(res.hint);
+        playFeedbackTTS(res.hint);
       } else if (res.remediation_text) {
         setFeedback({ text: res.remediation_text, kind: 'remediation' });
         setPhase('remediation');
-        playTTS(res.remediation_text);
+        playFeedbackTTS(res.remediation_text);
       } else {
         setFeedback({ text: 'Think about it and try again.', kind: 'hint' });
         setPhase('hint');
@@ -152,12 +205,18 @@ function LessonLearn() {
   async function handleNext() {
     if (!feedback) return;
     const action = feedback.nextAction;
-    stopAudio();
-    if (action === 'all_complete') { setPhase('complete'); return; }
+    lessonAudio.pauseAndSave();
+    if (action === 'all_complete' || action === 'lesson_complete') { setPhase('complete'); return; }
     setPhase('loading');
     try {
       let res: SessionStartResponse;
-      if (action === 'continue_unit_part2') res = await api.session.continuePart2(studentId);
+      if (action === 'continue_unit_part2') {
+        res = await api.session.continuePart2(studentId);
+        if ((res as { need_restart?: boolean }).need_restart) {
+          await api.session.start(studentId, chapter, lessonTitle, lessonDesc);
+          res = await api.session.continuePart2(studentId);
+        }
+      }
       else if (action === 'next_unit')      res = await api.session.nextUnit(studentId);
       else                                  res = await api.session.start(studentId, chapter);
       if (res.done || (res as { error?: string }).error) { setPhase('complete'); return; }
@@ -165,7 +224,8 @@ function LessonLearn() {
     } catch { setPhase('complete'); }
   }
 
-  const paragraphs  = teacherText.split(/\n+/).map(p => p.trim()).filter(Boolean);
+  const paragraphs  = lessonParagraphs(teacherText);
+  const canListen = paragraphs.length > 0;
   const hasFeedback = phase === 'hint' || phase === 'remediation' || phase === 'correct';
   const canRetry    = phase === 'hint' || phase === 'remediation';
 
@@ -178,10 +238,10 @@ function LessonLearn() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button
-            onClick={() => { stopAudio(); router.push('/lessons'); }}
+            onClick={() => { lessonAudio.abort(); router.push(lessonsBackPath); }}
             style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '5px 14px', color: 'var(--g2)', cursor: 'pointer', fontSize: 12, fontFamily: 'var(--fb)' }}
           >
-            ← Lessons
+            ← Back to Lessons
           </button>
           <span style={{ fontSize: 13, color: 'var(--g5)' }}>/</span>
           <span style={{ fontSize: 13, color: 'var(--vl)', fontWeight: 600 }}>{subjectLabel}</span>
@@ -189,17 +249,43 @@ function LessonLearn() {
           <span style={{ fontSize: 13, color: 'var(--w)' }}>{unitLabel}</span>
         </div>
 
-        {/* Part progress pills */}
+        {/* Part progress pills — click to switch unlocked parts.
+            History has NO parts (one lesson = one unit), so pills are hidden. */}
+        {!isHistory && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 10, color: 'var(--g4)', textTransform: 'uppercase', letterSpacing: '.06em' }}>
             Part {unitPart + 1} of 2
           </span>
-          <div style={{ display: 'flex', gap: 4 }}>
-            {[0, 1].map(p => (
-              <div key={p} style={{ width: 32, height: 4, borderRadius: 99, transition: 'background .3s', background: p <= unitPart ? 'var(--vl)' : 'rgba(255,255,255,.1)' }} />
-            ))}
+          <div style={{ display: 'flex', gap: 6 }}>
+            {([0, 1] as const).map(p => {
+              const unlocked = p <= maxUnlocked;
+              const active = p === unitPart;
+              return (
+                <button
+                  key={p}
+                  type="button"
+                  disabled={!unlocked || active || switching}
+                  onClick={() => goToPart(p)}
+                  title={unlocked ? `Go to Part ${p + 1}` : `Pass Part ${p} quiz to unlock`}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: 99,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    cursor: unlocked && !active ? 'pointer' : 'default',
+                    border: `1px solid ${active ? 'var(--vl)' : unlocked ? 'rgba(255,255,255,.2)' : 'rgba(255,255,255,.08)'}`,
+                    background: active ? 'rgba(91,33,245,.35)' : unlocked ? 'rgba(255,255,255,.06)' : 'transparent',
+                    color: active ? 'var(--w)' : unlocked ? 'var(--g2)' : 'var(--g5)',
+                    opacity: unlocked ? 1 : 0.5,
+                  }}
+                >
+                  {unlocked ? '' : '🔒 '}Part {p + 1}
+                </button>
+              );
+            })}
           </div>
         </div>
+        )}
       </div>
 
       {/* Loading / answering spinner */}
@@ -215,6 +301,15 @@ function LessonLearn() {
       {/* Main lesson content */}
       {(phase === 'active' || hasFeedback) && (
         <>
+          {/* Lesson video — one video per History lesson (no parts) */}
+          {isHistory && (
+            <LessonPartVideoPanel
+              unitId={chapter}
+              lessonTitle={unitLabel}
+              videoFilename={videoFilename}
+            />
+          )}
+
           {/* Teaching content card */}
           <div style={{ borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(91,33,245,.2)', marginBottom: 32, background: 'rgba(91,33,245,.05)' }}>
             {/* Card top bar */}
@@ -224,25 +319,73 @@ function LessonLearn() {
                   width: 36, height: 36, borderRadius: '50%', flexShrink: 0, fontSize: 16,
                   background: 'linear-gradient(135deg,#3D1FA8,#5B21F5)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  border: speaking ? '2px solid var(--mint)' : '2px solid rgba(255,255,255,.12)',
-                  boxShadow: speaking ? '0 0 14px rgba(0,229,160,.3)' : 'none',
+                  border: avatarSpeaking ? '2px solid var(--mint)' : '2px solid rgba(255,255,255,.12)',
+                  boxShadow: avatarSpeaking ? '0 0 14px rgba(0,229,160,.3)' : 'none',
                   transition: 'all .3s',
                 }}>🧑‍🏫</div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--vl)' }}>Jassmine · AI Tutor</div>
-                  <div style={{ fontSize: 10, color: speaking ? 'var(--mint)' : 'var(--g4)', transition: 'color .3s' }}>
-                    {speaking ? 'Reading lesson aloud…' : 'AI-guided lesson'}
+                  <div style={{ fontSize: 10, color: avatarSpeaking ? 'var(--mint)' : 'var(--g4)', transition: 'color .3s' }}>
+                    {lessonAudio.audioState === 'loading'
+                      ? 'Preparing audio…'
+                      : lessonAudio.audioState === 'speaking'
+                        ? 'Reading lesson aloud…'
+                        : lessonAudio.audioState === 'transitioning'
+                          ? 'Next part…'
+                          : lessonAudio.audioState === 'paused'
+                            ? 'Paused — pick up where you left off'
+                            : lessonAudio.audioState === 'completed'
+                              ? 'Lesson audio finished'
+                              : 'AI-guided lesson'}
                   </div>
                 </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                {speaking
-                  ? <button className="btn btn-o btn-sm" onClick={stopAudio}>⏹ Stop</button>
-                  : <button className="btn btn-o btn-sm" onClick={() => playTTS(teacherText)} disabled={!teacherText}>🔊 Listen</button>
-                }
-                {ttsError && (
-                  <div style={{ fontSize: 10, color: '#ff7070', maxWidth: 200, textAlign: 'right', lineHeight: 1.3 }}>
-                    {ttsError}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                  {lessonAudio.audioState === 'idle' && (
+                    <button
+                      className="btn btn-o btn-sm"
+                      onClick={lessonAudio.listen}
+                      disabled={!canListen}
+                    >
+                      🔊 Listen
+                    </button>
+                  )}
+                  {(lessonAudio.audioState === 'speaking'
+                    || lessonAudio.audioState === 'loading'
+                    || lessonAudio.audioState === 'transitioning') && (
+                    <button className="btn btn-o btn-sm" onClick={lessonAudio.pause}>
+                      ⏸ Pause
+                    </button>
+                  )}
+                  {lessonAudio.audioState === 'paused' && (
+                    <button className="btn btn-o btn-sm" onClick={lessonAudio.continuePlayback}>
+                      ▶ Continue
+                    </button>
+                  )}
+                  {lessonAudio.audioState === 'completed' && (
+                    <button className="btn btn-o btn-sm" onClick={lessonAudio.listen} disabled={!canListen}>
+                      🔊 Listen Again
+                    </button>
+                  )}
+                  {(lessonAudio.audioState === 'speaking'
+                    || lessonAudio.audioState === 'loading'
+                    || lessonAudio.audioState === 'transitioning'
+                    || lessonAudio.audioState === 'paused'
+                    || lessonAudio.audioState === 'completed'
+                    || lessonAudio.hasSavedProgress) && (
+                    <button
+                      className="btn btn-o btn-sm"
+                      onClick={lessonAudio.restart}
+                      style={{ opacity: 0.9 }}
+                    >
+                      ↺ Restart Lesson
+                    </button>
+                  )}
+                </div>
+                {lessonAudio.ttsError && (
+                  <div style={{ fontSize: 10, color: '#ff7070', maxWidth: 220, textAlign: 'right', lineHeight: 1.3 }}>
+                    {lessonAudio.ttsError}
                   </div>
                 )}
               </div>
@@ -257,6 +400,11 @@ function LessonLearn() {
               ))}
             </div>
           </div>
+
+          {/* AI-generated interactive images — 2 per History lesson */}
+          {isHistory && teacherText && (
+            <HistoryInteractiveImages unitId={chapter} teacherText={teacherText} />
+          )}
 
           {/* Quiz section */}
           {quiz && (
@@ -282,7 +430,7 @@ function LessonLearn() {
                     return (
                       <button
                         key={opt}
-                        onClick={() => { if (phase !== 'correct') setAnswer(opt); }}
+                        onClick={() => { if (phase !== 'correct') { setAnswer(opt); setAnswerIndex(idx); } }}
                         style={{
                           padding: '16px 18px', borderRadius: 14, textAlign: 'left', cursor: phase === 'correct' ? 'default' : 'pointer',
                           border: `1px solid ${sel ? 'rgba(91,33,245,.55)' : 'rgba(255,255,255,.08)'}`,
@@ -339,7 +487,7 @@ function LessonLearn() {
               {phase === 'correct'
                 ? (
                   <button className="auth-submit" onClick={handleNext}>
-                    {feedback?.nextAction === 'all_complete' ? '🎉 Finish Lesson'
+                    {feedback?.nextAction === 'all_complete' || feedback?.nextAction === 'lesson_complete' ? '🎉 Finish Lesson'
                       : feedback?.nextAction === 'continue_unit_part2' ? 'Continue to Part 2 →'
                       : 'Next →'}
                   </button>
@@ -369,9 +517,12 @@ function LessonLearn() {
           <div style={{ fontSize: 60, marginBottom: 18 }}>🎉</div>
           <div style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 26, marginBottom: 10 }}>Lesson Complete!</div>
           <div style={{ fontSize: 14, color: 'var(--g3)', marginBottom: 36 }}>
-            Great work on <strong style={{ color: 'var(--vl)' }}>{subjectLabel}</strong>. Your progress has been saved.
+            {completeMsg || (
+              <>Great work on <strong style={{ color: 'var(--vl)' }}>{subjectLabel}</strong>. Your progress has been saved.</>
+            )}
           </div>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+            {!isHistory && (
             <button className="btn btn-v" onClick={() => {
               setPhase('loading');
               api.session.start(studentId, chapter)
@@ -380,7 +531,8 @@ function LessonLearn() {
             }}>
               Start Next Unit
             </button>
-            <button className="btn btn-o" onClick={() => { stopAudio(); router.push('/lessons'); }}>
+            )}
+            <button className="btn btn-o" onClick={() => { lessonAudio.abort(); router.push(lessonsBackPath); }}>
               ← Back to Lessons
             </button>
           </div>
@@ -391,7 +543,7 @@ function LessonLearn() {
       {phase === 'error' && (
         <div>
           <div className="auth-error" style={{ marginBottom: 16 }}>{errorMsg}</div>
-          <button className="btn btn-o" onClick={() => router.push('/lessons')}>← Back to Lessons</button>
+          <button className="btn btn-o" onClick={() => router.push(lessonsBackPath)}>← Back to Lessons</button>
         </div>
       )}
     </div>
