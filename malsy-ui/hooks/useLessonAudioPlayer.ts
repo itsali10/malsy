@@ -8,7 +8,9 @@ import {
   dispatchSpeaking,
   loadAudioProgress,
   paragraphsForTTS,
+  precomputeAudioBands,
   saveAudioProgress,
+  type AudioBands,
   type LessonAudioProgress,
   type LessonAudioState,
 } from '../lib/lesson-audio';
@@ -99,7 +101,12 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
   }, []);
 
   const playElement = useCallback(
-    (el: HTMLAudioElement, token: number, startTime: number): Promise<'ended' | 'paused' | 'aborted'> => {
+    (
+      el: HTMLAudioElement,
+      token: number,
+      startTime: number,
+      bandsPromise?: Promise<AudioBands | null>,
+    ): Promise<'ended' | 'paused' | 'aborted'> => {
       audioRef.current = el;
       if (startTime > 0) {
         try { el.currentTime = startTime; } catch { /* before metadata */ }
@@ -135,10 +142,11 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
           finish('paused');
         };
 
-        // Lip-sync only starts once audio is actually producing sound.
+        // Lip-sync starts once audio is producing sound.
+        // bandsPromise provides per-window frequency-band data for accurate visemes.
         el.onplaying = () => {
           if (token !== sessionRef.current) return;
-          if (!stopLipSync) stopLipSync = attachLipSync(el);
+          if (!stopLipSync) stopLipSync = attachLipSync(el, bandsPromise);
           console.debug(
             `[lesson-audio] segment=${paragraphIndexRef.current} ` +
             `duration=${Number.isFinite(el.duration) ? el.duration.toFixed(2) : '?'}s isLipSyncing=true`,
@@ -193,8 +201,12 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
           return;
         }
 
+        // Pre-compute band energies in parallel with audio loading.
+        // The rAF loop uses these for real frequency-driven visemes.
+        const bandsPromise = precomputeAudioBands(src);
+
         setState('speaking');
-        const result = await playElement(new Audio(src), token, seek);
+        const result = await playElement(new Audio(src), token, seek, bandsPromise);
         if (token !== sessionRef.current) return;
         if (result === 'paused' || result === 'aborted') return;
 

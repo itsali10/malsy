@@ -36,12 +36,14 @@ function DetailPanel({
   onStartAI,
   locked,
   completed,
+  buttonLabel = 'Start with AI Teacher →',
 }: {
   lesson: CatalogLesson | null;
   sectionKey: string;
   onStartAI: () => void;
   locked?: boolean;
   completed?: boolean;
+  buttonLabel?: string;
 }) {
   if (!lesson) {
     return (
@@ -71,7 +73,7 @@ function DetailPanel({
         onClick={onStartAI}
         style={{ marginBottom: 16, padding: '11px 16px', fontSize: 13 }}
       >
-        Start with AI Teacher →
+        {buttonLabel}
       </button>
       )}
 
@@ -333,7 +335,102 @@ function LessonCard({
   );
 }
 
-// ── Linear layout (English, Science, Math) ─────────────────────────
+// ── English 3-section layout ───────────────────────────────────────
+
+function EnglishView({ cfg, onStartAI, onStartPronunciation }: {
+  cfg: SectionsSubject;
+  onStartAI: (lesson: CatalogLesson, sectionKey: string) => void;
+  onStartPronunciation: (lesson: CatalogLesson) => void;
+}) {
+  const [activeKey, setActiveKey]   = useState<string | null>(null);
+  const [selected,  setSelected]    = useState<{ lesson: CatalogLesson; sectionKey: string } | null>(null);
+
+  const activeSection = cfg.sections.find(s => s.key === activeKey) ?? null;
+  const isPronunciationSection = selected?.sectionKey === 'english_speaking';
+
+  function selectSection(key: string) {
+    setActiveKey(key);
+    setSelected(null);
+  }
+
+  function handleStart() {
+    if (!selected) return;
+    if (isPronunciationSection) {
+      onStartPronunciation(selected.lesson);
+    } else {
+      onStartAI(selected.lesson, selected.sectionKey);
+    }
+  }
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 24, alignItems: 'start' }}>
+      <div>
+        {/* ── 3 category cards ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 32 }}>
+          {cfg.sections.map(section => {
+            const active = activeKey === section.key;
+            return (
+              <button
+                key={section.key}
+                onClick={() => selectSection(section.key)}
+                style={{
+                  padding: '28px 20px',
+                  borderRadius: 18,
+                  border: `1.5px solid ${active ? 'rgba(91,33,245,.6)' : 'rgba(255,255,255,.08)'}`,
+                  background: active ? 'rgba(91,33,245,.14)' : 'rgba(255,255,255,.03)',
+                  cursor: 'pointer',
+                  textAlign: 'center' as const,
+                  transition: 'all .15s',
+                }}
+              >
+                <div style={{ fontSize: 32, marginBottom: 12 }}>{section.icon}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--w)', marginBottom: 6 }}>{section.title}</div>
+                <div style={{ fontSize: 11, color: active ? 'var(--vl)' : 'var(--g4)' }}>
+                  {section.lessons.length} lesson{section.lessons.length !== 1 ? 's' : ''}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ── lessons for selected section ── */}
+        {activeSection ? (
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--w)', marginBottom: 14 }}>
+              {activeSection.icon} {activeSection.title}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 12 }}>
+              {activeSection.lessons.map((lesson, i) => (
+                <LessonCard
+                  key={`${activeSection.key}-${lesson.id}`}
+                  lesson={lesson}
+                  index={i}
+                  sectionKey={activeSection.title}
+                  selected={selected?.lesson.id === lesson.id && selected?.sectionKey === activeSection.key}
+                  onClick={() => setSelected({ lesson, sectionKey: activeSection.key })}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--g4)', fontSize: 13 }}>
+            Choose a category above to see its lessons.
+          </div>
+        )}
+      </div>
+
+      {/* ── detail panel ── */}
+      <DetailPanel
+        lesson={selected?.lesson ?? null}
+        sectionKey={selected?.sectionKey ?? ''}
+        onStartAI={handleStart}
+        buttonLabel={isPronunciationSection ? 'Practice Pronunciation →' : 'Start with AI Teacher →'}
+      />
+    </div>
+  );
+}
+
+// ── Linear layout (Science, Math) ─────────────────────────────────
 
 function LinearView({ cfg, subject, onStartAI }: { cfg: LinearSubject; subject: string; onStartAI: (lesson: Lesson) => void }) {
   const [selected, setSelected] = useState<Lesson | null>(null);
@@ -522,6 +619,13 @@ export default function SubjectPage() {
     router.push(`/lessons/learn?${params.toString()}`);
   }
 
+  function startPronunciation(lesson: CatalogLesson) {
+    const params = new URLSearchParams({
+      lesson_title: lesson.name,
+    });
+    router.push(`/lessons/pronunciation?${params.toString()}`);
+  }
+
   return (
     <div className="page-enter">
       {/* Breadcrumb */}
@@ -555,7 +659,9 @@ export default function SubjectPage() {
       {/* Content */}
       {cfg.kind === 'linear'
         ? <LinearView cfg={cfg} subject={subject} onStartAI={(lesson) => startAI(lesson)} />
-        : <SectionsView cfg={cfg} subject={subject} onStartAI={(lesson, sectionKey) => startAI(lesson, sectionKey)} />
+        : subject === 'english'
+          ? <EnglishView cfg={cfg as SectionsSubject} onStartAI={(lesson, sectionKey) => startAI(lesson, sectionKey)} onStartPronunciation={startPronunciation} />
+          : <SectionsView cfg={cfg} subject={subject} onStartAI={(lesson, sectionKey) => startAI(lesson, sectionKey)} />
       }
     </div>
   );

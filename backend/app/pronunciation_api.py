@@ -232,7 +232,9 @@ class PronunciationResp(BaseModel):
 @router.post("/speech/pronunciation", response_model=PronunciationResp)
 async def score_pronunciation(req: PronunciationReq) -> Any:
     """Score pronunciation of a sentence against eSpeak reference phonemes."""
-    _ensure_model()
+    # _ensure_model does blocking I/O (model download + disk load) — must not run
+    # on the event loop or it stalls uvicorn and drops the HTTP connection.
+    await asyncio.to_thread(_ensure_model)
     return await asyncio.to_thread(_score_sync, req.audio_base64, req.sentence)
 
 

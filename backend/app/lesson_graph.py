@@ -15,6 +15,8 @@ from .prompts import (
     COVERAGE_GUARD_PROMPT,
     QUIZ_PROMPT,
     MCQ_QUIZ_PROMPT,
+    ENGLISH_MCQ_QUIZ_PROMPT,
+    SPEAKING_TASK_PROMPT,
     EVAL_PROMPT,
     HINT_PROMPT,
     REMEDIAL_PROMPT,
@@ -369,12 +371,12 @@ def ensure_unit_plan(state: LessonState):
             # chapter_id is like "english_g6", so use it as prefix
             unit_id = f"{state['chapter_id']}:{unit_id}"
     
-    # ALWAYS use unit_id for the plan key to ensure each unit has its own plan
-    # This prevents different units from sharing the same cached plan
-    if unit_id and unit_id != state["chapter_id"]:
-        plan_key = unit_id  # Use specific unit_id
+    # Use unit_id as plan key only when it's a real Chroma ID (contains ":").
+    # LLM-generated short IDs (e.g. "u1") collide across lessons — use chapter_id instead.
+    if unit_id and ":" in str(unit_id) and unit_id != state["chapter_id"]:
+        plan_key = unit_id
     else:
-        plan_key = state["chapter_id"]  # Only use chapter_id if we don't have a specific unit
+        plan_key = state["chapter_id"]
     
     print(f"[DEBUG] ensure_unit_plan: Using plan_key={plan_key} for unit_id={unit_id}")
     
@@ -405,31 +407,34 @@ def ensure_unit_plan(state: LessonState):
         print(f"[WARNING] No chunks found for unit {retrieve_id}, but keeping unit-specific context")
     
     if not chunks or len(chunks) == 0:
-        # If still no chunks found, create a minimal plan with a single item
-        # This allows the teaching to proceed even if plan generation fails
-        print(f"[DEBUG] No chunks found for {retrieve_id}, creating minimal plan")
-        unit_title = current_unit.get("title") or "Unit Content"
-        state["unit_plan"] = {
-            "unit_title": unit_title,
-            "items": [{
-                "id": "content",
-                "type": "other",
-                "title": unit_title,
-                "must_cover": True,
-                "keywords": current_unit.get("keywords", [])
-            }]
-        }
-        print(f"[DEBUG] Created minimal plan with {len(state['unit_plan']['items'])} items")
-        return state
-    
-    context = "\n\n".join(c["text"] for c in chunks)
+        # No book content — ask the LLM to generate the unit plan from the lesson title/keywords.
+        # This produces proper item types (speaking, grammar, vocab, etc.) instead of a
+        # generic "other" fallback, which is critical for subjects not yet ingested into Chroma.
+        print(f"[DEBUG] No chunks for {retrieve_id} — generating unit plan from lesson metadata")
+        unit_title_fb = current_unit.get("title") or "Unit Content"
+        keywords_fb = current_unit.get("keywords", [])
+        context = (
+            f"Lesson title: {unit_title_fb}\n"
+            + (f"Key concepts: {', '.join(keywords_fb)}\n" if keywords_fb else "")
+            + "There is no textbook excerpt available. Plan the items for this lesson based on the title and concepts above. "
+            "Include realistic item types (speaking, grammar, vocab, reading, writing, etc.) that match the lesson topic."
+        )
+    else:
+        context = "\n\n".join(c["text"] for c in chunks)
 
-    msg = llm.invoke([ 
+    msg = llm.invoke([
         {"role": "system", "content": UNIT_PLAN_PROMPT},
         {"role": "user", "content": f"Unit text:\n{context}"}
     ])
 
-    plan = json_safe(msg.content)
+    try:
+        plan = json_safe(msg.content)
+    except Exception:
+        unit_title_fb = current_unit.get("title") or "Unit Content"
+        plan = {
+            "unit_title": unit_title_fb,
+            "items": [{"id": "content", "type": "other", "title": unit_title_fb, "must_cover": True, "keywords": current_unit.get("keywords", [])}]
+        }
     print(f"[DEBUG] ensure_unit_plan: Saving new plan for {plan_key} with {len(plan.get('items', []))} items")
     save_unit_plan(state["student_id"], plan_key, plan)
     state["unit_plan"] = plan
@@ -492,9 +497,11 @@ def teach_item(state: LessonState):
     item_id = item.get("id", "")
     base_query = " ".join(item.get("keywords", [])) or item.get("title", "")
 
-    # Use unit_id from current_unit if available, otherwise use chapter_id
+    # Use unit_id from current_unit if it's a real Chroma ID (contains ":").
+    # LLM-generated short IDs (e.g. "u1") won't find anything in Chroma — use chapter_id instead.
     current_unit = state.get("current_unit", {})
-    unit_id = current_unit.get("real_unit_id") or current_unit.get("unit_id") or state["chapter_id"]
+    raw_unit_id = current_unit.get("real_unit_id") or current_unit.get("unit_id") or state["chapter_id"]
+    unit_id = raw_unit_id if (":" in str(raw_unit_id)) else state["chapter_id"]
     unit_part = current_unit.get("unit_part", 0)  # 0 = first half, 1 = second half
     unit_pages = current_unit.get("unit_pages", {})
     unit_title = current_unit.get("title") or state.get("unit_plan", {}).get("unit_title", "")
@@ -611,8 +618,20 @@ def teach_item(state: LessonState):
     state["pages_desc"] = pages_desc
 
     if not chunks or len(chunks) == 0:
-        state["teacher_text"] = f"Error: No content found for unit {unit_id}. Please check if the unit exists in the database."
-        state["quiz"] = {}
+        # No textbook content found — generate from general knowledge using unit title/keywords.
+        # This handles subjects whose PDFs haven't been ingested yet (e.g. English).
+        keywords = item.get("keywords", [])
+        fallback_context = (
+            f"You are teaching a Grade 6 lesson about: {unit_title or item.get('title', 'this topic')}\n"
+            + (f"Key concepts to cover: {', '.join(keywords)}\n" if keywords else "")
+            + "Teach this topic clearly and engagingly for a 10-12 year old student."
+        )
+        generated_text = _generate_guided_teacher_text(
+            context=fallback_context,
+            unit_title=unit_title or item.get("title", ""),
+        )
+        state["retrieved_chunks"] = []
+        state["teacher_text"] = generated_text or f"Let us learn about {unit_title or 'this topic'} today."
         return state
 
     # Build context with page order indicator
@@ -1005,12 +1024,39 @@ def make_quiz(state: LessonState):
     chapter_id = str(state.get("chapter_id") or "")
     current_unit = state.get("current_unit") if isinstance(state.get("current_unit"), dict) else {}
     unit_title = str(current_unit.get("title") or current_unit.get("name") or "").strip()
+    current_item = state.get("current_item") or {}
+    is_speaking_item = (
+        current_item.get("type") == "speaking"
+        or str(current_item.get("id", "")).startswith("speaking")
+    )
     use_mcq = _is_history_chapter(chapter_id) or _is_history_chapter(
         str(current_unit.get("unit_id") or current_unit.get("real_unit_id") or "")
     )
 
     try:
-        if use_mcq:
+        if is_speaking_item and not use_mcq:
+            msg = llm.invoke([
+                {"role": "system", "content": SPEAKING_TASK_PROMPT},
+                {"role": "user", "content": f"Lesson content:\n{teacher_text[:2000]}"},
+            ])
+            if msg and msg.content:
+                quiz_data = json_safe(msg.content)
+                if quiz_data.get("type") == "speaking" and quiz_data.get("sentence"):
+                    state["quiz"] = quiz_data
+                else:
+                    state["quiz"] = {
+                        "type": "speaking",
+                        "sentence": "Please read the following sentence out loud.",
+                        "instructions": "Read this sentence out loud clearly.",
+                    }
+            else:
+                state["quiz"] = {
+                    "type": "speaking",
+                    "sentence": "Please read the following sentence out loud.",
+                    "instructions": "Read this sentence out loud clearly.",
+                }
+            return state
+        elif use_mcq:
             from .history_lessons import get_lesson_by_unit_id, build_teaching_scope_block, part_count
             uid = str(current_unit.get("unit_id") or current_unit.get("real_unit_id") or chapter_id)
             hist_lesson = get_lesson_by_unit_id(uid)
@@ -1059,12 +1105,28 @@ TEACHER LESSON (this part only — quiz must test ownedTopics for this part):
                     "expected_points": ["Understanding of the main concepts"],
                 }
         else:
+            book_context = _get_book_context_for_quiz(state)
+            english_user_content = f"""LESSON TOPIC: {unit_title or chapter_id}
+
+TEXTBOOK CONTENT:
+{book_context or teacher_text[:4000]}
+
+TEACHER LESSON:
+{teacher_text[:4000]}
+"""
             msg = llm.invoke([
-                {"role": "system", "content": QUIZ_PROMPT},
-                {"role": "user", "content": teacher_text},
+                {"role": "system", "content": ENGLISH_MCQ_QUIZ_PROMPT},
+                {"role": "user", "content": english_user_content},
             ])
             if msg and msg.content:
-                state["quiz"] = json_safe(msg.content)
+                quiz_data = json_safe(msg.content)
+                if _quiz_has_mcq_options(quiz_data):
+                    state["quiz"] = ensure_mcq_integrity(quiz_data, shuffle=True)
+                else:
+                    state["quiz"] = {
+                        "question": "Please summarize what you learned from this lesson.",
+                        "expected_points": ["Understanding of the main concepts"],
+                    }
             else:
                 state["quiz"] = {
                     "question": "Please summarize what you learned from this lesson.",
@@ -1090,7 +1152,25 @@ def evaluate_answer(state: LessonState):
     if raw_index is not None and int(raw_index) >= 0:
         option_index = int(raw_index)
 
-    if _quiz_has_mcq_options(quiz):
+    if quiz.get("type") == "speaking":
+        try:
+            score = float(student_answer)
+        except (ValueError, TypeError):
+            score = 0.0
+        is_correct = score >= 70.0
+        if is_correct:
+            feedback = f"Great pronunciation! You scored {score:.0f}%. Well done!"
+        elif score >= 50:
+            feedback = f"Good effort! You scored {score:.0f}%. Try to pronounce each word a little more clearly."
+        else:
+            feedback = f"Keep practicing! You scored {score:.0f}%. Listen carefully to each word and try again."
+        state["evaluation"] = {
+            "correct": is_correct,
+            "feedback": feedback,
+            "missing": [] if is_correct else ["Clearer pronunciation"],
+            "score": score,
+        }
+    elif _quiz_has_mcq_options(quiz):
         graded = grade_mcq_answer(quiz, student_answer, option_index=option_index)
         state["quiz"] = graded.get("quiz") or quiz
         state["evaluation"] = {

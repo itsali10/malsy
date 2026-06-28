@@ -99,6 +99,19 @@ export interface EvaluationCreate {
   overall_score?: number;
 }
 
+// Pronunciation types
+export interface PronunciationWordResult {
+  word: string;
+  ref: string[];
+  got: string[];
+  score: number;
+}
+
+export interface PronunciationResult {
+  overall_score: number;
+  words: PronunciationWordResult[];
+}
+
 // AI session types
 export interface Quiz {
   question: string;
@@ -356,6 +369,15 @@ export const api = {
       request<LabSession>(`/labs/sessions/${sessionId}`, {
         method: 'PUT',
         body: JSON.stringify(data),
+      }),
+  },
+
+  // Pronunciation scoring
+  pronunciation: {
+    score: (audioBase64: string, sentence: string) =>
+      request<PronunciationResult>('/speech/pronunciation', {
+        method: 'POST',
+        body: JSON.stringify({ audio_base64: audioBase64, sentence }),
       }),
   },
 

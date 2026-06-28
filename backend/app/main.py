@@ -208,8 +208,9 @@ class SwitchPartReq(BaseModel):
 
 class AnswerReq(BaseModel):
     student_id: str
-    student_answer: str
+    student_answer: str = ""
     option_index: Optional[int] = None
+    audio_base64: Optional[str] = None
 
 class WeeklyExamStartReq(BaseModel):
     student_id: str
@@ -550,7 +551,15 @@ def start_session(req: StartSessionReq):
         save_progress(req.student_id, book_id, start_index, unit_part, max_unlocked_part=max_unlocked_part)
 
         real_unit_id = unit.get("real_unit_id") or unit.get("unit_id")
-        graph_chapter_id = chapter_id if "history" in book_id.lower() and ":" in chapter_id else real_unit_id
+        # Use real_unit_id only when it's a proper Chroma-ingested ID (contains ":").
+        # LLM-generated IDs (e.g. "u1") have no ":" and must not be used as graph keys —
+        # they collide across different lessons. Fall back to the original chapter_id instead.
+        if "history" in book_id.lower() and ":" in chapter_id:
+            graph_chapter_id = chapter_id
+        elif real_unit_id and ":" in str(real_unit_id):
+            graph_chapter_id = real_unit_id
+        else:
+            graph_chapter_id = chapter_id
 
         # Create single active session
         ACTIVE_SESSION = {
@@ -755,6 +764,19 @@ def answer(req: AnswerReq):
 
     graph_chapter_id = sess.get("graph_chapter_id") or real_unit_id
 
+    # For speaking tasks, score the audio first and pass the score as student_answer.
+    student_answer = req.student_answer
+    pronunciation_word_results = None
+    last_quiz = sess.get("last_quiz") or {}
+    if last_quiz.get("type") == "speaking" and req.audio_base64:
+        from .pronunciation_api import _score_sync
+        try:
+            pron_result = _score_sync(req.audio_base64, last_quiz.get("sentence", ""))
+            student_answer = str(pron_result.get("overall_score", 0.0))
+            pronunciation_word_results = pron_result.get("words", [])
+        except Exception as pron_err:
+            return {"error": f"Pronunciation scoring failed: {pron_err}"}
+
     out = lesson_graph.invoke({
         "student_id": req.student_id,
         "chapter_id": graph_chapter_id,
@@ -762,7 +784,7 @@ def answer(req: AnswerReq):
         # grade the SAME quiz we served last time
         "provided_quiz": sess.get("last_quiz"),
         "teacher_text": sess.get("last_teacher_text", ""),
-        "student_answer": req.student_answer,
+        "student_answer": student_answer,
         "option_index": req.option_index,
     })
 
@@ -770,13 +792,14 @@ def answer(req: AnswerReq):
     evaluation = out.get("evaluation")
     recommendations = out.get("recommendations")
     evaluation_summary = out.get("evaluation_summary") or eval_summary(req.student_id)
+    pron_extra = {"pronunciation_words": pronunciation_word_results} if pronunciation_word_results else {}
 
     # wrong answer - check if it's hint (1st or 2nd attempt) or remediation (3rd attempt)
     if not evaluation.get("correct", False):
         hint_text = out.get("hint_text", "")
         remediation_text = out.get("remediation_text", "")
         hint_count = out.get("hint_count", 0)
-        
+
         if hint_text:
             # 1st or 2nd incorrect answer - provide hint
             return {
@@ -789,6 +812,7 @@ def answer(req: AnswerReq):
                 "next_action": "answer_again",
                 "recommendations": recommendations,
                 "evaluation_summary": evaluation_summary,
+                **pron_extra,
             }
         elif remediation_text:
             # 3rd incorrect answer - provide full remediation
@@ -802,18 +826,20 @@ def answer(req: AnswerReq):
                 "next_action": "answer_again",
                 "recommendations": recommendations,
                 "evaluation_summary": evaluation_summary,
+                **pron_extra,
             }
         else:
             # Fallback (shouldn't happen)
             return {
                 "correct": False,
                 "evaluation": evaluation,
-                "hint": "Try again! Think about what we learned.",
+                "hint": "Try again! Read each word slowly and clearly.",
                 "remediation_text": "",
                 "quiz": _quiz_for_client(sess.get("last_quiz")),
                 "next_action": "answer_again",
                 "recommendations": recommendations,
                 "evaluation_summary": evaluation_summary,
+                **pron_extra,
             }
 
     # Correct answer - check if we need to move to part 2 or next unit.
@@ -842,6 +868,7 @@ def answer(req: AnswerReq):
             "message": "Great job! Part 2 is now unlocked.",
             "course_week": course_week,
             "course_month": course_month,
+            **pron_extra,
             "recommendations": recommendations,
             "evaluation_summary": evaluation_summary,
         }

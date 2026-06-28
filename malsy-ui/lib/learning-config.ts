@@ -31,20 +31,43 @@ export type SubjectConfig = LinearSubject | SectionsSubject;
 
 export const learningConfig: Record<string, SubjectConfig> = {
   english: {
-    kind: 'linear',
+    kind: 'sections',
     title: 'English',
     icon: '📖',
     color: 'var(--sky)',
-    lessons: [
-      { id: 1, name: 'Grammar Foundations',    description: 'Parts of speech, sentence basics, and punctuation.' },
-      { id: 2, name: 'Sentence Structure',      description: 'Simple, compound, and complex sentence building.' },
-      { id: 3, name: 'Vocabulary Growth',       description: 'Context clues, synonyms, and antonyms.' },
-      { id: 4, name: 'Reading Comprehension',   description: 'Main idea, supporting details, and inference.' },
-      { id: 5, name: 'Writing Paragraphs',      description: 'Topic sentences, cohesion, and transitions.' },
-      { id: 6, name: 'Narrative Writing',       description: 'Story sequence, characters, and setting.' },
-      { id: 7, name: 'Informative Writing',     description: 'Explaining ideas with clear evidence.' },
-      { id: 8, name: 'Public Speaking',         description: 'Presenting ideas clearly and confidently.' },
-      { id: 9, name: 'Final English Review',    description: 'Revision practice and readiness check.' },
+    sections: [
+      {
+        key: 'english_speaking',
+        title: 'Pronunciation',
+        icon: '🎤',
+        lessons: [
+          { id: 1, name: 'Public Speaking',          description: 'Presenting ideas clearly and confidently out loud.' },
+          { id: 2, name: 'Pronunciation Practice',   description: 'Phonemes, stress patterns, and spoken fluency.' },
+          { id: 3, name: 'Storytelling Aloud',       description: 'Narrating a story with expression and clarity.' },
+        ],
+      },
+      {
+        key: 'english_grammar',
+        title: 'Grammar',
+        icon: '✏️',
+        lessons: [
+          { id: 1, name: 'Grammar Foundations',  description: 'Parts of speech, sentence basics, and punctuation.' },
+          { id: 2, name: 'Sentence Structure',   description: 'Simple, compound, and complex sentence building.' },
+          { id: 3, name: 'Vocabulary Growth',    description: 'Context clues, synonyms, and antonyms.' },
+          { id: 4, name: 'Writing Paragraphs',   description: 'Topic sentences, cohesion, and transitions.' },
+        ],
+      },
+      {
+        key: 'english_comprehension',
+        title: 'Comprehension',
+        icon: '📚',
+        lessons: [
+          { id: 1, name: 'Reading Comprehension', description: 'Main idea, supporting details, and inference.' },
+          { id: 2, name: 'Narrative Writing',     description: 'Story sequence, characters, and setting.' },
+          { id: 3, name: 'Informative Writing',   description: 'Explaining ideas with clear evidence.' },
+          { id: 4, name: 'Final English Review',  description: 'Revision practice and readiness check.' },
+        ],
+      },
     ],
   },
   science: {

@@ -81,6 +81,47 @@ Return JSON ONLY:
 }
 """
 
+SPEAKING_TASK_PROMPT = """
+You are an English teacher creating a speaking exercise for Grade 6.
+
+Generate 1 sentence from the lesson content for the student to read aloud.
+The sentence must:
+- Come directly from or be closely based on the lesson content provided.
+- Be 8-15 words long.
+- Naturally practice the vocabulary or grammar from this lesson.
+- Sound clear and natural when spoken.
+
+Return JSON ONLY:
+{
+  "type": "speaking",
+  "sentence": "...",
+  "instructions": "Read this sentence out loud clearly."
+}
+"""
+
+ENGLISH_MCQ_QUIZ_PROMPT = """
+Write 1 multiple-choice quiz question for a Grade 6 English lesson.
+
+You will receive LESSON TOPIC, TEXTBOOK CONTENT (ground truth), and a teacher lesson summary.
+The question MUST test the LESSON TOPIC only — vocabulary, grammar, reading comprehension, or language skills taught.
+Use ONLY content explicitly covered in the TEXTBOOK CONTENT.
+Do NOT ask about things not mentioned in the lesson.
+
+Rules:
+- 4 options: exactly 1 correct + 3 plausible wrong distractors from the same lesson.
+- Keep language simple and clear (age 10-12).
+- "correct_answer" MUST be copied WORD-FOR-WORD from one entry in "options".
+- "options" MUST contain exactly 4 items.
+
+Return JSON ONLY:
+{
+  "question": "...",
+  "options": ["option A", "option B", "option C", "option D"],
+  "correct_answer": "exact copy of the correct option from options",
+  "expected_points": ["short explanation of why the correct answer is right"]
+}
+"""
+
 HISTORY_TEACHER_PROMPT = """
 You are Jassmine, an experienced, enthusiastic Grade 6 History teacher for Ancient Egypt (ages 10–12).
 
