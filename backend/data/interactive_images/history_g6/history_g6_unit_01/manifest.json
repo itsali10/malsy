@@ -1,0 +1,34 @@
+{
+  "book_id": "history_g6",
+  "unit_id": "history_g6:unit_01",
+  "lesson_title": "Where and Who Were the Ancient Egyptians?",
+  "lesson_number": 1,
+  "images": [
+    {
+      "id": "67055131-b3ad-4644-8198-b968206bc93c",
+      "tap_label": "Tap the hieroglyphics",
+      "title": "Ancient Egyptian Writing",
+      "description": "Symbols used in Ancient Egyptian communication",
+      "labels": [
+        "Hieroglyphics",
+        "Communication",
+        "Symbols"
+      ],
+      "image_url": "/interactive-images/static/history_g6/history_g6_unit_01/img_1.png",
+      "filename": "img_1.png"
+    },
+    {
+      "id": "de88d17f-36e4-4d09-acda-7e75021d1ced",
+      "tap_label": "Tap the Red and Black Lands",
+      "title": "Egyptian Land Division",
+      "description": "Concept of Red Land and Black Land in Ancient Egypt",
+      "labels": [
+        "Division",
+        "Geography",
+        "Resources"
+      ],
+      "image_url": "/interactive-images/static/history_g6/history_g6_unit_01/img_2.png",
+      "filename": "img_2.png"
+    }
+  ]
+}

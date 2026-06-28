@@ -1,0 +1,115 @@
+{
+  "unit_title": "Parts of Speech",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Opening",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Introduction to Parts of Speech",
+      "must_cover": true,
+      "keywords": [
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs",
+        "pronouns",
+        "prepositions",
+        "conjunctions",
+        "interjections"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Vocabulary: Parts of Speech",
+      "must_cover": true,
+      "keywords": [
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs",
+        "pronouns",
+        "prepositions",
+        "conjunctions",
+        "interjections"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar Rules for Parts of Speech",
+      "must_cover": true,
+      "keywords": [
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs",
+        "pronouns",
+        "prepositions",
+        "conjunctions",
+        "interjections"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Practice Exercises on Parts of Speech",
+      "must_cover": true,
+      "keywords": [
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs",
+        "pronouns",
+        "prepositions",
+        "conjunctions",
+        "interjections"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Wrap Up: Parts of Speech",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions on Parts of Speech",
+      "must_cover": true,
+      "keywords": [
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs",
+        "pronouns",
+        "prepositions",
+        "conjunctions",
+        "interjections"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements for Parts of Speech",
+      "must_cover": true,
+      "keywords": [
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs",
+        "pronouns",
+        "prepositions",
+        "conjunctions",
+        "interjections"
+      ]
+    }
+  ]
+}

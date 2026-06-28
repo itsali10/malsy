@@ -1,0 +1,29 @@
+{
+  "objectives": [
+    "Practice speaking skills",
+    "Gain confidence in speaking English",
+    "Receive feedback on speaking abilities"
+  ],
+  "units": [
+    {
+      "unit_id": "u1",
+      "title": "Introduction to Speaking Test",
+      "keywords": [
+        "speaking skills",
+        "confidence",
+        "feedback"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u2",
+      "title": "Practice Speaking Test",
+      "keywords": [
+        "practice",
+        "fluency",
+        "pronunciation"
+      ],
+      "minutes": 90
+    }
+  ]
+}

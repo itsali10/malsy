@@ -1,0 +1,107 @@
+{
+  "unit_title": "Organizing Your Speech",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Opening",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "overview"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Introduction to Speech Organization",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "speech organization"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Vocabulary: Speech Structure",
+      "must_cover": true,
+      "keywords": [
+        "vocabulary",
+        "speech structure"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar Focus: Transition Words",
+      "must_cover": true,
+      "keywords": [
+        "grammar",
+        "transition words"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking Practice: Organizing Your Ideas",
+      "must_cover": true,
+      "keywords": [
+        "speaking practice",
+        "organizing ideas"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing Task: Drafting Your Speech",
+      "must_cover": true,
+      "keywords": [
+        "writing task",
+        "drafting speech"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Lesson Conclusion",
+      "must_cover": true,
+      "keywords": [
+        "conclusion",
+        "lesson wrap up"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions: Reflecting on Your Speech Organization",
+      "must_cover": true,
+      "keywords": [
+        "discussion questions",
+        "reflecting",
+        "speech organization"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements: Speech Structure Diagram",
+      "must_cover": true,
+      "keywords": [
+        "visual elements",
+        "diagram",
+        "speech structure"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Practice Exercises: Identifying Speech Components",
+      "must_cover": true,
+      "keywords": [
+        "practice exercises",
+        "speech components"
+      ]
+    }
+  ]
+}

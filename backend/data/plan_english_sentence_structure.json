@@ -1,0 +1,39 @@
+{
+  "objectives": [
+    "Understand simple, compound, and complex sentence structures.",
+    "Practice building sentences of each type.",
+    "Identify examples of each type of sentence in a text."
+  ],
+  "units": [
+    {
+      "unit_id": "u1",
+      "title": "Introduction to Sentence Structure",
+      "keywords": [
+        "simple sentence",
+        "subject",
+        "predicate"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u2",
+      "title": "Building Compound Sentences",
+      "keywords": [
+        "compound sentence",
+        "conjunctions",
+        "joining sentences"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u3",
+      "title": "Exploring Complex Sentences",
+      "keywords": [
+        "complex sentence",
+        "subordinating conjunctions",
+        "dependent clause"
+      ],
+      "minutes": 90
+    }
+  ]
+}

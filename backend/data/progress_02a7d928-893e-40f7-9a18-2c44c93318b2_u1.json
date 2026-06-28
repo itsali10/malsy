@@ -5,5 +5,24 @@
   "done_items": [],
   "last_quiz": null,
   "hint_count": 0,
-  "attempt_history": []
+  "attempt_history": [
+    {
+      "ts": "2026-06-28T17:05:37.357077Z",
+      "item_id": "content",
+      "quiz_question": "Which part of speech describes or modifies nouns?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-28T17:06:15.147451Z",
+      "item_id": "content",
+      "quiz_question": "Which part of speech describes or modifies nouns?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ]
 }

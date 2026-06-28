@@ -1,0 +1,88 @@
+{
+  "unit_title": "Ancient Egyptian Mummification",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Ancient Egyptian Mummification",
+      "must_cover": true,
+      "keywords": [
+        "mummies",
+        "ancient Egypt",
+        "religious beliefs",
+        "mummification process"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "The Process of Mummification",
+      "must_cover": true,
+      "keywords": [
+        "washing",
+        "purification",
+        "organ removal",
+        "stuffing",
+        "drying",
+        "wrapping",
+        "sarcophagus"
+      ]
+    },
+    {
+      "id": "reading_2",
+      "type": "reading",
+      "title": "Beliefs and Practices",
+      "must_cover": true,
+      "keywords": [
+        "heart importance",
+        "afterlife beliefs",
+        "burial practices"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Class Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "afterlife significance",
+        "mummification purpose",
+        "cultural beliefs"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements in Ancient Egyptian Mummification",
+      "must_cover": true,
+      "keywords": [
+        "illustrations",
+        "diagrams",
+        "pictures",
+        "Valley of Kings"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Mummification Process Exercises",
+      "must_cover": true,
+      "keywords": [
+        "fill-in-the-blanks",
+        "writing prompts",
+        "practice tasks"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Unit Wrap-Up",
+      "must_cover": true,
+      "keywords": [
+        "summary",
+        "key learnings",
+        "review"
+      ]
+    }
+  ]
+}

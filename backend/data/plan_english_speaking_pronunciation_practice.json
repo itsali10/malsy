@@ -1,0 +1,39 @@
+{
+  "objectives": [
+    "Identify and practice different phonemes in English",
+    "Recognize stress patterns in words and sentences",
+    "Improve spoken fluency through pronunciation practice"
+  ],
+  "units": [
+    {
+      "unit_id": "u1",
+      "title": "Exploring Phonemes",
+      "keywords": [
+        "phonemes",
+        "sounds",
+        "practice"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u2",
+      "title": "Mastering Stress Patterns",
+      "keywords": [
+        "stress patterns",
+        "words",
+        "sentences"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u3",
+      "title": "Enhancing Spoken Fluency",
+      "keywords": [
+        "fluency",
+        "pronunciation",
+        "practice"
+      ],
+      "minutes": 90
+    }
+  ]
+}

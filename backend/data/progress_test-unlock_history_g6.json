@@ -1,0 +1,9 @@
+{
+  "student_id": "test-unlock",
+  "book_id": "history_g6",
+  "max_unlocked_lesson_index": 2,
+  "completed_lesson_numbers": [
+    1,
+    2
+  ]
+}

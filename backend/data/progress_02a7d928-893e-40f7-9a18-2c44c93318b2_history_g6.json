@@ -1,0 +1,9 @@
+{
+  "student_id": "02a7d928-893e-40f7-9a18-2c44c93318b2",
+  "book_id": "history_g6",
+  "max_unlocked_lesson_index": 2,
+  "completed_lesson_numbers": [
+    1,
+    2
+  ]
+}

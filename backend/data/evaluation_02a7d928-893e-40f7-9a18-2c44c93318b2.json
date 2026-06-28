@@ -1,172 +1,12 @@
 {
   "student_id": "02a7d928-893e-40f7-9a18-2c44c93318b2",
-  "updated_at": "2026-06-24T22:36:39.970106Z",
+  "updated_at": "2026-06-28T17:42:56.624947Z",
   "totals": {
-    "attempts": 51,
-    "correct": 30,
-    "accuracy": 58.82
+    "attempts": 67,
+    "correct": 40,
+    "accuracy": 59.7
   },
   "recent_attempts": [
-    {
-      "ts": "2026-06-23T17:33:02.821737Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "unit_opening",
-      "quiz_question": "What will we be exploring in the Parkside Academy History Project unit?",
-      "correct": false,
-      "hint_count_before": 0,
-      "hint_count_after": 1,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T17:34:04.981756Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "unit_opening",
-      "quiz_question": "What will we be exploring in the Parkside Academy History Project unit?",
-      "correct": false,
-      "hint_count_before": 1,
-      "hint_count_after": 2,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:01:23.189949Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "unit_opening",
-      "quiz_question": "Where did the Ancient Egyptians settle and why was the River Nile important to them?",
-      "correct": false,
-      "hint_count_before": 0,
-      "hint_count_after": 1,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:07:44.722774Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "unit_opening",
-      "quiz_question": "What was the significance of the Nile River for the Ancient Egyptians?",
-      "correct": true,
-      "hint_count_before": 0,
-      "hint_count_after": 0,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:08:26.592829Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "reading_1",
-      "quiz_question": "What was the significance of the River Nile to the Ancient Egyptians?",
-      "correct": true,
-      "hint_count_before": 0,
-      "hint_count_after": 0,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:13:45.533995Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "unit_opening",
-      "quiz_question": "Why was the River Nile important to the Ancient Egyptians?",
-      "correct": false,
-      "hint_count_before": 0,
-      "hint_count_after": 1,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:14:46.720379Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "unit_opening",
-      "quiz_question": "What was the capital established by King Narmer to unite Upper and Lower Egypt?",
-      "correct": false,
-      "hint_count_before": 1,
-      "hint_count_after": 2,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:16:14.107486Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "unit_opening",
-      "quiz_question": "What was the capital established by King Narmer to unite Upper and Lower Egypt?",
-      "correct": false,
-      "hint_count_before": 2,
-      "hint_count_after": 0,
-      "remediation_used": true
-    },
-    {
-      "ts": "2026-06-23T18:21:26.121631Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "unit_opening",
-      "quiz_question": "What was the capital established by King Narmer to unite Upper and Lower Egypt?",
-      "correct": false,
-      "hint_count_before": 0,
-      "hint_count_after": 1,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:34:52.708193Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "unit_opening",
-      "quiz_question": "Why was the Nile River so important to the Ancient Egyptians?",
-      "correct": true,
-      "hint_count_before": 0,
-      "hint_count_after": 0,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:45:49.437156Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "reading_1",
-      "quiz_question": "What was the significance of the River Nile for the Ancient Egyptians?",
-      "correct": false,
-      "hint_count_before": 0,
-      "hint_count_after": 1,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:46:13.399467Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "reading_1",
-      "quiz_question": "What was the significance of the River Nile for the Ancient Egyptians?",
-      "correct": false,
-      "hint_count_before": 1,
-      "hint_count_after": 2,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:46:49.497474Z",
-      "unit_id": "history_g6:unit_01",
-      "item_id": "reading_1",
-      "quiz_question": "What was the significance of the River Nile for the Ancient Egyptians?",
-      "correct": true,
-      "hint_count_before": 2,
-      "hint_count_after": 0,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:48:26.400451Z",
-      "unit_id": "history_g6:unit_02",
-      "item_id": "unit_opening",
-      "quiz_question": "Which Ancient Egyptian god was associated with the head of a cat?",
-      "correct": false,
-      "hint_count_before": 0,
-      "hint_count_after": 1,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:48:50.397121Z",
-      "unit_id": "history_g6:unit_02",
-      "item_id": "unit_opening",
-      "quiz_question": "Which Ancient Egyptian god was associated with the head of a cat?",
-      "correct": false,
-      "hint_count_before": 1,
-      "hint_count_after": 2,
-      "remediation_used": false
-    },
-    {
-      "ts": "2026-06-23T18:49:20.868150Z",
-      "unit_id": "history_g6:unit_02",
-      "item_id": "unit_opening",
-      "quiz_question": "Which Ancient Egyptian god was associated with the head of a cat?",
-      "correct": false,
-      "hint_count_before": 2,
-      "hint_count_after": 0,
-      "remediation_used": true
-    },
     {
       "ts": "2026-06-23T19:04:06.863695Z",
       "unit_id": "history_g6:unit_02",
@@ -506,28 +346,198 @@
       "hint_count_before": 0,
       "hint_count_after": 0,
       "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T23:06:54.048366Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Where did the Ancient Egyptians live and settle around 5000 BC?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-24T23:19:04.746400Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Where did the Ancient Egyptians live and depend on for water, food, and transportation?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-25T17:46:34.791612Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Where did the Ancient Egyptians primarily settle?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-25T18:23:00.222488Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Where did the Ancient Egyptians live and depend on for water, food, and transportation?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-25T18:35:00.253965Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "discussion_questions",
+      "quiz_question": "What was the capital city built by King Narmer or Menes in Ancient Egypt?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-25T18:48:57.323304Z",
+      "unit_id": "history_g6:unit_02",
+      "item_id": "discussion_questions",
+      "quiz_question": "Which Egyptian god was associated with the head of a ram and known as the King of the Gods?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-26T19:24:02.252027Z",
+      "unit_id": "history_g6:unit_03",
+      "item_id": "unit_opening",
+      "quiz_question": "In Ancient Egypt, who were the most trusted advisors of the Pharaoh?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-26T19:28:46.009455Z",
+      "unit_id": "history_g6:unit_03",
+      "item_id": "unit_opening",
+      "quiz_question": "In Ancient Egypt, who were the most trusted advisors of the Pharaoh?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-26T19:29:19.093979Z",
+      "unit_id": "history_g6:unit_03",
+      "item_id": "unit_opening",
+      "quiz_question": "In Ancient Egypt, who were the most trusted advisors of the Pharaoh?",
+      "correct": false,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": true
+    },
+    {
+      "ts": "2026-06-28T16:59:12.797825Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "visual_elements",
+      "quiz_question": "What is the capital city that King Narmer or Menes established after uniting Upper and Lower Egypt?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-28T17:00:21.681959Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "visual_elements",
+      "quiz_question": "What is the capital city that King Narmer or Menes established after uniting Upper and Lower Egypt?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-28T17:05:38.579629Z",
+      "unit_id": "u1",
+      "item_id": "content",
+      "quiz_question": "Which part of speech describes or modifies nouns?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-28T17:06:15.753692Z",
+      "unit_id": "u1",
+      "item_id": "content",
+      "quiz_question": "Which part of speech describes or modifies nouns?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-28T17:34:39.382577Z",
+      "unit_id": "u1",
+      "item_id": "content",
+      "quiz_question": "Which part of speech describes how, when, or where an action happens?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-28T17:35:26.631286Z",
+      "unit_id": "u1",
+      "item_id": "content",
+      "quiz_question": "Which part of speech describes how, when, or where an action happens?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-28T17:42:56.624947Z",
+      "unit_id": "u1",
+      "item_id": "content",
+      "quiz_question": "What is the purpose of the introduction in a speech?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
     }
   ],
   "by_unit": {
     "history_g6:unit_01": {
-      "attempts": 39,
-      "correct": 27,
-      "accuracy": 69.23
+      "attempts": 46,
+      "correct": 32,
+      "accuracy": 69.57
     },
     "history_g6:unit_02": {
-      "attempts": 12,
-      "correct": 3,
-      "accuracy": 25.0
+      "attempts": 13,
+      "correct": 4,
+      "accuracy": 30.77
+    },
+    "history_g6:unit_03": {
+      "attempts": 3,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "u1": {
+      "attempts": 5,
+      "correct": 4,
+      "accuracy": 80.0
     }
   },
   "by_item": {
     "history_g6:unit_01:unit_opening": {
-      "attempts": 20,
+      "attempts": 23,
       "incorrect": 9,
       "remediation_used": 1
     },
     "history_g6:unit_01:reading_1": {
-      "attempts": 11,
+      "attempts": 12,
       "incorrect": 2,
       "remediation_used": 0
     },
@@ -547,17 +557,17 @@
       "remediation_used": 0
     },
     "history_g6:unit_01:discussion_questions": {
-      "attempts": 4,
+      "attempts": 5,
       "incorrect": 1,
       "remediation_used": 0
     },
     "history_g6:unit_01:visual_elements": {
-      "attempts": 2,
-      "incorrect": 0,
+      "attempts": 4,
+      "incorrect": 2,
       "remediation_used": 0
     },
     "history_g6:unit_02:discussion_questions": {
-      "attempts": 6,
+      "attempts": 7,
       "incorrect": 6,
       "remediation_used": 0
     },
@@ -569,6 +579,16 @@
     "history_g6:unit_01:wrap_up": {
       "attempts": 1,
       "incorrect": 0,
+      "remediation_used": 0
+    },
+    "history_g6:unit_03:unit_opening": {
+      "attempts": 3,
+      "incorrect": 3,
+      "remediation_used": 1
+    },
+    "u1:content": {
+      "attempts": 5,
+      "incorrect": 1,
       "remediation_used": 0
     }
   },
@@ -896,6 +916,73 @@
         "coverage_missing": [],
         "coverage_fix_applied": false,
         "teacher_text_len": 2033,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-28T17:05:38.579629Z",
+      "unit_id": "u1",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of parts of speech including nouns, verbs, adjectives, and adverbs"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 85,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-28T17:06:15.753692Z",
+      "unit_id": "u1",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of parts of speech including nouns, verbs, adjectives, adverbs"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 85,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-28T17:34:39.382577Z",
+      "unit_id": "u1",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of verbs, adjectives, and adverbs",
+          "Examples of verbs, adjectives, and adverbs in sentences",
+          "Discussion on the roles of verbs, adjectives, and adverbs in sentences"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 449,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-28T17:35:26.631286Z",
+      "unit_id": "u1",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of verbs, adjectives, and adverbs",
+          "Examples of verbs, adjectives, and adverbs",
+          "Engaging students in identifying verbs, adjectives, and adverbs in a sentence"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 395,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-06-28T17:42:56.624947Z",
+      "unit_id": "u1",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [],
+        "coverage_fix_applied": false,
+        "teacher_text_len": 521,
         "mentions_page_ranges": false
       }
     }

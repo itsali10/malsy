@@ -1,0 +1,34 @@
+{
+  "book_id": "history_g6",
+  "unit_id": "history_g6:unit_02",
+  "lesson_title": "Religion and Gods of Ancient Egypt",
+  "lesson_number": 2,
+  "images": [
+    {
+      "id": "040b4f51-25ad-48ea-82c4-25fd98b02605",
+      "tap_label": "Tap the animal-headed deities",
+      "title": "Animal-Headed Deities",
+      "description": "Representation of gods with human bodies and animal heads",
+      "labels": [
+        "Symbolic",
+        "Deities",
+        "Power"
+      ],
+      "image_url": "/interactive-images/static/history_g6/history_g6_unit_02/img_1.png",
+      "filename": "img_1.png"
+    },
+    {
+      "id": "e18f7155-6b90-4dd6-aa98-a61aea521365",
+      "tap_label": "Tap the temple ceremony",
+      "title": "Temple Ceremony",
+      "description": "Ancient ritual honoring the gods",
+      "labels": [
+        "Ritual",
+        "Worship",
+        "Ancient"
+      ],
+      "image_url": "/interactive-images/static/history_g6/history_g6_unit_02/img_2.png",
+      "filename": "img_2.png"
+    }
+  ]
+}

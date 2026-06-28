@@ -66,6 +66,31 @@
       "unit_id": "history_g6:unit_01",
       "taught_at": "2026-06-24T22:34:29.054854Z",
       "completed_parts": 2
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-25T18:23:00.374253Z",
+      "completed_parts": 2
+    },
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-06-25T18:35:00.368637Z",
+      "completed_parts": 2
+    },
+    {
+      "unit_id": "history_g6:unit_02",
+      "taught_at": "2026-06-25T18:48:57.596967Z",
+      "completed_parts": 2
+    },
+    {
+      "unit_id": "u1",
+      "taught_at": "2026-06-28T17:06:15.819753Z",
+      "completed_parts": 2
+    },
+    {
+      "unit_id": "u1",
+      "taught_at": "2026-06-28T17:42:56.697584Z",
+      "completed_parts": 2
     }
   ]
 }

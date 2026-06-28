@@ -5,5 +5,33 @@
   "done_items": [],
   "last_quiz": null,
   "hint_count": 0,
-  "attempt_history": []
+  "attempt_history": [
+    {
+      "ts": "2026-06-26T19:24:01.468256Z",
+      "item_id": "unit_opening",
+      "quiz_question": "In Ancient Egypt, who were the most trusted advisors of the Pharaoh?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-26T19:28:45.257481Z",
+      "item_id": "unit_opening",
+      "quiz_question": "In Ancient Egypt, who were the most trusted advisors of the Pharaoh?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-26T19:29:17.099197Z",
+      "item_id": "unit_opening",
+      "quiz_question": "In Ancient Egypt, who were the most trusted advisors of the Pharaoh?",
+      "correct": false,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": true
+    }
+  ]
 }

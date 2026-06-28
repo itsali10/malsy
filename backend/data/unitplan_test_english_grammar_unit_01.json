@@ -1,0 +1,102 @@
+{
+  "unit_title": "Parts of Speech",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Parts of Speech",
+      "must_cover": true,
+      "keywords": [
+        "parts of speech",
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs",
+        "pronouns",
+        "prepositions",
+        "conjunctions",
+        "interjections"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Identifying Parts of Speech",
+      "must_cover": true,
+      "keywords": [
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs",
+        "pronouns",
+        "prepositions",
+        "conjunctions",
+        "interjections"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Vocabulary: Parts of Speech",
+      "must_cover": true,
+      "keywords": [
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs",
+        "pronouns",
+        "prepositions",
+        "conjunctions",
+        "interjections"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Practice: Identifying Parts of Speech",
+      "must_cover": true,
+      "keywords": [
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs",
+        "pronouns",
+        "prepositions",
+        "conjunctions",
+        "interjections"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion: Applying Parts of Speech",
+      "must_cover": true,
+      "keywords": [
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs",
+        "pronouns",
+        "prepositions",
+        "conjunctions",
+        "interjections"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Review: Parts of Speech",
+      "must_cover": true,
+      "keywords": [
+        "nouns",
+        "verbs",
+        "adjectives",
+        "adverbs",
+        "pronouns",
+        "prepositions",
+        "conjunctions",
+        "interjections"
+      ]
+    }
+  ]
+}

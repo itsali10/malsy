@@ -1,0 +1,29 @@
+{
+  "objectives": [
+    "Learn how to organize ideas for a speech",
+    "Practice speaking clearly and confidently",
+    "Receive and provide constructive feedback on public speaking skills"
+  ],
+  "units": [
+    {
+      "unit_id": "u1",
+      "title": "Organizing Your Speech",
+      "keywords": [
+        "introduction",
+        "body",
+        "conclusion"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u2",
+      "title": "Practicing Speaking Skills",
+      "keywords": [
+        "eye contact",
+        "voice projection",
+        "body language"
+      ],
+      "minutes": 90
+    }
+  ]
+}

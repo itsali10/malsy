@@ -1,0 +1,127 @@
+{
+  "unit_title": "Exploring Phonemes",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Opening",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "lesson objectives",
+        "overview"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Introduction to Phonemes",
+      "must_cover": true,
+      "keywords": [
+        "phonemes",
+        "sounds",
+        "basic concepts"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Vocabulary",
+      "must_cover": true,
+      "keywords": [
+        "phonemes",
+        "sounds",
+        "practice"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Phoneme Practice",
+      "must_cover": true,
+      "keywords": [
+        "phonemes",
+        "practice",
+        "sounds"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening Exercise",
+      "must_cover": true,
+      "keywords": [
+        "listening comprehension",
+        "phonemes",
+        "sounds"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking Practice",
+      "must_cover": true,
+      "keywords": [
+        "speaking",
+        "pronunciation",
+        "phonemes"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing Activity",
+      "must_cover": true,
+      "keywords": [
+        "writing",
+        "phonemes",
+        "sounds"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Lesson Wrap Up",
+      "must_cover": true,
+      "keywords": [
+        "summary",
+        "key concepts",
+        "lesson review"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "class discussion",
+        "critical thinking",
+        "application of concepts"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "pictures",
+        "diagrams",
+        "charts",
+        "visual content"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Practice Exercises",
+      "must_cover": true,
+      "keywords": [
+        "phoneme exercises",
+        "practice tasks",
+        "writing prompts"
+      ]
+    }
+  ]
+}

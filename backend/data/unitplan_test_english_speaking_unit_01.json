@@ -1,0 +1,66 @@
+{
+  "unit_title": "Introduction to Speaking Test",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Introduction",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "speaking test"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Developing Speaking Skills",
+      "must_cover": true,
+      "keywords": [
+        "speaking skills",
+        "confidence"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Class Discussion on Speaking Skills",
+      "must_cover": true,
+      "keywords": [
+        "discussion",
+        "feedback"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visuals for Speaking Test",
+      "must_cover": true,
+      "keywords": [
+        "visuals",
+        "diagrams",
+        "charts"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Practice Speaking Test Questions",
+      "must_cover": true,
+      "keywords": [
+        "practice",
+        "speaking test"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Lesson Wrap-Up",
+      "must_cover": true,
+      "keywords": [
+        "summary",
+        "lesson conclusion"
+      ]
+    }
+  ]
+}
