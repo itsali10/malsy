@@ -1,0 +1,71 @@
+{
+  "unit_title": "Ancient Egyptian Gods and Religion",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Ancient Egyptian Gods and Religion",
+      "must_cover": true,
+      "keywords": [
+        "Ancient Egypt",
+        "religion",
+        "gods",
+        "goddesses"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Overview of Ancient Egyptian Gods",
+      "must_cover": true,
+      "keywords": [
+        "names of gods",
+        "images of gods",
+        "Ra",
+        "Amun",
+        "Anubis",
+        "Bastet",
+        "Geb",
+        "Hathor",
+        "Sekmet",
+        "Horus",
+        "Heket",
+        "Tefnut",
+        "Thoth",
+        "Sobek"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Representation of Egyptian Gods",
+      "must_cover": true,
+      "keywords": [
+        "images of gods and goddesses",
+        "depictions of gods with human body and animal heads",
+        "table showing Egyptian gods and animals they were linked to"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions on Ancient Egyptian Gods",
+      "must_cover": true,
+      "keywords": [
+        "worship practices",
+        "symbolism of animal representations",
+        "importance of Ra",
+        "roles of different gods and goddesses"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Wrap Up: Understanding Ancient Egyptian Religion",
+      "must_cover": true,
+      "keywords": [
+        "summary of Egyptian gods and their significance"
+      ]
+    }
+  ]
+}

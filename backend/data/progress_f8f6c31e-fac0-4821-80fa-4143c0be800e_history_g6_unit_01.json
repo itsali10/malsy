@@ -1,0 +1,21 @@
+{
+  "student_id": "f8f6c31e-fac0-4821-80fa-4143c0be800e",
+  "chapter_id": "history_g6:unit_01",
+  "current_item_index": 1,
+  "done_items": [
+    "unit_opening"
+  ],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [
+    {
+      "ts": "2026-06-30T19:18:50.108589Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Where did the Ancient Egyptians live?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ]
+}

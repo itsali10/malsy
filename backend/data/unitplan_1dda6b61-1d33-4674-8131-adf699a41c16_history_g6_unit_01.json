@@ -1,0 +1,75 @@
+{
+  "unit_title": "Ancient Egyptians",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Opening",
+      "must_cover": true,
+      "keywords": [
+        "research project",
+        "Ancient Egyptians"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Where and who were the Ancient Egyptians?",
+      "must_cover": true,
+      "keywords": [
+        "Egypt",
+        "civilization",
+        "Pharaohs",
+        "River Nile",
+        "settlement",
+        "Nile valley",
+        "farming",
+        "King Narmer",
+        "Menes",
+        "Memphis",
+        "red land",
+        "black land"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "key points",
+        "similarities",
+        "differences",
+        "life today"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "monuments",
+        "tombs",
+        "River Nile",
+        "maps",
+        "illustrations"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "reading aloud",
+        "discussion",
+        "extended reading",
+        "family member",
+        "key points",
+        "similarities",
+        "differences"
+      ]
+    }
+  ]
+}

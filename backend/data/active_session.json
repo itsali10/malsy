@@ -1,56 +1,50 @@
 {
-  "student_id": "fb57bf6f-403d-4dbb-b1fc-a58fa9909fc0",
-  "chapter_id": "english_grammar:unit_01",
-  "book_id": "english_grammar",
-  "graph_chapter_id": "english_grammar:unit_01",
+  "student_id": "02a7d928-893e-40f7-9a18-2c44c93318b2",
+  "chapter_id": "history_g6:unit_03",
+  "book_id": "history_g6",
+  "graph_chapter_id": "history_g6:unit_03",
   "session_units": [
     {
-      "unit_id": "u1",
-      "title": "Parts of Speech",
-      "keywords": [
-        "nouns",
-        "verbs",
-        "adjectives",
-        "adverbs",
-        "pronouns",
-        "prepositions",
-        "conjunctions",
-        "interjections"
-      ],
-      "minutes": 90
+      "unit_id": "unit_03",
+      "title": "Egyptian Society, Pharaohs and the Social Hierarchy",
+      "keywords": [],
+      "minutes": 90,
+      "real_unit_id": "history_g6:unit_03"
     }
   ],
   "current_pos": 0,
   "unit_part": 0,
   "last_quiz": {
-    "question": "Which part of speech is used to describe a noun?",
+    "question": "Who were the most powerful figures in Ancient Egypt, serving as both the government leader and high priest in temples?",
     "options": [
-      "Adjective",
-      "Verb",
-      "Preposition",
-      "Conjunction"
+      "Officials and Scribes",
+      "High priests and nobles",
+      "Pharaohs",
+      "Craftsmen"
     ],
-    "correct_answer": "Adjective",
+    "correct_answer": "Pharaohs",
     "expected_points": [
-      "Adjectives are used to describe or modify nouns, providing more information about them."
-    ]
+      "The Pharaohs were considered the most important and powerful people in the kingdom, leading the government and serving as high priests in temples."
+    ],
+    "source_quote": "They were the most important and powerful people in the kingdom. They were head of the government and high priest of every temple."
   },
-  "last_teacher_text": "Unit Title: Parts of Speech Unit Opening: Welcome to the exciting world of \"Parts of Speech\"! In this unit, we will dive into the building blocks of language that help us communicate effectively.\n\nUnderstanding parts of speech is like having a superpower that lets us express ourselves clearly and creatively. Throughout this unit.\n\nwe will explore different parts of speech. such as nouns.\n\nWhat do you think so far?\n\nverbs. adjectives.\n\nadverbs. pronouns.\n\nprepositions. conjunctions.\n\nWhat do you think so far?\n\nand interjections. Each part plays a unique role in shaping our sentences and giving them meaning.\n\nBy the end of this unit. you will be able to identify and use various parts of speech correctly in your writing and speaking.\n\nGet ready to embark on this language adventure and become a master of words! Now, let's start our journey into the fascinating world of \"Parts of Speech\"!\n\nWhat do you think so far?\n\nGreat job. You are doing great.",
+  "last_teacher_text": "Alright, let's dive into the fascinating world of Ancient Egypt's social hierarchy and the mighty Pharaohs! \n\nIn Ancient Egypt, society was structured in a way where people had different roles and positions. At the very base of this social system were slaves, laborers, and peasants. They worked hard to support the kingdom.\n\nMoving up the hierarchy, we had craftsmen who were skilled workers creating beautiful objects and structures that were essential for daily life and religious ceremonies.\n\nOfficials and scribes played crucial roles in the administration and keeping records. They were highly respected for their knowledge and organizational skills.\n\nNext, we have high priests and nobles. These individuals held significant power and often had close ties to the Pharaoh. They oversaw religious practices and managed important affairs of the kingdom.\n\nNow, let's talk about the Pharaohs – the kings or queens of Egypt. They were the most powerful figures in the land, leading the government and serving as high priests in temples. The people saw them as part divine, part human, believing they had a special connection to the gods.\n\nDuring the Old and Middle Kingdoms, Pharaohs were laid to rest in grand pyramids near Memphis. These pyramids were monumental structures that housed the Pharaohs' remains and treasures.\n\nIn the New Kingdom, Pharaohs were buried in the Valley of the Kings in Thebes. These tombs were carved deep into the rock, hidden from view. One of the most famous Pharaohs, Tutankhamun, had an incredible tomb discovered in 1922. It contained a wealth of treasures like paintings, canopic jars, and stunning gold jewelry.\n\nIsn't it amazing how the Ancient Egyptians built such elaborate tombs and treasures for their Pharaohs? It truly shows the importance they placed on honoring their rulers even in the afterlife.\n\nNow, imagine if you were a craftsman in Ancient Egypt, creating beautiful artifacts for the Pharaoh's tomb. What kind of skills would you need? \n\nTo wrap up, we've explored the social hierarchy in Ancient Egypt, from slaves to the revered Pharaohs, and learned about the grandeur of the Pharaohs' tombs like that of Tutankhamun. \n\nAre you ready to test your knowledge with a fun quiz on Egyptian society and the Pharaohs? Let's see how much you've learned!",
   "part_cache": {
     "0": {
-      "teacher_text": "Unit Title: Parts of Speech Unit Opening: Welcome to the exciting world of \"Parts of Speech\"! In this unit, we will dive into the building blocks of language that help us communicate effectively.\n\nUnderstanding parts of speech is like having a superpower that lets us express ourselves clearly and creatively. Throughout this unit.\n\nwe will explore different parts of speech. such as nouns.\n\nWhat do you think so far?\n\nverbs. adjectives.\n\nadverbs. pronouns.\n\nprepositions. conjunctions.\n\nWhat do you think so far?\n\nand interjections. Each part plays a unique role in shaping our sentences and giving them meaning.\n\nBy the end of this unit. you will be able to identify and use various parts of speech correctly in your writing and speaking.\n\nGet ready to embark on this language adventure and become a master of words! Now, let's start our journey into the fascinating world of \"Parts of Speech\"!\n\nWhat do you think so far?\n\nGreat job. You are doing great.",
+      "teacher_text": "Alright, let's dive into the fascinating world of Ancient Egypt's social hierarchy and the mighty Pharaohs! \n\nIn Ancient Egypt, society was structured in a way where people had different roles and positions. At the very base of this social system were slaves, laborers, and peasants. They worked hard to support the kingdom.\n\nMoving up the hierarchy, we had craftsmen who were skilled workers creating beautiful objects and structures that were essential for daily life and religious ceremonies.\n\nOfficials and scribes played crucial roles in the administration and keeping records. They were highly respected for their knowledge and organizational skills.\n\nNext, we have high priests and nobles. These individuals held significant power and often had close ties to the Pharaoh. They oversaw religious practices and managed important affairs of the kingdom.\n\nNow, let's talk about the Pharaohs – the kings or queens of Egypt. They were the most powerful figures in the land, leading the government and serving as high priests in temples. The people saw them as part divine, part human, believing they had a special connection to the gods.\n\nDuring the Old and Middle Kingdoms, Pharaohs were laid to rest in grand pyramids near Memphis. These pyramids were monumental structures that housed the Pharaohs' remains and treasures.\n\nIn the New Kingdom, Pharaohs were buried in the Valley of the Kings in Thebes. These tombs were carved deep into the rock, hidden from view. One of the most famous Pharaohs, Tutankhamun, had an incredible tomb discovered in 1922. It contained a wealth of treasures like paintings, canopic jars, and stunning gold jewelry.\n\nIsn't it amazing how the Ancient Egyptians built such elaborate tombs and treasures for their Pharaohs? It truly shows the importance they placed on honoring their rulers even in the afterlife.\n\nNow, imagine if you were a craftsman in Ancient Egypt, creating beautiful artifacts for the Pharaoh's tomb. What kind of skills would you need? \n\nTo wrap up, we've explored the social hierarchy in Ancient Egypt, from slaves to the revered Pharaohs, and learned about the grandeur of the Pharaohs' tombs like that of Tutankhamun. \n\nAre you ready to test your knowledge with a fun quiz on Egyptian society and the Pharaohs? Let's see how much you've learned!",
       "quiz": {
-        "question": "Which part of speech is used to describe a noun?",
+        "question": "Who were the most powerful figures in Ancient Egypt, serving as both the government leader and high priest in temples?",
         "options": [
-          "Adjective",
-          "Verb",
-          "Preposition",
-          "Conjunction"
+          "Officials and Scribes",
+          "High priests and nobles",
+          "Pharaohs",
+          "Craftsmen"
         ],
-        "correct_answer": "Adjective",
+        "correct_answer": "Pharaohs",
         "expected_points": [
-          "Adjectives are used to describe or modify nouns, providing more information about them."
-        ]
+          "The Pharaohs were considered the most important and powerful people in the kingdom, leading the government and serving as high priests in temples."
+        ],
+        "source_quote": "They were the most important and powerful people in the kingdom. They were head of the government and high priest of every temple."
       }
     }
   }

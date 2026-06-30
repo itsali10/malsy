@@ -1,0 +1,39 @@
+{
+  "objectives": [
+    "Identify the main idea of a passage",
+    "Recognize supporting details in a text",
+    "Make inferences based on information provided"
+  ],
+  "units": [
+    {
+      "unit_id": "u1",
+      "title": "Understanding Main Idea",
+      "keywords": [
+        "main idea",
+        "topic sentence",
+        "key idea"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u2",
+      "title": "Exploring Supporting Details",
+      "keywords": [
+        "supporting details",
+        "examples",
+        "facts"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u3",
+      "title": "Making Inferences",
+      "keywords": [
+        "inference",
+        "conclusion",
+        "context clues"
+      ],
+      "minutes": 90
+    }
+  ]
+}

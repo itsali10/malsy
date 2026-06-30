@@ -1,0 +1,95 @@
+{
+  "unit_title": "Ancient Egyptians",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Ancient Egyptians",
+      "must_cover": true,
+      "keywords": [
+        "research project",
+        "Ancient Egyptians",
+        "reading",
+        "sections",
+        "life"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Where and who were the Ancient Egyptians?",
+      "must_cover": true,
+      "keywords": [
+        "Egypt",
+        "civilisation",
+        "monuments",
+        "Pharaohs",
+        "River Nile",
+        "Sudan",
+        "banks",
+        "farmers",
+        "population",
+        "Nile valley",
+        "water",
+        "food",
+        "transportation",
+        "fertile land",
+        "kingdoms",
+        "Upper Egypt",
+        "Lower Egypt",
+        "pharaoh",
+        "King Narmer",
+        "Menes",
+        "Memphis",
+        "Two Lands"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "similarities",
+        "differences",
+        "life today",
+        "family",
+        "key points"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "pictures",
+        "illustrations",
+        "diagrams",
+        "charts"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Reading Comprehension Exercises",
+      "must_cover": true,
+      "keywords": [
+        "reading aloud",
+        "extended reading",
+        "key points",
+        "life today"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Unit Wrap-Up",
+      "must_cover": true,
+      "keywords": [
+        "summary",
+        "Ancient Egyptians"
+      ]
+    }
+  ]
+}

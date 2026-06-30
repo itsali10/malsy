@@ -1,0 +1,19 @@
+{
+  "student_id": "f8f6c31e-fac0-4821-80fa-4143c0be800e",
+  "chapter_id": "english_grammar:unit_01",
+  "current_item_index": 0,
+  "done_items": [],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [
+    {
+      "ts": "2026-06-30T19:46:14.783393Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Which part of speech is 'brightly' in the sentence 'The sun shines brightly in the sky'?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    }
+  ]
+}

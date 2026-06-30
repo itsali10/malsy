@@ -1,0 +1,72 @@
+{
+  "student_id": "f8f6c31e-fac0-4821-80fa-4143c0be800e",
+  "updated_at": "2026-06-30T19:46:18.207439Z",
+  "totals": {
+    "attempts": 2,
+    "correct": 1,
+    "accuracy": 50.0
+  },
+  "recent_attempts": [
+    {
+      "ts": "2026-06-30T19:18:50.888035Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Where did the Ancient Egyptians live?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-06-30T19:46:18.206412Z",
+      "unit_id": "u1",
+      "item_id": "unit_opening",
+      "quiz_question": "Which part of speech is 'brightly' in the sentence 'The sun shines brightly in the sky'?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    }
+  ],
+  "by_unit": {
+    "history_g6:unit_01": {
+      "attempts": 1,
+      "correct": 1,
+      "accuracy": 100.0
+    },
+    "u1": {
+      "attempts": 1,
+      "correct": 0,
+      "accuracy": 0.0
+    }
+  },
+  "by_item": {
+    "history_g6:unit_01:unit_opening": {
+      "attempts": 1,
+      "incorrect": 0,
+      "remediation_used": 0
+    },
+    "u1:unit_opening": {
+      "attempts": 1,
+      "incorrect": 1,
+      "remediation_used": 0
+    }
+  },
+  "tutor_quality_events": [
+    {
+      "ts": "2026-06-30T19:46:18.206412Z",
+      "unit_id": "u1",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Definition of each part of speech",
+          "Examples of each part of speech",
+          "Explanation of the importance of understanding parts of speech"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 551,
+        "mentions_page_ranges": false
+      }
+    }
+  ]
+}

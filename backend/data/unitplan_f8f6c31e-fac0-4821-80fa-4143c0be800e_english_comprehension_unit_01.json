@@ -1,0 +1,70 @@
+{
+  "unit_title": "Understanding Main Idea",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Opening",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "lesson overview"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Identifying Main Idea in a Passage",
+      "must_cover": true,
+      "keywords": [
+        "main idea",
+        "topic sentence",
+        "key idea"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Vocabulary: Main Idea Terms",
+      "must_cover": true,
+      "keywords": [
+        "main idea",
+        "topic sentence",
+        "key idea"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions on Main Idea",
+      "must_cover": true,
+      "keywords": [
+        "main idea",
+        "topic sentence",
+        "key idea"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Practice: Identifying Main Idea",
+      "must_cover": true,
+      "keywords": [
+        "main idea",
+        "topic sentence",
+        "key idea"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Lesson Wrap-Up",
+      "must_cover": true,
+      "keywords": [
+        "main idea",
+        "topic sentence",
+        "key idea"
+      ]
+    }
+  ]
+}
