@@ -1,3 +1,12 @@
+import {
+  buildLipSyncTimeline,
+  visemeAtTime,
+  applyAudioBands,
+  type LipSyncTimeline,
+  type RpmVisemeWeights,
+  type BandSample,
+} from './viseme-lipsync';
+
 export type LessonAudioState =
   | 'idle'
   | 'loading'
@@ -22,10 +31,11 @@ export function dispatchSpeaking(
   speaking: boolean,
   amplitude = 0,
   visemes?: Partial<VisemeFrame>,
+  rpm?: RpmVisemeWeights,
 ): void {
   if (typeof window === 'undefined') return;
   window.dispatchEvent(
-    new CustomEvent('malsy-tts', { detail: { speaking, amplitude, visemes } }),
+    new CustomEvent('malsy-tts', { detail: { speaking, amplitude, visemes, rpm } }),
   );
 }
 
@@ -116,111 +126,117 @@ export async function precomputeAudioBands(
 }
 
 /**
- * Attach lip-sync driven by real audio frequency analysis.
- *
- * `bandsPromise` (from precomputeAudioBands) provides per-window band energy.
- * While it resolves, a brief synthetic fallback keeps the mouth moving.
- * Once resolved, each rAF frame looks up the current window by el.currentTime
- * and maps the three bands onto specific viseme targets:
- *
- *  low  (100–700 Hz)  → jaw opening + open-vowel (aa/O) shapes
- *  mid  (700–2500 Hz) → front-vowel (E) shape
- *  high (2500+ Hz)    → fricative (FF/SS) shapes
- *
- * Silent gaps between words have near-zero energy in all bands, so the
- * mouth closes automatically without any special silence detection.
+ * Build a sampler that returns the normalized (0..1) band energies at a given
+ * playback time. Normalization is per-clip (relative to each band's peak), so
+ * the same rules work for loud and quiet recordings — the audio analogue of
+ * Wav2Lip normalizing its mel input before inference.
  */
-export function attachLipSync(
-  el: HTMLAudioElement,
-  bandsPromise?: Promise<AudioBands | null>,
-): () => void {
+export function makeBandSampler(bands: AudioBands): (t: number) => BandSample {
+  const n = bands.low.length;
+  const env = new Float32Array(n);
+  let peakEnv = 1e-6, peakLow = 1e-6, peakMid = 1e-6, peakHigh = 1e-6;
+
+  for (let i = 0; i < n; i++) {
+    const e = Math.hypot(bands.low[i], bands.mid[i], bands.high[i]);
+    env[i] = e;
+    if (e > peakEnv)            peakEnv  = e;
+    if (bands.low[i]  > peakLow)  peakLow  = bands.low[i];
+    if (bands.mid[i]  > peakMid)  peakMid  = bands.mid[i];
+    if (bands.high[i] > peakHigh) peakHigh = bands.high[i];
+  }
+
+  const winMs = bands.windowMs || 40;
+
+  return (t: number): BandSample => {
+    const idx = Math.floor((t * 1000) / winMs);
+    const i = Math.max(0, Math.min(n - 1, idx));
+    return {
+      low:    bands.low[i]  / peakLow,
+      mid:    bands.mid[i]  / peakMid,
+      high:   bands.high[i] / peakHigh,
+      energy: env[i]        / peakEnv,
+    };
+  };
+}
+
+/**
+ * Attach text-driven RPM viseme lip-sync to an audio element.
+ *
+ * We map the spoken `text` to a viseme timeline spread across the clip's real
+ * duration. Each frame we look up the active viseme at `el.currentTime` and
+ * dispatch its RPM weights (+ a legacy {aa,E,O,FF,SS,jaw} frame for the avatar).
+ *
+ * Bilabials (m/p/b) reach full-strength PP shape (lips meet) and the jaw is
+ * closed; fricatives nearly close; word gaps / silence close the mouth.
+ *
+ * Without `text` (or before metadata) a gentle synthetic motion keeps the mouth
+ * moving so the avatar never looks frozen while speaking.
+ */
+export function attachLipSync(el: HTMLAudioElement, text?: string): () => void {
   let alive = true;
-  let raf   = 0;
-  let bands: AudioBands | null = null;
+  let raf = 0;
+  let timeline: LipSyncTimeline | null = null;
+  let sampleBand: ((t: number) => BandSample) | null = null;
   const t0 = performance.now();
 
-  bandsPromise?.then(b => { if (alive) bands = b; });
+  const build = () => {
+    if (text && Number.isFinite(el.duration) && el.duration > 0) {
+      timeline = buildLipSyncTimeline(text, el.duration);
+    }
+  };
+  build();
+  const onMeta = () => build();
+  el.addEventListener('loadedmetadata', onMeta);
+  el.addEventListener('durationchange', onMeta);
 
-  // Envelope followers for smoothing (attack fast, release slow)
-  let envLow = 0, envMid = 0, envHigh = 0;
+  // Wav2Lip-style: analyse the real audio so the mouth follows the sound.
+  // This is best-effort — if it fails (CORS, decode error) we silently keep the
+  // text-only behaviour, so lip-sync never breaks.
+  const src = el.currentSrc || el.src;
+  if (src) {
+    void precomputeAudioBands(src).then((bands) => {
+      if (alive && bands && bands.low.length) sampleBand = makeBandSampler(bands);
+    });
+  }
 
   const loop = () => {
     if (!alive) return;
     raf = requestAnimationFrame(loop);
 
-    const audible =
-      !el.paused && !el.ended && el.currentTime > 0 && (el.volume ?? 1) > 0;
-
+    const audible = !el.paused && !el.ended && (el.volume ?? 1) > 0;
     if (!audible) {
-      envLow = envMid = envHigh = 0;
       dispatchSpeaking(false, 0);
       return;
     }
 
-    if (bands) {
-      // ── Real frequency-band lip sync ───────────────────────
-      const idx = Math.min(
-        Math.floor(el.currentTime * 1000 / bands.windowMs),
-        bands.low.length - 1,
-      );
+    if (!timeline) build();
 
-      const rawL = bands.low[idx];
-      const rawM = bands.mid[idx];
-      const rawH = bands.high[idx];
+    if (timeline) {
+      const t = el.currentTime;
+      const textW = visemeAtTime(timeline, t);
+      // Condition the text shape on the real audio when analysis is ready.
+      const band = sampleBand ? sampleBand(t) : null;
+      const w = band ? applyAudioBands(textW, band) : textW;
 
-      // ── Silence gate on raw values — no envelope lag ──────
-      // Piper TTS has a clean noise floor, so any window with
-      // total raw RMS < 0.004 is a genuine silence / word gap.
-      const rawTotal = rawL + rawM + rawH;
-      if (rawTotal < 0.004) {
-        envLow = envMid = envHigh = 0;
-        dispatchSpeaking(false, 0);
-        return;
-      }
+      // Legacy frame for any morph paths that still read {aa,E,O,FF,SS,jaw}.
+      const frame: VisemeFrame = {
+        aa: Math.min(1, w.aa ?? 0),
+        E:  Math.min(1, Math.max(w.E ?? 0, w.I ?? 0)),
+        O:  Math.min(1, Math.max(w.O ?? 0, w.U ?? 0)),
+        FF: Math.min(1, w.FF ?? 0),
+        SS: Math.min(1, Math.max(w.SS ?? 0, w.CH ?? 0)),
+        jaw: w.jaw,
+      };
 
-      // ── Envelope follower for smooth shape transitions ─────
-      // ATK fast so the mouth opens immediately with speech.
-      // REL moderate so consonant dips don't snap the mouth shut,
-      // but it still closes quickly enough during real word gaps.
-      const ATK = 0.40;
-      const REL = 0.18;
-      envLow  = rawL > envLow  ? envLow  + ATK * (rawL  - envLow)  : envLow  + REL * (rawL  - envLow);
-      envMid  = rawM > envMid  ? envMid  + ATK * (rawM  - envMid)  : envMid  + REL * (rawM  - envMid);
-      envHigh = rawH > envHigh ? envHigh + ATK * (rawH  - envHigh) : envHigh + REL * (rawH  - envHigh);
+      const closure = Math.max(w.PP ?? 0, (w.FF ?? 0) * 0.6);
+      // With audio, amplitude tracks real loudness (mouth closes in gaps);
+      // closures still register so p/b/m frames press the lips.
+      const amp = band
+        ? Math.min(0.6, Math.max(band.energy * 0.7, closure * 0.35) + Math.max(frame.FF, frame.SS) * 0.1)
+        : Math.min(0.6, frame.jaw * 0.7 + closure * 0.2 + Math.max(frame.FF, frame.SS) * 0.2);
 
-      const envTotal = envLow + envMid + envHigh;
-
-      // ── Jaw: proportional to total energy ─────────────────
-      // Scales linearly so it is never permanently maxed out.
-      // Typical Piper TTS voiced energy sum: 0.05–0.18 → jaw 0.35–0.9
-      const jaw = Math.min(0.85, envTotal * 7);
-
-      // ── Frequency ratios → shape selection ────────────────
-      // Ratios cannot saturate regardless of absolute level,
-      // so different phoneme types produce different shapes.
-      const inv = 1 / (envTotal + 1e-6);
-      const lR = envLow  * inv;   // fraction in 0–700 Hz
-      const mR = envMid  * inv;   // fraction in 700–2500 Hz
-      const hR = envHigh * inv;   // fraction in 2500+ Hz
-
-      // Open vowels (ah, aw): F1 at 700–1000 Hz → mid band carries it
-      const aa = jaw * Math.min(1, mR * 2.2);
-
-      // Back / round vowels (oh, oo): low band dominant, mid low
-      const O  = jaw * Math.min(0.7, lR * 2.0 * (1 - hR * 2) * (1 - mR * 0.8));
-
-      // Front / close vowels (ee, ih): low dominant, not fricative
-      const E  = jaw * Math.min(0.8, lR * 1.8 * (1 - hR * 3));
-
-      // Fricatives / sibilants: high fraction is large
-      const FF = Math.min(0.7, hR * 3.0);
-      const SS = Math.min(0.8, hR * 4.0);
-
-      const amp = Math.min(0.6, jaw * 0.75);
-
-      dispatchSpeaking(true, amp, { aa, E, O, FF, SS, jaw });
+      dispatchSpeaking(true, amp, frame, w);
     } else {
-      // ── Synthetic fallback while bands are still loading ──
       const t = (performance.now() - t0) / 1000;
       const amp = 0.18 + 0.12 * Math.abs(Math.sin(t * 6.0)) + 0.06 * Math.sin(t * 11.0);
       dispatchSpeaking(true, Math.max(0, Math.min(0.55, amp)));
@@ -232,6 +248,8 @@ export function attachLipSync(
   return () => {
     alive = false;
     cancelAnimationFrame(raf);
+    el.removeEventListener('loadedmetadata', onMeta);
+    el.removeEventListener('durationchange', onMeta);
     dispatchSpeaking(false, 0);
   };
 }

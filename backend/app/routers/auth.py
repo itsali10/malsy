@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import create_access_token, get_current_user, hash_password, verify_password
 from ..database import get_db
+from ..default_schedule import enroll_user_in_default_schedules
 from ..models import User
 from ..schemas import LoginRequest, Token, UserCreate, UserRead
 
@@ -35,6 +36,9 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
     db.add(user)
     await db.commit()
     await db.refresh(user)
+
+    await enroll_user_in_default_schedules(db, user.user_id)
+
     return user
 
 

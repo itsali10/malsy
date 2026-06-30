@@ -1,86 +1,188 @@
-import ProgressBar from '../../components/ui/ProgressBar';
+'use client';
 
-const days = [
-  { name: 'Sun', num: 1, hasClass: true },
-  { name: 'Mon', num: 2, hasClass: true },
-  { name: 'Tue', num: 3, hasClass: true, today: true },
-  { name: 'Wed', num: 4, hasClass: true },
-  { name: 'Thu', num: 5 },
-  { name: 'Fri', num: 6 },
-  { name: 'Sat', num: 7 },
-];
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  WEEK_DAYS,
+  getAllSubjects,
+  getSubjectMeta,
+  getTodayName,
+  getWeeklySessionCount,
+  getSessionsForDay,
+  routeForSubject,
+  type DayName,
+  type ScheduleSession,
+} from '../../lib/studentSchedule';
 
-const classes = [
-  { time: '08:00', color: 'var(--mint)',  name: 'Biology — Plant Cell Cont.',     teacher: 'Mr. Ahmed Samy · Room 204',  pill: 'pill-m', pillLabel: 'Now' },
-  { time: '09:30', color: 'var(--sky)',   name: 'Mathematics — Algebra Unit 5',   teacher: 'Ms. Hana Khalil · Room 110', pill: 'pill-s', pillLabel: 'Up Next' },
-  { time: '11:00', color: 'var(--vl)',    name: 'Chemistry — Atomic Structure',    teacher: 'Dr. Rania Farouk · Lab 3',   pill: 'pill-v', pillLabel: 'Lab Session' },
-  { time: '12:30', color: 'var(--coral)', name: 'Arabic Language — Monthly Exam', teacher: 'Ms. Nour Adel · Room 302',   pill: 'pill-c', pillLabel: 'Exam!' },
-  { time: '14:00', color: 'var(--amber)', name: 'MALSY Arcade Session',           teacher: 'Free study · Vocab games available', pill: 'pill-a', pillLabel: 'Free Time' },
-];
+const DAY_ABBR: Record<DayName, string> = {
+  Monday: 'Mon',
+  Tuesday: 'Tue',
+  Wednesday: 'Wed',
+  Thursday: 'Thu',
+  Friday: 'Fri',
+  Saturday: 'Sat',
+  Sunday: 'Sun',
+};
 
-const exams = [
-  { name: 'Arabic Monthly Exam', when: 'Today · 12:30 PM',    pill: 'pill-c', label: 'Today' },
-  { name: 'Biology Weekly Quiz',  when: 'Jun 8 · After Unit 3', pill: 'pill-s', label: '5 Days' },
-  { name: 'Math Unit 5 Exam',    when: 'Jun 12 · 09:30 AM',   pill: 'pill-v', label: '9 Days' },
-];
+function getCurrentWeekDates(): Record<DayName, Date> {
+  const today = new Date();
+  const dow = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - ((dow + 6) % 7));
+  const dates = {} as Record<DayName, Date>;
+  WEEK_DAYS.forEach((day, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    dates[day] = d;
+  });
+  return dates;
+}
+
+function statusLabel(status: ScheduleSession['status']): string {
+  switch (status) {
+    case 'available':
+      return 'Available';
+    case 'completed':
+      return 'Completed';
+    default:
+      return 'Scheduled';
+  }
+}
+
+function statusClass(status: ScheduleSession['status']): string {
+  switch (status) {
+    case 'available':
+      return 'schedule-status schedule-status--available';
+    case 'completed':
+      return 'schedule-status schedule-status--completed';
+    default:
+      return 'schedule-status schedule-status--locked';
+  }
+}
 
 export default function SchedulePage() {
+  const router = useRouter();
+  const todayName = getTodayName();
+  const [selected, setSelected] = useState<DayName>(todayName);
+  const weekDates = getCurrentWeekDates();
+
+  const sessions = getSessionsForDay(selected);
+  const subjects = getAllSubjects();
+  const sessionCount = getWeeklySessionCount();
+
+  const headingBase =
+    weekDates[selected]?.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+    }) ?? selected;
+  const heading = selected === todayName ? `${headingBase} · Today` : headingBase;
+
+  function handleSessionClick(session: ScheduleSession) {
+    if (session.status === 'available') {
+      router.push(routeForSubject(session.subject));
+      return;
+    }
+    alert(`This ${session.subject} session is scheduled for ${selected}, not today.`);
+  }
+
   return (
     <div className="page-enter">
-      {/* Week bar */}
       <div className="week-bar">
-        {days.map(d => (
-          <div key={d.num} className={`day-btn${d.today ? ' today' : ''}${d.hasClass ? ' has-class' : ''}`}>
-            <div className="day-name">{d.name}</div>
-            <div className="day-num">{d.num}</div>
+        {WEEK_DAYS.map((day) => (
+          <div
+            key={day}
+            onClick={() => setSelected(day)}
+            className={[
+              'day-btn',
+              day === todayName ? 'today' : '',
+              'has-class',
+              day === selected ? 'selected' : '',
+            ]
+              .join(' ')
+              .trim()}
+            style={{ cursor: 'pointer' }}
+          >
+            <div className="day-name">{DAY_ABBR[day]}</div>
+            <div className="day-num">{weekDates[day]?.getDate()}</div>
           </div>
         ))}
       </div>
 
       <div className="g-left">
-        {/* Schedule */}
         <div>
-          <div className="card-title" style={{ marginBottom: 16 }}>Tuesday, June 3 · Today</div>
-          {classes.map(c => (
-            <div key={c.time} className="sched-item" style={{ borderLeftColor: c.color }}>
-              <div className="si-time">{c.time}</div>
-              <div className="si-dot" style={{ background: c.color }} />
-              <div className="si-body">
-                <div className="si-name">{c.name}</div>
-                <div className="si-teacher">{c.teacher}</div>
-              </div>
-              <div className="si-right">
-                <span className={`pill ${c.pill}`}>{c.pillLabel}</span>
-              </div>
-            </div>
-          ))}
+          <div className="card-title" style={{ marginBottom: 16 }}>{heading}</div>
+
+          <div className="schedule-session-list">
+            {sessions.map((session) => {
+              const meta = getSubjectMeta(session.subject);
+              return (
+                <div
+                  key={session.id}
+                  className={`schedule-session-card${session.status === 'available' ? ' schedule-session-card--active' : ''}`}
+                  onClick={() => handleSessionClick(session)}
+                  style={{ borderLeftColor: meta.color }}
+                >
+                  <div className="schedule-session-card__time">{session.time}</div>
+                  <div className="schedule-session-card__icon" style={{ background: meta.bg }}>
+                    {meta.icon}
+                  </div>
+                  <div className="schedule-session-card__body">
+                    <div className="schedule-session-card__title">{session.title}</div>
+                    <div className="schedule-session-card__meta">{session.subject}</div>
+                  </div>
+                  <span className={statusClass(session.status)}>{statusLabel(session.status)}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Right column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* Attendance */}
           <div className="card">
-            <div className="card-title">Attendance</div>
-            <div className="card-sub">This semester</div>
-            <div style={{ fontFamily: 'var(--fd)', fontSize: 40, fontWeight: 800, color: 'var(--mint)', lineHeight: 1 }}>92%</div>
-            <div style={{ fontSize: 11, color: 'var(--g3)', marginTop: 4, marginBottom: 12 }}>Present 46 / 50 days</div>
-            <ProgressBar value={92} color="var(--mint)" />
+            <div className="card-title">This Week</div>
+            <div className="card-sub">
+              {sessionCount} sessions · {WEEK_DAYS.length} days
+            </div>
+            <div className="schedule-week-active">Weekly schedule active</div>
+            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {WEEK_DAYS.map((day) => (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() => setSelected(day)}
+                  className={`schedule-week-row${day === selected ? ' schedule-week-row--selected' : ''}`}
+                >
+                  <span
+                    className="schedule-week-row__day"
+                    style={{ color: day === todayName ? 'var(--vl)' : 'var(--g2)' }}
+                  >
+                    {day}
+                    {day === todayName ? ' · Today' : ''}
+                  </span>
+                  <span className="schedule-week-row__count">2 sessions</span>
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Upcoming exams */}
           <div className="card">
-            <div className="card-title">Upcoming Exams</div>
-            <div className="card-sub">Next 2 weeks</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {exams.map((e, i) => (
-                <div key={e.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: i < exams.length - 1 ? '1px solid rgba(255,255,255,.06)' : 'none' }}>
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 600 }}>{e.name}</div>
-                    <div style={{ fontSize: 10, color: 'var(--g3)' }}>{e.when}</div>
+            <div className="card-title">My Subjects</div>
+            <div className="card-sub">Enrolled this term</div>
+            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {subjects.map((subject) => {
+                const meta = getSubjectMeta(subject);
+                return (
+                  <div key={subject} className="schedule-subject-row">
+                    <div
+                      className="schedule-subject-row__dot"
+                      style={{ background: meta.color }}
+                    />
+                    <span className="schedule-subject-row__name">{subject}</span>
+                    <span className="schedule-subject-row__code">{meta.code}</span>
                   </div>
-                  <span className={`pill ${e.pill}`}>{e.label}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

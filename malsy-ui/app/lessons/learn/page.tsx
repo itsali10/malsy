@@ -6,8 +6,9 @@ import { api, Quiz, SessionAnswerResponse, SessionStartResponse } from '../../..
 import { auth } from '../../../lib/auth';
 import LessonPartVideoPanel from '../../../components/LessonPartVideoPanel';
 import HistoryInteractiveImages from '../../../components/HistoryInteractiveImages';
+import AvatarWidget from '../../../components/AvatarWidget';
 import { unitVideoFilename } from '../../../lib/unit-video';
-import { subjectPathFromChapter } from '../../../lib/learning-config';
+import { subjectPathFromChapter, nextLessonFromChapter } from '../../../lib/learning-config';
 import { useLessonAudioPlayer } from '../../../hooks/useLessonAudioPlayer';
 import { attachLipSync, dispatchSpeaking } from '../../../lib/lesson-audio';
 
@@ -57,6 +58,7 @@ function LessonLearn() {
 
   const feedbackAudioRef = useRef<HTMLAudioElement | null>(null);
   const feedbackTokenRef = useRef(0);
+  const sessionLoadIdRef = useRef(0);
 
   // Labels for breadcrumb: prefer explicit lesson_title param, fall back to chapter ID parsing
   const [subjectLabel, unitLabel] = (() => {
@@ -88,7 +90,7 @@ function LessonLearn() {
       const el = new Audio(src);
       feedbackAudioRef.current = el;
       let stopLipSync: (() => void) | null = null;
-      el.onplaying = () => { if (!stopLipSync) stopLipSync = attachLipSync(el); };
+      el.onplaying = () => { if (!stopLipSync) stopLipSync = attachLipSync(el, text); };
       const stop = () => {
         setFeedbackSpeaking(false);
         stopLipSync?.();
@@ -152,13 +154,27 @@ function LessonLearn() {
 
   useEffect(() => {
     if (!chapter) { router.replace('/lessons'); return; }
+
+    const loadId = ++sessionLoadIdRef.current;
+    setPhase('loading');
+    setErrorMsg('');
+
     api.session.start(studentId, chapter, lessonTitle, lessonDesc)
       .then(res => {
-        if ((res as { error?: string }).error) { setErrorMsg((res as { error?: string }).error ?? 'Error'); setPhase('error'); return; }
+        if (loadId !== sessionLoadIdRef.current) return;
+        if ((res as { error?: string }).error) {
+          setErrorMsg((res as { error?: string }).error ?? 'Error');
+          setPhase('error');
+          return;
+        }
         if (res.done) { setPhase('complete'); return; }
         applySession(res);
       })
-      .catch(e => { setErrorMsg(e instanceof Error ? e.message : 'Failed to load lesson'); setPhase('error'); });
+      .catch(e => {
+        if (loadId !== sessionLoadIdRef.current) return;
+        setErrorMsg(e instanceof Error ? e.message : 'Failed to load lesson');
+        setPhase('error');
+      });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chapter]);
 
@@ -226,13 +242,25 @@ function LessonLearn() {
 
   const paragraphs  = lessonParagraphs(teacherText);
   const canListen = paragraphs.length > 0;
+  const nextLesson = nextLessonFromChapter(chapter);
+
+  function goToNextLesson() {
+    if (!nextLesson) return;
+    lessonAudio.abort();
+    const params = new URLSearchParams({
+      chapter: nextLesson.chapter,
+      lesson_title: nextLesson.title,
+      lesson_desc: nextLesson.description,
+    });
+    router.push(`/lessons/learn?${params.toString()}`);
+  }
   const hasFeedback = phase === 'hint' || phase === 'remediation' || phase === 'correct';
   const canRetry    = phase === 'hint' || phase === 'remediation';
 
   // ── render ────────────────────────────────────────────────────
 
   return (
-    <div className="page-enter" style={{ maxWidth: 820, margin: '0 auto', paddingBottom: 64 }}>
+    <div className="page-enter lesson-page">
 
       {/* Breadcrumb header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
@@ -295,12 +323,18 @@ function LessonLearn() {
           <div style={{ marginTop: 18, color: 'var(--g3)', fontSize: 13 }}>
             {phase === 'answering' ? 'Checking your answer…' : 'Loading lesson…'}
           </div>
+          {phase === 'loading' && (
+            <div style={{ marginTop: 8, color: 'var(--g5)', fontSize: 11 }}>
+              Connecting to the server…
+            </div>
+          )}
         </div>
       )}
 
       {/* Main lesson content */}
       {(phase === 'active' || hasFeedback) && (
-        <>
+        <div className="lesson-main">
+          <div className="lesson-column">
           {/* Lesson video — one video per History lesson (no parts) */}
           {isHistory && (
             <LessonPartVideoPanel
@@ -311,9 +345,9 @@ function LessonLearn() {
           )}
 
           {/* Teaching content card */}
-          <div style={{ borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(91,33,245,.2)', marginBottom: 32, background: 'rgba(91,33,245,.05)' }}>
+          <div className="lesson-card board-card" style={{ overflow: 'hidden', marginBottom: 32 }}>
             {/* Card top bar */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 22px', borderBottom: '1px solid rgba(91,33,245,.12)', background: 'rgba(91,33,245,.07)' }}>
+            <div className="lesson-card__header">
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: '50%', flexShrink: 0, fontSize: 16,
@@ -391,15 +425,65 @@ function LessonLearn() {
               </div>
             </div>
 
-            {/* Lesson text */}
-            <div style={{ padding: '28px 32px 36px' }}>
-              {paragraphs.map((p, i) => (
-                <p key={i} style={{ fontSize: 15, lineHeight: 1.9, color: 'rgba(255,255,255,.88)', marginBottom: i < paragraphs.length - 1 ? 18 : 0 }}>
-                  {p}
-                </p>
-              ))}
+            {/* Lesson whiteboard — text appears word-by-word as Jassmine speaks */}
+            <div className="lesson-whiteboard">
+              <div className="lesson-whiteboard__outer">
+                <div className="lesson-whiteboard__inner">
+                  <div className="lesson-whiteboard__surface">
+                    {(() => {
+                      const segs = lessonAudio.segments.length ? lessonAudio.segments : paragraphs;
+                      const completed = lessonAudio.audioState === 'completed';
+                      const cur = lessonAudio.currentSegment;
+                      const started = cur >= 0 || completed;
+
+                      if (!started) {
+                        return (
+                          <div style={{
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                            minHeight: 124, textAlign: 'center', color: '#8a93a3',
+                            fontFamily: "var(--font-roboto),'Helvetica Neue',Arial,sans-serif",
+                          }}>
+                            <div style={{ fontSize: 34, marginBottom: 10 }}>📝</div>
+                            <div style={{ fontSize: 14, fontWeight: 500 }}>
+                              Press <strong style={{ color: '#5B21F5' }}>🔊 Listen</strong> and the lesson will appear here as Jassmine teaches.
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return segs.map((seg, i) => {
+                        if (!completed && i > cur) return null;
+                        const isCurrent = !completed && i === cur;
+                        let content = seg;
+                        if (isCurrent) {
+                          const words = seg.split(/\s+/).filter(Boolean);
+                          const shown = Math.max(0, Math.min(words.length, Math.round(lessonAudio.segmentProgress * words.length)));
+                          content = words.slice(0, shown).join(' ');
+                        }
+                        return (
+                          <p key={i} style={{
+                            fontFamily: "var(--font-roboto),'Helvetica Neue',Arial,sans-serif",
+                            fontSize: 16.5,
+                            lineHeight: 1.85,
+                            color: '#1f2733',
+                            margin: 0,
+                            marginBottom: i < segs.length - 1 ? 16 : 0,
+                            animation: 'wb-fade .25s ease',
+                          }}>
+                            {content}
+                            {isCurrent && content.length > 0 && (
+                              <span style={{ color: '#5B21F5', fontWeight: 700, animation: 'wb-caret 1s steps(1) infinite', marginLeft: 1 }}>▍</span>
+                            )}
+                          </p>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+          <style>{`@keyframes wb-fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}@keyframes wb-caret{0%,50%{opacity:1}50.01%,100%{opacity:0}}`}</style>
 
           {/* AI-generated interactive images — 2 per History lesson */}
           {isHistory && teacherText && (
@@ -508,7 +592,14 @@ function LessonLearn() {
               </button>
             </div>
           )}
-        </>
+          </div>
+
+          <aside className={`teacher-stage${avatarSpeaking ? ' teacher-stage--speaking' : ''}`}>
+            <div className="avatar-wrapper">
+              <AvatarWidget variant="lesson" />
+            </div>
+          </aside>
+        </div>
       )}
 
       {/* Complete */}
@@ -521,20 +612,27 @@ function LessonLearn() {
               <>Great work on <strong style={{ color: 'var(--vl)' }}>{subjectLabel}</strong>. Your progress has been saved.</>
             )}
           </div>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-            {!isHistory && (
-            <button className="btn btn-v" onClick={() => {
-              setPhase('loading');
-              api.session.start(studentId, chapter)
-                .then(r => { if (!r.done) applySession(r); else setPhase('complete'); })
-                .catch(() => setPhase('complete'));
-            }}>
-              Start Next Unit
-            </button>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+              {!isHistory && (
+              <button className="btn btn-v" onClick={() => {
+                setPhase('loading');
+                api.session.start(studentId, chapter)
+                  .then(r => { if (!r.done) applySession(r); else setPhase('complete'); })
+                  .catch(() => setPhase('complete'));
+              }}>
+                Start Next Unit
+              </button>
+              )}
+              <button className="btn btn-o" onClick={() => { lessonAudio.abort(); router.push(lessonsBackPath); }}>
+                ← Back to Lessons
+              </button>
+            </div>
+            {nextLesson && (
+              <button className="btn btn-v" onClick={goToNextLesson} style={{ minWidth: 260 }}>
+                Next Lesson: {nextLesson.title} →
+              </button>
             )}
-            <button className="btn btn-o" onClick={() => { lessonAudio.abort(); router.push(lessonsBackPath); }}>
-              ← Back to Lessons
-            </button>
           </div>
         </div>
       )}

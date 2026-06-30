@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { api } from '../../lib/api';
@@ -31,6 +31,12 @@ export default function LoginPage() {
     guardian_name: '', guardian_gender: '',
     guardian_email: '', guardian_phone_number: '',
   });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('expired')) {
+      setError('Your session has expired. Please sign in again.');
+    }
+  }, []);
 
   function switchTab(t: Tab) { setTab(t); setError(''); setSuccess(''); }
 

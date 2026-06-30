@@ -4,21 +4,23 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, MySubjectRead, ContentUnit } from '../../lib/api';
 import { learningConfig } from '../../lib/learning-config';
-
-const ALLOWED_SUBJECTS = ['english', 'science', 'history', 'math'];
+import {
+  filterAppSubjects,
+  getLockedMessage,
+  getTodaySubjects,
+  isSubjectUnlocked,
+} from '../../lib/studentSchedule';
 
 const SUBJ_META: Record<string, { icon: string; color: string; bg: string }> = {
   english: { icon: '📖', color: 'var(--sky)',   bg: 'linear-gradient(135deg,rgba(59,191,255,.12),rgba(91,33,245,.06))' },
   science: { icon: '🔬', color: 'var(--mint)',  bg: 'linear-gradient(135deg,rgba(0,229,160,.1),rgba(59,191,255,.08))' },
   history: { icon: '🏛️', color: 'var(--amber)', bg: 'linear-gradient(135deg,rgba(255,184,48,.1),rgba(200,130,0,.06))' },
-  math:    { icon: '🧮', color: 'var(--vl)',    bg: 'linear-gradient(135deg,rgba(91,33,245,.15),rgba(139,85,255,.08))' },
 };
 
 const FALLBACK_SUBJECTS: MySubjectRead[] = [
   { subject_id: '1', subject_name: 'English', subject_code: 'ENG', enrolled_sessions_count: 12 },
   { subject_id: '2', subject_name: 'Science', subject_code: 'SCI', enrolled_sessions_count: 10 },
   { subject_id: '3', subject_name: 'History', subject_code: 'HIS', enrolled_sessions_count: 9  },
-  { subject_id: '4', subject_name: 'Math',    subject_code: 'MAT', enrolled_sessions_count: 8  },
 ];
 
 function subjMeta(name: string) {
@@ -49,13 +51,6 @@ const DEFAULT_CHAPTERS: Record<string, Chapter[]> = {
     { id: 'history:unit_03', title: 'The Modern World',        desc: 'Industrial Revolution · empires' },
     { id: 'history:unit_04', title: 'World Wars',              desc: 'WW1 · WW2 · causes & effects' },
     { id: 'history:unit_05', title: 'Contemporary History',    desc: 'Post-1945 · politics · today' },
-  ],
-  math: [
-    { id: 'math:unit_01', title: 'Numbers & Operations',       desc: 'Fractions · decimals · integers' },
-    { id: 'math:unit_02', title: 'Algebra',                    desc: 'Equations · inequalities · functions' },
-    { id: 'math:unit_03', title: 'Geometry',                   desc: 'Shapes · angles · measurement' },
-    { id: 'math:unit_04', title: 'Statistics & Probability',   desc: 'Data · graphs · chance' },
-    { id: 'math:unit_05', title: 'Problem Solving',            desc: 'Applied maths · word problems' },
   ],
 };
 
@@ -186,13 +181,17 @@ export default function LessonsPage() {
       api.dashboard.subjects().catch(() => []),
       api.units.list().catch(() => ({ units: [] })),
     ]).then(([s, u]) => {
-      const filtered = Array.isArray(s) ? s.filter(sub => ALLOWED_SUBJECTS.includes(sub.subject_name.toLowerCase())) : [];
+      const filtered = Array.isArray(s) ? filterAppSubjects(s) : [];
       setSubjects(filtered.length ? filtered : FALLBACK_SUBJECTS);
       setUnits(u?.units ?? []);
     }).finally(() => setLoading(false));
   }, []);
 
   function openSubject(s: MySubjectRead) {
+    if (!isSubjectUnlocked(s.subject_name)) {
+      alert(getLockedMessage());
+      return;
+    }
     const key = s.subject_name.toLowerCase().split(' ')[0];
     if (learningConfig[key]) {
       router.push(`/lessons/subject/${key}`);
@@ -209,7 +208,9 @@ export default function LessonsPage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
           <div className="card-title" style={{ fontSize: 18 }}>All Lessons</div>
-          <div style={{ fontSize: 12, color: 'var(--g3)', marginTop: 3 }}>{loading ? 'Loading…' : `${subjects.length} subjects available`}</div>
+          <div style={{ fontSize: 12, color: 'var(--g3)', marginTop: 3 }}>
+            {loading ? 'Loading…' : `Today: ${getTodaySubjects().join(' · ')}`}
+          </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {filters.map(f => (
@@ -223,15 +224,35 @@ export default function LessonsPage() {
       <div className="lesson-grid">
         {visible.map(s => {
           const m = subjMeta(s.subject_name);
+          const unlocked = isSubjectUnlocked(s.subject_name);
           return (
-            <div key={s.subject_id} className="lesson-card">
+            <div
+              key={s.subject_id}
+              className={`lesson-card${unlocked ? '' : ' locked'}`}
+              onClick={() => unlocked ? openSubject(s) : alert(getLockedMessage())}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  unlocked ? openSubject(s) : alert(getLockedMessage());
+                }
+              }}
+            >
               <div className="lc-thumb" style={{ background: m.bg }}>{m.icon}</div>
               <div className="lc-body">
                 <div className="lc-subject" style={{ color: m.color }}>{s.subject_name}</div>
                 <div className="lc-title">{s.enrolled_sessions_count} sessions enrolled</div>
+                {!unlocked && (
+                  <div className="subject-lock-msg">{getLockedMessage()}</div>
+                )}
                 <div className="lc-meta">
                   <span className="lc-time">AI-guided · Jassmine</span>
-                  <span className="pill pill-s" style={{ cursor: 'pointer' }} onClick={() => openSubject(s)}>▶ Start</span>
+                  {unlocked ? (
+                    <span className="pill pill-s">▶ Start</span>
+                  ) : (
+                    <span className="lock-badge">🔒 Locked</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -249,7 +270,17 @@ export default function LessonsPage() {
             Jassmine reads the textbook with you, explains every topic — vocabulary, grammar, reading passages, and exercises — then quizzes you with hints and re-explanations if you need them.
           </div>
         </div>
-        {subjects[0] && <button className="btn btn-v" onClick={() => openSubject(subjects[0])}>▶ Start Now</button>}
+        {subjects.find(s => isSubjectUnlocked(s.subject_name)) && (
+          <button
+            className="btn btn-v"
+            onClick={() => {
+              const first = subjects.find(s => isSubjectUnlocked(s.subject_name));
+              if (first) openSubject(first);
+            }}
+          >
+            ▶ Start Now
+          </button>
+        )}
       </div>
 
       {activeSubject && <LessonModal subject={activeSubject} units={units} onClose={() => setActiveSubject(null)} />}

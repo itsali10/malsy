@@ -4,16 +4,16 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ProgressBar from '../components/ui/ProgressBar';
 import StatCard from '../components/ui/StatCard';
+import AvatarWidget from '../components/AvatarWidget';
+import SubjectCard from '../components/SubjectCard';
 import { api, UserRead, MySubjectRead, LessonEvaluationRead } from '../lib/api';
 import { auth } from '../lib/auth';
-
-const ALLOWED_SUBJECTS = ['english', 'science', 'history', 'math'];
+import { filterAppSubjects } from '../lib/studentSchedule';
 
 const SUBJ_META: Record<string, { icon: string; color: string; bg: string }> = {
   english: { icon: '📖', color: 'var(--sky)',   bg: 'rgba(59,191,255,.12)' },
   science: { icon: '🔬', color: 'var(--mint)',  bg: 'rgba(0,229,160,.10)'  },
   history: { icon: '🏛️', color: 'var(--amber)', bg: 'rgba(255,184,48,.12)' },
-  math:    { icon: '🧮', color: 'var(--vl)',    bg: 'rgba(91,33,245,.15)'  },
 };
 
 function subjMeta(name: string) {
@@ -26,11 +26,10 @@ function avg(arr: (number | undefined)[]): number {
   return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
 }
 
-const FALLBACK_SUBJECTS = [
+const FALLBACK_SUBJECTS: MySubjectRead[] = [
   { subject_id: '1', subject_name: 'English', subject_code: 'ENG', enrolled_sessions_count: 12 },
   { subject_id: '2', subject_name: 'Science', subject_code: 'SCI', enrolled_sessions_count: 10 },
   { subject_id: '3', subject_name: 'History', subject_code: 'HIS', enrolled_sessions_count: 9  },
-  { subject_id: '4', subject_name: 'Math',    subject_code: 'MAT', enrolled_sessions_count: 8  },
 ];
 
 export default function DashboardPage() {
@@ -46,9 +45,7 @@ export default function DashboardPage() {
       api.evaluations.mine().catch(() => []),
     ]).then(([u, s, e]) => {
       if (u) { setUser(u); auth.setUser(u); }
-      const filtered = Array.isArray(s)
-        ? s.filter(sub => ALLOWED_SUBJECTS.includes(sub.subject_name.toLowerCase()))
-        : [];
+      const filtered = Array.isArray(s) ? filterAppSubjects(s) : [];
       setSubjects(filtered.length ? filtered : FALLBACK_SUBJECTS);
       setEvals(Array.isArray(e) ? e : []);
     }).finally(() => setLoading(false));
@@ -67,10 +64,10 @@ export default function DashboardPage() {
     : 0);
 
   return (
-    <div className="page-enter">
-      {/* ── Hero ── */}
-      <div className="dash-hero">
-        <div style={{ maxWidth: '65%', position: 'relative', zIndex: 2 }}>
+    <div className="page-enter dashboard-page">
+      {/* ── Welcome banner with embedded avatar ── */}
+      <div className="welcome-banner">
+        <div className="welcome-content">
           <div className="dash-greeting">Welcome back, <span>{firstName}!</span></div>
           <div className="dash-tagline">
             {loading
@@ -79,50 +76,20 @@ export default function DashboardPage() {
                 ? `${completed} lesson${completed > 1 ? 's' : ''} completed — keep it up!`
                 : 'Ready to start your first lesson? Let\'s go!'}
           </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div className="welcome-actions">
             <Link href="/lessons"><button className="btn btn-v">▶ Continue Lesson</button></Link>
             <Link href="/schedule"><button className="btn btn-o">View Schedule</button></Link>
           </div>
         </div>
-
-        {/* Jassmine AI avatar */}
-        <div className="jassmine-wrap">
-          <svg width="220" height="210" viewBox="0 0 220 210" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="110" cy="190" rx="58" ry="12" fill="rgba(91,33,245,0.25)" />
-            <path d="M58 210 Q54 175 62 158 Q72 140 110 136 Q148 140 158 158 Q166 175 162 210Z" fill="#3D1FA8" />
-            <rect x="88" y="172" width="44" height="22" rx="11" fill="rgba(255,255,255,0.08)" />
-            <rect x="100" y="126" width="20" height="18" rx="6" fill="#F4C5A0" />
-            <ellipse cx="110" cy="102" rx="36" ry="38" fill="#F4C5A0" />
-            <path d="M74 88 Q72 60 84 50 Q94 40 110 38 Q126 40 136 50 Q148 60 146 88 Q142 70 136 64 Q128 55 110 54 Q92 55 84 64 Q78 70 74 88Z" fill="#1A0A3C" />
-            <path d="M90 84 Q97 80 104 83" stroke="#3D1FA8" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-            <path d="M116 83 Q123 80 130 84" stroke="#3D1FA8" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-            <ellipse cx="97" cy="95" rx="8" ry="7" fill="white" />
-            <ellipse cx="123" cy="95" rx="8" ry="7" fill="white" />
-            <circle cx="97" cy="95" r="4.5" fill="#5B21F5" />
-            <circle cx="123" cy="95" r="4.5" fill="#5B21F5" />
-            <circle cx="97" cy="95" r="2.2" fill="#1A0A3C" />
-            <circle cx="123" cy="95" r="2.2" fill="#1A0A3C" />
-            <circle cx="99" cy="93" r="1.2" fill="white" opacity="0.9" />
-            <circle cx="125" cy="93" r="1.2" fill="white" opacity="0.9" />
-            <path d="M100 114 Q110 122 120 114" stroke="#D4845A" strokeWidth="2" fill="none" strokeLinecap="round" />
-            <ellipse cx="74" cy="100" rx="6" ry="9" fill="#F4C5A0" />
-            <ellipse cx="146" cy="100" rx="6" ry="9" fill="#F4C5A0" />
-            <circle cx="74" cy="104" r="3" fill="#00E5A0" />
-            <circle cx="146" cy="104" r="3" fill="#00E5A0" />
-            <g transform="translate(0,8)">
-              <rect x="6" y="32" width="112" height="32" rx="10" fill="#5B21F5" opacity="0.92" />
-              <polygon points="70,64 58,74 82,64" fill="#5B21F5" opacity="0.92" />
-              <text x="62" y="50" textAnchor="middle" fill="white" fontFamily="Syne,sans-serif" fontSize="10" fontWeight="700">
-                Hey {firstName}! Ready? 👋
-              </text>
-            </g>
-          </svg>
-          <div className="jassmine-name">Jassmine · Your AI Tutor</div>
+        <div className="welcome-teacher-stage">
+          <div className="avatar-wrapper">
+            <AvatarWidget variant="dashboard" />
+          </div>
         </div>
       </div>
 
       {/* ── Stats ── */}
-      <div className="stat-row">
+      <div className="stat-row dashboard-stat-row">
         <StatCard value={String(completed || 0)}        label="Lessons Done"   color="var(--vl)" />
         <StatCard value={quizAvg ? `${quizAvg}%` : '—'} label="Quiz Average"   color="var(--mint)" />
         <StatCard value="0"                              label="Total XP"       color="var(--amber)" />
@@ -130,31 +97,28 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Main grid ── */}
-      <div className="g-left">
-        {/* Subject cards */}
-        <div>
+      <div className="dashboard-grid">
+        {/* Left: Continue Learning */}
+        <div className="dashboard-grid__left">
           <div className="card-title" style={{ marginBottom: 14 }}>Continue Learning</div>
-          {subjects.slice(0, 4).map(s => {
+          {subjects.map(s => {
             const m = subjMeta(s.subject_name);
             return (
-              <Link key={s.subject_id} href="/lessons">
-                <div className="subject-card">
-                  <div className="subj-ico" style={{ background: m.bg }}>{m.icon}</div>
-                  <div className="subj-body">
-                    <div className="subj-name">{s.subject_name}</div>
-                    <div className="subj-meta">{s.enrolled_sessions_count} sessions enrolled</div>
-                    <div style={{ marginTop: 6 }}><ProgressBar value={0} color={m.color} /></div>
-                  </div>
-                  <div className="subj-pct" style={{ color: m.color }}>—</div>
-                </div>
-              </Link>
+              <SubjectCard
+                key={s.subject_id}
+                subjectId={s.subject_id}
+                subjectName={s.subject_name}
+                sessionsCount={s.enrolled_sessions_count}
+                icon={m.icon}
+                color={m.color}
+                bg={m.bg}
+              />
             );
           })}
         </div>
 
-        {/* Right column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* Performance */}
+        {/* Right: Performance + Account */}
+        <div className="dashboard-grid__right">
           <div className="card">
             <div className="card-title">Performance</div>
             <div className="card-sub">
@@ -175,7 +139,6 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          {/* Account card */}
           <div className="card">
             <div className="card-title">👤 Your Account</div>
             <div className="card-sub">Logged in as</div>

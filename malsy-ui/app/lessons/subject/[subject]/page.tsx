@@ -2,8 +2,8 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { learningConfig, Lesson, LinearSubject, SectionsSubject } from '../../../../lib/learning-config';
-import { api, HistoryLessonCard } from '../../../../lib/api';
+import { learningConfig, Lesson, LinearSubject, SectionsSubject, Section } from '../../../../lib/learning-config';
+import { api, HistoryLessonCard, LessonEvaluationRead } from '../../../../lib/api';
 import { auth } from '../../../../lib/auth';
 
 /** Lesson card with optional backend catalog fields (History G6). */
@@ -342,90 +342,103 @@ function EnglishView({ cfg, onStartAI, onStartPronunciation }: {
   onStartAI: (lesson: CatalogLesson, sectionKey: string) => void;
   onStartPronunciation: (lesson: CatalogLesson) => void;
 }) {
-  const [activeKey, setActiveKey]   = useState<string | null>(null);
-  const [selected,  setSelected]    = useState<{ lesson: CatalogLesson; sectionKey: string } | null>(null);
+  const [evaluations, setEvaluations] = useState<LessonEvaluationRead[]>([]);
 
-  const activeSection = cfg.sections.find(s => s.key === activeKey) ?? null;
-  const isPronunciationSection = selected?.sectionKey === 'english_speaking';
+  useEffect(() => {
+    api.evaluations.mine().then(setEvaluations).catch(() => {});
+  }, []);
 
-  function selectSection(key: string) {
-    setActiveKey(key);
-    setSelected(null);
+  function getProgress(section: Section) {
+    const completedChapters = new Set(
+      evaluations
+        .filter(e => e.lesson_completed && e.content_id.startsWith(section.key + ':'))
+        .map(e => e.content_id)
+    );
+    const nextIdx = section.lessons.findIndex(l => {
+      const id = section.key + ':unit_' + String(l.id).padStart(2, '0');
+      return !completedChapters.has(id);
+    });
+    const completed = nextIdx === -1 ? section.lessons.length : nextIdx;
+    const current   = Math.min(completed, section.lessons.length - 1);
+    const allDone   = nextIdx === -1;
+    return { completed, current, allDone };
   }
 
-  function handleStart() {
-    if (!selected) return;
-    if (isPronunciationSection) {
-      onStartPronunciation(selected.lesson);
-    } else {
-      onStartAI(selected.lesson, selected.sectionKey);
+  function handleClick(section: Section) {
+    if (section.key === 'english_speaking') {
+      onStartPronunciation(section.lessons[0]);
+      return;
     }
+    const { current } = getProgress(section);
+    onStartAI(section.lessons[current], section.key);
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 24, alignItems: 'start' }}>
-      <div>
-        {/* ── 3 category cards ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 32 }}>
-          {cfg.sections.map(section => {
-            const active = activeKey === section.key;
-            return (
-              <button
-                key={section.key}
-                onClick={() => selectSection(section.key)}
-                style={{
-                  padding: '28px 20px',
-                  borderRadius: 18,
-                  border: `1.5px solid ${active ? 'rgba(91,33,245,.6)' : 'rgba(255,255,255,.08)'}`,
-                  background: active ? 'rgba(91,33,245,.14)' : 'rgba(255,255,255,.03)',
-                  cursor: 'pointer',
-                  textAlign: 'center' as const,
-                  transition: 'all .15s',
-                }}
-              >
-                <div style={{ fontSize: 32, marginBottom: 12 }}>{section.icon}</div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--w)', marginBottom: 6 }}>{section.title}</div>
-                <div style={{ fontSize: 11, color: active ? 'var(--vl)' : 'var(--g4)' }}>
-                  {section.lessons.length} lesson{section.lessons.length !== 1 ? 's' : ''}
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 20 }}>
+      {cfg.sections.map(section => {
+        const isPronunciation = section.key === 'english_speaking';
+        const { completed, current, allDone } = isPronunciation
+          ? { completed: 0, current: 0, allDone: false }
+          : getProgress(section);
+        const total = section.lessons.length;
+        const pct   = isPronunciation ? 100 : Math.round((completed / total) * 100);
+
+        return (
+          <button
+            key={section.key}
+            onClick={() => handleClick(section)}
+            style={{
+              padding: '36px 24px',
+              borderRadius: 20,
+              border: '1.5px solid rgba(255,255,255,.09)',
+              background: 'rgba(255,255,255,.03)',
+              cursor: 'pointer',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 14,
+              transition: 'border-color .15s, background .15s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(91,33,245,.5)';
+              (e.currentTarget as HTMLButtonElement).style.background  = 'rgba(91,33,245,.08)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,.09)';
+              (e.currentTarget as HTMLButtonElement).style.background  = 'rgba(255,255,255,.03)';
+            }}
+          >
+            <div style={{ fontSize: 40 }}>{section.icon}</div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--w)' }}>{section.title}</div>
+
+            {isPronunciation ? (
+              <div style={{ fontSize: 12, color: 'var(--g3)', lineHeight: 1.5 }}>
+                Practice anytime<br />New words each session
+              </div>
+            ) : (
+              <>
+                <div style={{ fontSize: 12, color: allDone ? 'var(--mint)' : 'var(--g3)' }}>
+                  {allDone ? '✓ All lessons completed' : `Lesson ${current + 1} of ${total}`}
                 </div>
-              </button>
-            );
-          })}
-        </div>
 
-        {/* ── lessons for selected section ── */}
-        {activeSection ? (
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--w)', marginBottom: 14 }}>
-              {activeSection.icon} {activeSection.title}
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 12 }}>
-              {activeSection.lessons.map((lesson, i) => (
-                <LessonCard
-                  key={`${activeSection.key}-${lesson.id}`}
-                  lesson={lesson}
-                  index={i}
-                  sectionKey={activeSection.title}
-                  selected={selected?.lesson.id === lesson.id && selected?.sectionKey === activeSection.key}
-                  onClick={() => setSelected({ lesson, sectionKey: activeSection.key })}
-                />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--g4)', fontSize: 13 }}>
-            Choose a category above to see its lessons.
-          </div>
-        )}
-      </div>
+                <div style={{ width: '100%', height: 4, borderRadius: 99, background: 'rgba(255,255,255,.08)' }}>
+                  <div style={{
+                    height: '100%', borderRadius: 99,
+                    background: allDone ? 'var(--mint)' : 'var(--vl)',
+                    width: `${pct}%`,
+                    transition: 'width .4s ease',
+                  }} />
+                </div>
 
-      {/* ── detail panel ── */}
-      <DetailPanel
-        lesson={selected?.lesson ?? null}
-        sectionKey={selected?.sectionKey ?? ''}
-        onStartAI={handleStart}
-        buttonLabel={isPronunciationSection ? 'Practice Pronunciation →' : 'Start with AI Teacher →'}
-      />
+                <div style={{ fontSize: 11, color: 'var(--g4)' }}>
+                  {completed} / {total} completed
+                </div>
+              </>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }

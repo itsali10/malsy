@@ -8,9 +8,7 @@ import {
   dispatchSpeaking,
   loadAudioProgress,
   paragraphsForTTS,
-  precomputeAudioBands,
   saveAudioProgress,
-  type AudioBands,
   type LessonAudioProgress,
   type LessonAudioState,
 } from '../lib/lesson-audio';
@@ -33,6 +31,10 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
   const [audioState, setAudioState] = useState<LessonAudioState>('idle');
   const [ttsError, setTtsError] = useState('');
   const [hasSavedProgress, setHasSavedProgress] = useState(false);
+  // Whiteboard sync: which paragraph is being read and how far through it.
+  const [segments, setSegments] = useState<string[]>([]);
+  const [currentSegment, setCurrentSegment] = useState(-1);
+  const [segmentProgress, setSegmentProgress] = useState(0);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sessionRef = useRef(0);
@@ -71,7 +73,11 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
   }, [lessonId, teacherText]);
 
   useEffect(() => {
-    chunksRef.current = paragraphsForTTS(teacherText);
+    const chunks = paragraphsForTTS(teacherText);
+    chunksRef.current = chunks;
+    setSegments(chunks);
+    setCurrentSegment(-1);
+    setSegmentProgress(0);
     urlCacheRef.current.clear();
   }, [teacherText]);
 
@@ -105,7 +111,7 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
       el: HTMLAudioElement,
       token: number,
       startTime: number,
-      bandsPromise?: Promise<AudioBands | null>,
+      text?: string,
     ): Promise<'ended' | 'paused' | 'aborted'> => {
       audioRef.current = el;
       if (startTime > 0) {
@@ -113,12 +119,15 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
       }
 
       let stopLipSync: (() => void) | null = null;
+      let progressRaf = 0;
 
       return new Promise((resolve) => {
         let settled = false;
         const cleanup = () => {
           stopLipSync?.();
           stopLipSync = null;
+          if (progressRaf) cancelAnimationFrame(progressRaf);
+          progressRaf = 0;
           el.ontimeupdate = null;
           el.onplaying = null;
           el.onended = null;
@@ -143,10 +152,22 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
         };
 
         // Lip-sync starts once audio is producing sound.
-        // bandsPromise provides per-window frequency-band data for accurate visemes.
+        // Text drives per-letter RPM viseme shapes synced to the clip duration.
         el.onplaying = () => {
           if (token !== sessionRef.current) return;
-          if (!stopLipSync) stopLipSync = attachLipSync(el, bandsPromise);
+          if (!stopLipSync) stopLipSync = attachLipSync(el, text);
+          // Smoothly drive whiteboard word reveal off real playback position.
+          if (!progressRaf) {
+            const tick = () => {
+              if (token !== sessionRef.current) return;
+              const d = el.duration;
+              if (Number.isFinite(d) && d > 0) {
+                setSegmentProgress(Math.min(1, el.currentTime / d));
+              }
+              progressRaf = requestAnimationFrame(tick);
+            };
+            progressRaf = requestAnimationFrame(tick);
+          }
           console.debug(
             `[lesson-audio] segment=${paragraphIndexRef.current} ` +
             `duration=${Number.isFinite(el.duration) ? el.duration.toFixed(2) : '?'}s isLipSyncing=true`,
@@ -189,6 +210,8 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
         if (token !== sessionRef.current) return;
 
         paragraphIndexRef.current = i;
+        setCurrentSegment(i);
+        setSegmentProgress(0);
         const seek = i === startIndex ? startTime : 0;
         if (i !== startIndex) currentTimeRef.current = 0;
 
@@ -201,12 +224,8 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
           return;
         }
 
-        // Pre-compute band energies in parallel with audio loading.
-        // The rAF loop uses these for real frequency-driven visemes.
-        const bandsPromise = precomputeAudioBands(src);
-
         setState('speaking');
-        const result = await playElement(new Audio(src), token, seek, bandsPromise);
+        const result = await playElement(new Audio(src), token, seek, chunks[i]);
         if (token !== sessionRef.current) return;
         if (result === 'paused' || result === 'aborted') return;
 
@@ -222,6 +241,9 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
       if (token !== sessionRef.current) return;
       paragraphIndexRef.current = 0;
       currentTimeRef.current = 0;
+      // Reveal the full lesson text on the whiteboard once finished.
+      setCurrentSegment(chunks.length);
+      setSegmentProgress(1);
       persistProgress({ currentParagraphIndex: 0, currentTime: 0, isCompleted: true });
       setState('completed');
       dispatchSpeaking(false, 0);
@@ -239,25 +261,16 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
     audioRef.current?.pause();
     audioRef.current = null;
 
-    let startIndex = 0;
-    let startTime = 0;
+    // "Listen" always starts the lesson from the very beginning.
+    clearAudioProgress(lessonId);
+    paragraphIndexRef.current = 0;
+    currentTimeRef.current = 0;
+    setCurrentSegment(-1);
+    setSegmentProgress(0);
+    setHasSavedProgress(false);
 
-    if (audioState === 'completed') {
-      clearAudioProgress(lessonId);
-      paragraphIndexRef.current = 0;
-      currentTimeRef.current = 0;
-    } else {
-      const saved = loadAudioProgress(lessonId);
-      if (saved && !saved.isCompleted) {
-        startIndex = Math.min(saved.currentParagraphIndex, chunks.length - 1);
-        startTime = saved.currentTime;
-        paragraphIndexRef.current = startIndex;
-        currentTimeRef.current = startTime;
-      }
-    }
-
-    void runPlayback(startIndex, startTime, token);
-  }, [audioState, lessonId, runPlayback]);
+    void runPlayback(0, 0, token);
+  }, [lessonId, runPlayback]);
 
   const pause = useCallback(() => {
     pauseRef.current?.();
@@ -325,6 +338,9 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
     ttsError,
     hasSavedProgress,
     isSpeaking: audioState === 'speaking',
+    segments,
+    currentSegment,
+    segmentProgress,
     listen,
     pause,
     continuePlayback,

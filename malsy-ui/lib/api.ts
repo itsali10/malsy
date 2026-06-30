@@ -1,24 +1,69 @@
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 
+const NETWORK_RETRY_MS = [400, 800, 1500, 2500];
+
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('malsy_token');
 }
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = getToken();
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...((init.headers as Record<string, string>) ?? {}),
-  };
-  const res = await fetch(`${BASE}${path}`, { ...init, headers });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(body.detail ?? 'Request failed');
+function isNetworkFailure(err: unknown): boolean {
+  if (err instanceof TypeError) return true;
+  if (err instanceof Error) {
+    const m = err.message.toLowerCase();
+    return m === 'failed to fetch' || m.includes('network') || m.includes('load failed');
   }
-  if (res.status === 204) return undefined as T;
-  return res.json() as Promise<T>;
+  return false;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function request<T>(
+  path: string,
+  init: RequestInit = {},
+  opts: { retries?: number } = {},
+): Promise<T> {
+  const maxAttempts = 1 + (opts.retries ?? 0);
+  let lastErr: unknown;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      const token = getToken();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...((init.headers as Record<string, string>) ?? {}),
+      };
+      const res = await fetch(`${BASE}${path}`, { ...init, headers });
+      if (res.status === 401) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('malsy_token');
+          localStorage.removeItem('malsy_user');
+          if (!window.location.pathname.startsWith('/login')) {
+            window.location.replace('/login?expired=1');
+          }
+        }
+        throw new Error('Your session has expired. Please sign in again.');
+      }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(body.detail ?? 'Request failed');
+      }
+      if (res.status === 204) return undefined as T;
+      return res.json() as Promise<T>;
+    } catch (err) {
+      lastErr = err;
+      if (!isNetworkFailure(err) || attempt >= maxAttempts - 1) break;
+      await sleep(NETWORK_RETRY_MS[attempt] ?? 2500);
+    }
+  }
+
+  if (lastErr instanceof Error && lastErr.message === 'Failed to fetch') {
+    throw new Error('Could not connect to the server. Make sure the backend is running on port 8000.');
+  }
+  throw lastErr;
 }
 
 // ── Types ─────────────────────────────────────────────────────────
@@ -260,15 +305,19 @@ export const api = {
   // AI teacher session (single-student in-memory)
   session: {
     start: (studentId: string, chapterId: string, lessonTitle = '', lessonDescription = '') =>
-      request<SessionStartResponse>('/session/start', {
-        method: 'POST',
-        body: JSON.stringify({
-          student_id: studentId,
-          chapter_id: chapterId,
-          lesson_title: lessonTitle,
-          lesson_description: lessonDescription,
-        }),
-      }),
+      request<SessionStartResponse>(
+        '/session/start',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            student_id: studentId,
+            chapter_id: chapterId,
+            lesson_title: lessonTitle,
+            lesson_description: lessonDescription,
+          }),
+        },
+        { retries: 4 },
+      ),
     answer: (studentId: string, studentAnswer: string, optionIndex?: number) =>
       request<SessionAnswerResponse>('/session/answer', {
         method: 'POST',

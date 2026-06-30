@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import ProgressBar from '../../components/ui/ProgressBar';
 import { auth } from '../../lib/auth';
 import type { UserRead } from '../../lib/api';
+import { getStreak } from '../../lib/streak';
 
 const badges = [
   { icon: '🧬', label: 'Bio Master', bg: 'linear-gradient(135deg,#5B21F5,#8B55FF)', col: 'var(--vl)', locked: false },
@@ -16,9 +17,12 @@ const badges = [
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserRead | null>(null);
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
-    setUser(auth.getUser());
+    const u = auth.getUser();
+    setUser(u);
+    setStreak(getStreak(u?.user_id));
   }, []);
 
   const initials = user
@@ -57,7 +61,7 @@ export default function ProfilePage() {
         <div className="prof-stats">
           <div className="ps-item"><div className="ps-n" style={{ color: 'var(--vl)' }}>12</div><div className="ps-l">Lessons Done</div></div>
           <div className="ps-item"><div className="ps-n" style={{ color: 'var(--mint)' }}>94%</div><div className="ps-l">Quiz Average</div></div>
-          <div className="ps-item"><div className="ps-n" style={{ color: 'var(--amber)' }}>🔥 18</div><div className="ps-l">Day Streak</div></div>
+          <div className="ps-item"><div className="ps-n" style={{ color: 'var(--amber)' }}>🔥 {streak}</div><div className="ps-l">Day Streak</div></div>
           <div className="ps-item"><div className="ps-n" style={{ color: 'var(--sky)' }}>#4</div><div className="ps-l">Class Rank</div></div>
         </div>
       </div>

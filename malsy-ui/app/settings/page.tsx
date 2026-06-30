@@ -56,6 +56,7 @@ export default function SettingsPage() {
         {/* Right body */}
         <div className="settings-body">
           {/* Appearance */}
+          {activeTab === 0 && (
           <div className="setting-group">
             <div className="sg-title">Theme</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 8 }}>
@@ -120,8 +121,10 @@ export default function SettingsPage() {
               <Toggle defaultOn />
             </div>
           </div>
+          )}
 
           {/* Notifications */}
+          {activeTab === 1 && (
           <div className="setting-group">
             <div className="sg-title">Notifications</div>
             <div className="setting-row">
@@ -149,8 +152,10 @@ export default function SettingsPage() {
               <Toggle />
             </div>
           </div>
+          )}
 
           {/* Audio */}
+          {activeTab === 2 && (
           <div className="setting-group">
             <div className="sg-title">Audio &amp; AI Voice</div>
             <div className="setting-row">
@@ -185,10 +190,58 @@ export default function SettingsPage() {
               <Toggle />
             </div>
           </div>
+          )}
 
-          {/* Danger zone */}
+          {/* Language */}
+          {activeTab === 3 && (
           <div className="setting-group">
-            <div className="sg-title">Danger Zone</div>
+            <div className="sg-title">Language</div>
+            <div className="setting-row">
+              <span className="sr-icon">🌐</span>
+              <div className="sr-body">
+                <div className="sr-name">App Language</div>
+                <div className="sr-desc">Language used across the interface</div>
+              </div>
+              <select className="select-box">
+                <option>English</option>
+                <option>العربية</option>
+                <option>Français</option>
+              </select>
+            </div>
+            <div className="setting-row">
+              <span className="sr-icon">📚</span>
+              <div className="sr-body">
+                <div className="sr-name">Lesson Language</div>
+                <div className="sr-desc">Language for lesson content and the AI tutor</div>
+              </div>
+              <select className="select-box">
+                <option>English</option>
+                <option>العربية</option>
+              </select>
+            </div>
+          </div>
+          )}
+
+          {/* Privacy */}
+          {activeTab === 4 && (
+          <div className="setting-group">
+            <div className="sg-title">Privacy</div>
+            <div className="setting-row">
+              <span className="sr-icon">📈</span>
+              <div className="sr-body">
+                <div className="sr-name">Usage Analytics</div>
+                <div className="sr-desc">Help improve MALSY by sharing anonymous usage data</div>
+              </div>
+              <Toggle defaultOn />
+            </div>
+            <div className="setting-row">
+              <span className="sr-icon">🏆</span>
+              <div className="sr-body">
+                <div className="sr-name">Show on Leaderboard</div>
+                <div className="sr-desc">Display your name and rank to classmates</div>
+              </div>
+              <Toggle defaultOn />
+            </div>
             <div className="setting-row" style={{ border: '1px solid rgba(255,107,107,.2)', background: 'rgba(255,107,107,.04)' }}>
               <span className="sr-icon">🚫</span>
               <div className="sr-body">
@@ -200,6 +253,66 @@ export default function SettingsPage() {
               </button>
             </div>
           </div>
+          )}
+
+          {/* Accessibility */}
+          {activeTab === 5 && (
+          <div className="setting-group">
+            <div className="sg-title">Accessibility</div>
+            <div className="setting-row">
+              <span className="sr-icon">🎬</span>
+              <div className="sr-body">
+                <div className="sr-name">Reduce Motion</div>
+                <div className="sr-desc">Minimize animations across the app</div>
+              </div>
+              <Toggle />
+            </div>
+            <div className="setting-row">
+              <span className="sr-icon">🔆</span>
+              <div className="sr-body">
+                <div className="sr-name">High Contrast</div>
+                <div className="sr-desc">Increase contrast for better readability</div>
+              </div>
+              <Toggle />
+            </div>
+            <div className="setting-row">
+              <span className="sr-icon">🔠</span>
+              <div className="sr-body">
+                <div className="sr-name">Larger Text</div>
+                <div className="sr-desc">Increase font size throughout the app</div>
+              </div>
+              <Toggle />
+            </div>
+          </div>
+          )}
+
+          {/* About */}
+          {activeTab === 6 && (
+          <div className="setting-group">
+            <div className="sg-title">About MALSY</div>
+            <div className="setting-row">
+              <span className="sr-icon">ℹ️</span>
+              <div className="sr-body">
+                <div className="sr-name">Version</div>
+                <div className="sr-desc">MALSY Learning Platform · v1.0.0</div>
+              </div>
+            </div>
+            <div className="setting-row">
+              <span className="sr-icon">📄</span>
+              <div className="sr-body">
+                <div className="sr-name">Terms &amp; Privacy Policy</div>
+                <div className="sr-desc">Review how your data is used and stored</div>
+              </div>
+            </div>
+            <div className="setting-row">
+              <span className="sr-icon">💬</span>
+              <div className="sr-body">
+                <div className="sr-name">Support</div>
+                <div className="sr-desc">Contact us at support@malsy.app</div>
+              </div>
+            </div>
+          </div>
+          )}
         </div>
       </div>
     </div>

@@ -41,9 +41,7 @@ export const learningConfig: Record<string, SubjectConfig> = {
         title: 'Pronunciation',
         icon: '🎤',
         lessons: [
-          { id: 1, name: 'Public Speaking',          description: 'Presenting ideas clearly and confidently out loud.' },
-          { id: 2, name: 'Pronunciation Practice',   description: 'Phonemes, stress patterns, and spoken fluency.' },
-          { id: 3, name: 'Storytelling Aloud',       description: 'Narrating a story with expression and clarity.' },
+          { id: 1, name: 'Pronunciation Practice', description: 'Phonemes, stress patterns, and spoken fluency.' },
         ],
       },
       {
@@ -133,6 +131,45 @@ export const learningConfig: Record<string, SubjectConfig> = {
     ],
   },
 };
+
+/** Find the lessons array that a chapter's book key belongs to. */
+function lessonsForBookKey(bookKey: string): Lesson[] | null {
+  for (const cfg of Object.values(learningConfig)) {
+    if (cfg.kind === 'sections') {
+      const sec = cfg.sections.find(s => s.key === bookKey);
+      if (sec) return sec.lessons;
+    }
+  }
+  const direct = learningConfig[bookKey];
+  if (direct && direct.kind === 'linear') return direct.lessons;
+  return null;
+}
+
+/**
+ * Given a chapter id like `history_g6:unit_01`, return the next lesson in the
+ * same section (chapter id + title + description), or null if it's the last one.
+ */
+export function nextLessonFromChapter(
+  chapter: string,
+): { chapter: string; title: string; description: string } | null {
+  const [bookKey, unitPart] = chapter.split(':');
+  if (!bookKey || !unitPart) return null;
+  const m = unitPart.match(/unit_(\d+)/i);
+  if (!m) return null;
+  const currentId = parseInt(m[1], 10);
+
+  const lessons = lessonsForBookKey(bookKey);
+  if (!lessons) return null;
+
+  const next = lessons.find(l => l.id === currentId + 1);
+  if (!next) return null;
+
+  return {
+    chapter: `${bookKey}:unit_${String(next.id).padStart(2, '0')}`,
+    title: next.name,
+    description: next.description,
+  };
+}
 
 /** Resolve /lessons/subject/{key} from a chapter id like history_g6:unit_01 */
 export function subjectPathFromChapter(chapter: string): string {
