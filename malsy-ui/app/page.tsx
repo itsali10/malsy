@@ -8,7 +8,7 @@ import AvatarWidget from '../components/AvatarWidget';
 import SubjectCard from '../components/SubjectCard';
 import { api, UserRead, MySubjectRead, LessonEvaluationRead } from '../lib/api';
 import { auth } from '../lib/auth';
-import { filterAppSubjects } from '../lib/studentSchedule';
+import { filterAppSubjects, isSubjectUnlocked } from '../lib/studentSchedule';
 
 const SUBJ_META: Record<string, { icon: string; color: string; bg: string }> = {
   english: { icon: '📖', color: 'var(--sky)',   bg: 'rgba(59,191,255,.12)' },
@@ -101,7 +101,7 @@ export default function DashboardPage() {
         {/* Left: Continue Learning */}
         <div className="dashboard-grid__left">
           <div className="card-title" style={{ marginBottom: 14 }}>Continue Learning</div>
-          {subjects.map(s => {
+          {subjects.filter(s => isSubjectUnlocked(s.subject_name)).map(s => {
             const m = subjMeta(s.subject_name);
             return (
               <SubjectCard

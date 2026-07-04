@@ -503,8 +503,8 @@ def start_session(req: StartSessionReq):
         book_id = progress_book_id(chapter_id)
         is_history_book = "history" in str(book_id).lower()
 
-        # Block locked History lessons (sequential unlock).
-        if is_history_book and ":" in chapter_id and "unit_" in chapter_id:
+        # Block locked lessons (sequential unlock).
+        if ":" in chapter_id and "unit_" in chapter_id:
             from .history_lessons import lesson_number_from_unit_id
             lesson_num = lesson_number_from_unit_id(chapter_id)
             if lesson_num > 0 and not is_lesson_unlocked(req.student_id, book_id, lesson_num):
@@ -908,6 +908,25 @@ def answer(req: AnswerReq):
                 lesson_num = lesson_number_from_unit_id(real_unit_id)
                 book_prog = record_lesson_passed(req.student_id, book_id, lesson_num)
                 total_lessons = len(plan_units) or 6
+                unlock_msg = (
+                    f"Lesson {lesson_num} complete! Lesson {lesson_num + 1} is now unlocked."
+                    if lesson_num < total_lessons
+                    else f"Lesson {lesson_num} complete! You finished all lessons."
+                )
+                save_progress(req.student_id, book_id, min(next_idx, max(0, total_lessons - 1)), 0)
+                return {
+                    **base,
+                    "next_action": "lesson_complete",
+                    "max_unlocked_lesson_index": int(book_prog.get("max_unlocked_lesson_index", 0)),
+                    "completed_lesson_numbers": list(book_prog.get("completed_lesson_numbers") or []),
+                    "message": unlock_msg,
+                }
+
+            from .history_lessons import lesson_number_from_unit_id
+            lesson_num = lesson_number_from_unit_id(str(real_unit_id or chapter_id))
+            if lesson_num > 0:
+                book_prog = record_lesson_passed(req.student_id, book_id, lesson_num)
+                total_lessons = len(plan_units) or lesson_num
                 unlock_msg = (
                     f"Lesson {lesson_num} complete! Lesson {lesson_num + 1} is now unlocked."
                     if lesson_num < total_lessons

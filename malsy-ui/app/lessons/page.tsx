@@ -6,7 +6,6 @@ import { api, MySubjectRead, ContentUnit } from '../../lib/api';
 import { learningConfig } from '../../lib/learning-config';
 import {
   filterAppSubjects,
-  getLockedMessage,
   getTodaySubjects,
   isSubjectUnlocked,
 } from '../../lib/studentSchedule';
@@ -188,10 +187,6 @@ export default function LessonsPage() {
   }, []);
 
   function openSubject(s: MySubjectRead) {
-    if (!isSubjectUnlocked(s.subject_name)) {
-      alert(getLockedMessage());
-      return;
-    }
     const key = s.subject_name.toLowerCase().split(' ')[0];
     if (learningConfig[key]) {
       router.push(`/lessons/subject/${key}`);
@@ -200,8 +195,12 @@ export default function LessonsPage() {
     }
   }
 
-  const filters = ['All', ...FALLBACK_SUBJECTS.map(s => s.subject_name)];
-  const visible = filter === 'All' ? subjects : subjects.filter(s => s.subject_name === filter);
+  const todaySubjects = getTodaySubjects();
+  const scheduledSubjects = subjects.filter(s => isSubjectUnlocked(s.subject_name));
+  const filters = ['All', ...todaySubjects];
+  const visible = filter === 'All'
+    ? scheduledSubjects
+    : scheduledSubjects.filter(s => s.subject_name === filter);
 
   return (
     <div className="page-enter">
@@ -224,18 +223,17 @@ export default function LessonsPage() {
       <div className="lesson-grid">
         {visible.map(s => {
           const m = subjMeta(s.subject_name);
-          const unlocked = isSubjectUnlocked(s.subject_name);
           return (
             <div
               key={s.subject_id}
-              className={`lesson-card${unlocked ? '' : ' locked'}`}
-              onClick={() => unlocked ? openSubject(s) : alert(getLockedMessage())}
+              className="lesson-card"
+              onClick={() => openSubject(s)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  unlocked ? openSubject(s) : alert(getLockedMessage());
+                  openSubject(s);
                 }
               }}
             >
@@ -243,16 +241,9 @@ export default function LessonsPage() {
               <div className="lc-body">
                 <div className="lc-subject" style={{ color: m.color }}>{s.subject_name}</div>
                 <div className="lc-title">{s.enrolled_sessions_count} sessions enrolled</div>
-                {!unlocked && (
-                  <div className="subject-lock-msg">{getLockedMessage()}</div>
-                )}
                 <div className="lc-meta">
                   <span className="lc-time">AI-guided · Jassmine</span>
-                  {unlocked ? (
-                    <span className="pill pill-s">▶ Start</span>
-                  ) : (
-                    <span className="lock-badge">🔒 Locked</span>
-                  )}
+                  <span className="pill pill-s">▶ Start</span>
                 </div>
               </div>
             </div>

@@ -1,50 +1,50 @@
 {
-  "student_id": "02a7d928-893e-40f7-9a18-2c44c93318b2",
-  "chapter_id": "history_g6:unit_03",
+  "student_id": "f8f6c31e-fac0-4821-80fa-4143c0be800e",
+  "chapter_id": "history_g6:unit_02",
   "book_id": "history_g6",
-  "graph_chapter_id": "history_g6:unit_03",
+  "graph_chapter_id": "history_g6:unit_02",
   "session_units": [
     {
-      "unit_id": "unit_03",
-      "title": "Egyptian Society, Pharaohs and the Social Hierarchy",
+      "unit_id": "unit_02",
+      "title": "Religion and Gods of Ancient Egypt",
       "keywords": [],
       "minutes": 90,
-      "real_unit_id": "history_g6:unit_03"
+      "real_unit_id": "history_g6:unit_02"
     }
   ],
   "current_pos": 0,
   "unit_part": 0,
   "last_quiz": {
-    "question": "Who were the most powerful figures in Ancient Egypt, serving as both the government leader and high priest in temples?",
+    "question": "Which Egyptian god was known as the King of the Gods and was even more powerful when combined with Ra?",
     "options": [
-      "Officials and Scribes",
-      "High priests and nobles",
-      "Pharaohs",
-      "Craftsmen"
+      "Amun with the head of a ram",
+      "Hathor with the head of a cow",
+      "Thoth with the head of a bird",
+      "Sekmet with the head of a lioness"
     ],
-    "correct_answer": "Pharaohs",
+    "correct_answer": "Amun with the head of a ram",
     "expected_points": [
-      "The Pharaohs were considered the most important and powerful people in the kingdom, leading the government and serving as high priests in temples."
+      "Amun was known as the King of the Gods and was even more powerful when combined with Ra."
     ],
-    "source_quote": "They were the most important and powerful people in the kingdom. They were head of the government and high priest of every temple."
+    "source_quote": "Amun King of the Gods. When Amun was combined with Ra he was even more powerful."
   },
-  "last_teacher_text": "Alright, let's dive into the fascinating world of Ancient Egypt's social hierarchy and the mighty Pharaohs! \n\nIn Ancient Egypt, society was structured in a way where people had different roles and positions. At the very base of this social system were slaves, laborers, and peasants. They worked hard to support the kingdom.\n\nMoving up the hierarchy, we had craftsmen who were skilled workers creating beautiful objects and structures that were essential for daily life and religious ceremonies.\n\nOfficials and scribes played crucial roles in the administration and keeping records. They were highly respected for their knowledge and organizational skills.\n\nNext, we have high priests and nobles. These individuals held significant power and often had close ties to the Pharaoh. They oversaw religious practices and managed important affairs of the kingdom.\n\nNow, let's talk about the Pharaohs – the kings or queens of Egypt. They were the most powerful figures in the land, leading the government and serving as high priests in temples. The people saw them as part divine, part human, believing they had a special connection to the gods.\n\nDuring the Old and Middle Kingdoms, Pharaohs were laid to rest in grand pyramids near Memphis. These pyramids were monumental structures that housed the Pharaohs' remains and treasures.\n\nIn the New Kingdom, Pharaohs were buried in the Valley of the Kings in Thebes. These tombs were carved deep into the rock, hidden from view. One of the most famous Pharaohs, Tutankhamun, had an incredible tomb discovered in 1922. It contained a wealth of treasures like paintings, canopic jars, and stunning gold jewelry.\n\nIsn't it amazing how the Ancient Egyptians built such elaborate tombs and treasures for their Pharaohs? It truly shows the importance they placed on honoring their rulers even in the afterlife.\n\nNow, imagine if you were a craftsman in Ancient Egypt, creating beautiful artifacts for the Pharaoh's tomb. What kind of skills would you need? \n\nTo wrap up, we've explored the social hierarchy in Ancient Egypt, from slaves to the revered Pharaohs, and learned about the grandeur of the Pharaohs' tombs like that of Tutankhamun. \n\nAre you ready to test your knowledge with a fun quiz on Egyptian society and the Pharaohs? Let's see how much you've learned!",
+  "last_teacher_text": "Alright, class, let's dive into the fascinating world of Ancient Egyptian gods and their religion! Imagine a world where there were over 2,000 gods and goddesses worshipped by the Ancient Egyptians. These gods were often depicted with human bodies but with the heads of animals or birds. Can you picture that? It's like having a human body with a bird's head!\n\nThe most important god in Ancient Egypt was Ra, the sun god. Ra was often shown with a falcon head, wearing a sun disc on his head encircled by a sacred cobra. He sailed across the sky in a special boat called the Barque of Millions of Years. Every day, Ra was believed to die at sunset, traveling through the underworld, while the Moon lit up the world above. Isn't that a fascinating story?\n\nLet's meet some of these intriguing Egyptian gods and goddesses. Amun, known as the King of the Gods, was even more powerful when combined with Ra. He was symbolized with the head of a ram. Anubis, the god of mummification, had the head of a jackal. Priests often wore masks resembling Anubis during ceremonies. Bastet, associated with protection and household entertainment, had the head of a cat. Can you imagine having a cat-headed goddess looking after your home?\n\nGeb, the earth god, was believed to cause earthquakes when he laughed. He was depicted with the head of a goose. Hathor, the goddess of love, joy, music, and dance, had the head of a cow. Sekhmet, the goddess of war and battle, was represented with the head of a lioness. Horus, the god of the sky, had the head of a falcon. Heket, the goddess of childbirth, was shown with the head of a frog. Tefnut, the goddess of rain, had the head of a lioness. Thoth, the god of wisdom, writing, and knowledge, was depicted with the head of a bird. Lastly, Sobek, the god of the Nile, was symbolized with the head of a crocodile. \n\nEach of these gods represented different aspects of life and nature, and they were linked to various animals, symbolizing their powers and characteristics. It's like having a team of powerful beings watching over different parts of the world, isn't it?\n\nNow, think about this: if you had to choose an animal to represent you as a god or goddess, which animal would you pick and why? It's fun to imagine ourselves as part of this ancient pantheon of gods and goddesses, each with unique traits and responsibilities.\n\nTo wrap up, Ancient Egyptian gods were not just mystical beings but also symbols of the forces of nature and aspects of human life. They were worshipped for their powers and guidance in different areas of life. Next time, we'll explore more about the intriguing world of Ancient Egyptian beliefs. So, get ready to uncover more mysteries of this ancient civilization in our next lesson!",
   "part_cache": {
     "0": {
-      "teacher_text": "Alright, let's dive into the fascinating world of Ancient Egypt's social hierarchy and the mighty Pharaohs! \n\nIn Ancient Egypt, society was structured in a way where people had different roles and positions. At the very base of this social system were slaves, laborers, and peasants. They worked hard to support the kingdom.\n\nMoving up the hierarchy, we had craftsmen who were skilled workers creating beautiful objects and structures that were essential for daily life and religious ceremonies.\n\nOfficials and scribes played crucial roles in the administration and keeping records. They were highly respected for their knowledge and organizational skills.\n\nNext, we have high priests and nobles. These individuals held significant power and often had close ties to the Pharaoh. They oversaw religious practices and managed important affairs of the kingdom.\n\nNow, let's talk about the Pharaohs – the kings or queens of Egypt. They were the most powerful figures in the land, leading the government and serving as high priests in temples. The people saw them as part divine, part human, believing they had a special connection to the gods.\n\nDuring the Old and Middle Kingdoms, Pharaohs were laid to rest in grand pyramids near Memphis. These pyramids were monumental structures that housed the Pharaohs' remains and treasures.\n\nIn the New Kingdom, Pharaohs were buried in the Valley of the Kings in Thebes. These tombs were carved deep into the rock, hidden from view. One of the most famous Pharaohs, Tutankhamun, had an incredible tomb discovered in 1922. It contained a wealth of treasures like paintings, canopic jars, and stunning gold jewelry.\n\nIsn't it amazing how the Ancient Egyptians built such elaborate tombs and treasures for their Pharaohs? It truly shows the importance they placed on honoring their rulers even in the afterlife.\n\nNow, imagine if you were a craftsman in Ancient Egypt, creating beautiful artifacts for the Pharaoh's tomb. What kind of skills would you need? \n\nTo wrap up, we've explored the social hierarchy in Ancient Egypt, from slaves to the revered Pharaohs, and learned about the grandeur of the Pharaohs' tombs like that of Tutankhamun. \n\nAre you ready to test your knowledge with a fun quiz on Egyptian society and the Pharaohs? Let's see how much you've learned!",
+      "teacher_text": "Alright, class, let's dive into the fascinating world of Ancient Egyptian gods and their religion! Imagine a world where there were over 2,000 gods and goddesses worshipped by the Ancient Egyptians. These gods were often depicted with human bodies but with the heads of animals or birds. Can you picture that? It's like having a human body with a bird's head!\n\nThe most important god in Ancient Egypt was Ra, the sun god. Ra was often shown with a falcon head, wearing a sun disc on his head encircled by a sacred cobra. He sailed across the sky in a special boat called the Barque of Millions of Years. Every day, Ra was believed to die at sunset, traveling through the underworld, while the Moon lit up the world above. Isn't that a fascinating story?\n\nLet's meet some of these intriguing Egyptian gods and goddesses. Amun, known as the King of the Gods, was even more powerful when combined with Ra. He was symbolized with the head of a ram. Anubis, the god of mummification, had the head of a jackal. Priests often wore masks resembling Anubis during ceremonies. Bastet, associated with protection and household entertainment, had the head of a cat. Can you imagine having a cat-headed goddess looking after your home?\n\nGeb, the earth god, was believed to cause earthquakes when he laughed. He was depicted with the head of a goose. Hathor, the goddess of love, joy, music, and dance, had the head of a cow. Sekhmet, the goddess of war and battle, was represented with the head of a lioness. Horus, the god of the sky, had the head of a falcon. Heket, the goddess of childbirth, was shown with the head of a frog. Tefnut, the goddess of rain, had the head of a lioness. Thoth, the god of wisdom, writing, and knowledge, was depicted with the head of a bird. Lastly, Sobek, the god of the Nile, was symbolized with the head of a crocodile. \n\nEach of these gods represented different aspects of life and nature, and they were linked to various animals, symbolizing their powers and characteristics. It's like having a team of powerful beings watching over different parts of the world, isn't it?\n\nNow, think about this: if you had to choose an animal to represent you as a god or goddess, which animal would you pick and why? It's fun to imagine ourselves as part of this ancient pantheon of gods and goddesses, each with unique traits and responsibilities.\n\nTo wrap up, Ancient Egyptian gods were not just mystical beings but also symbols of the forces of nature and aspects of human life. They were worshipped for their powers and guidance in different areas of life. Next time, we'll explore more about the intriguing world of Ancient Egyptian beliefs. So, get ready to uncover more mysteries of this ancient civilization in our next lesson!",
       "quiz": {
-        "question": "Who were the most powerful figures in Ancient Egypt, serving as both the government leader and high priest in temples?",
+        "question": "Which Egyptian god was known as the King of the Gods and was even more powerful when combined with Ra?",
         "options": [
-          "Officials and Scribes",
-          "High priests and nobles",
-          "Pharaohs",
-          "Craftsmen"
+          "Amun with the head of a ram",
+          "Hathor with the head of a cow",
+          "Thoth with the head of a bird",
+          "Sekmet with the head of a lioness"
         ],
-        "correct_answer": "Pharaohs",
+        "correct_answer": "Amun with the head of a ram",
         "expected_points": [
-          "The Pharaohs were considered the most important and powerful people in the kingdom, leading the government and serving as high priests in temples."
+          "Amun was known as the King of the Gods and was even more powerful when combined with Ra."
         ],
-        "source_quote": "They were the most important and powerful people in the kingdom. They were head of the government and high priest of every temple."
+        "source_quote": "Amun King of the Gods. When Amun was combined with Ra he was even more powerful."
       }
     }
   }
