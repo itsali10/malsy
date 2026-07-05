@@ -1,18 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { api } from '../../lib/api';
+import TimetableCard from '../../components/ui/TimetableCard';
+import SubjectIcon from '../../components/ui/SubjectIcon';
+import DashboardWidget from '../../components/ui/DashboardWidget';
+import SectionHeader from '../../components/ui/SectionHeader';
 import {
   WEEK_DAYS,
-  getAllSubjects,
+  apiWeekToSchedule,
   getSubjectMeta,
   getTodayName,
   getWeeklySessionCount,
-  getSessionsForDay,
-  routeForSubject,
+  getSessionsForDayFromApi,
+  routeForSession,
+  getLockedMessage,
   type DayName,
   type ScheduleSession,
 } from '../../lib/studentSchedule';
+import { usePortalSubjects } from '../../lib/studentPortalSubjects';
 
 const DAY_ABBR: Record<DayName, string> = {
   Monday: 'Mon',
@@ -45,30 +52,54 @@ function statusLabel(status: ScheduleSession['status']): string {
     case 'completed':
       return 'Completed';
     default:
-      return 'Scheduled';
-  }
-}
-
-function statusClass(status: ScheduleSession['status']): string {
-  switch (status) {
-    case 'available':
-      return 'schedule-status schedule-status--available';
-    case 'completed':
-      return 'schedule-status schedule-status--completed';
-    default:
-      return 'schedule-status schedule-status--locked';
+      return 'Locked';
   }
 }
 
 export default function SchedulePage() {
   const router = useRouter();
   const todayName = getTodayName();
+  const { subjects, loading: subjectsLoading } = usePortalSubjects();
   const [selected, setSelected] = useState<DayName>(todayName);
+  const [apiWeek, setApiWeek] = useState<Partial<Record<DayName, ScheduleSession[]>>>({});
   const weekDates = getCurrentWeekDates();
 
-  const sessions = getSessionsForDay(selected);
-  const subjects = getAllSubjects();
-  const sessionCount = getWeeklySessionCount();
+  useEffect(() => {
+    let cancelled = false;
+    api.dashboard.week()
+      .then((week) => {
+        if (cancelled) return;
+        if (!Array.isArray(week)) {
+          console.warn('[portal] schedule fetch returned non-array — keeping previous week');
+          return;
+        }
+        console.info('[portal] fetched lesson schedule', week.map((d) => ({
+          day: d.day_of_week,
+          sessions: d.sessions?.length ?? 0,
+        })));
+        setApiWeek((prev) => {
+          const mapped = apiWeekToSchedule(week);
+          const total = Object.values(mapped).flat().length;
+          const byDay = WEEK_DAYS.map((d) => ({ day: d, count: mapped[d]?.length ?? 0 }));
+          console.info('[portal] generated schedule by day', byDay, 'total=', total);
+          if (total === 0 && Object.keys(prev).length === 0) {
+            return mapped;
+          }
+          if (total === 0) {
+            console.warn('[portal] mapped schedule empty — keeping previous week');
+            return prev;
+          }
+          return mapped;
+        });
+      })
+      .catch((err) => {
+        console.warn('[portal] schedule fetch failed — keeping previous week', err);
+      });
+    return () => { cancelled = true; };
+  }, [subjects]);
+
+  const sessions = getSessionsForDayFromApi(selected, apiWeek);
+  const sessionCount = getWeeklySessionCount(apiWeek);
 
   const headingBase =
     weekDates[selected]?.toLocaleDateString('en-US', {
@@ -79,11 +110,11 @@ export default function SchedulePage() {
   const heading = selected === todayName ? `${headingBase} · Today` : headingBase;
 
   function handleSessionClick(session: ScheduleSession) {
-    if (session.status === 'available') {
-      router.push(routeForSubject(session.subject));
+    if (session.status === 'available' || session.status === 'completed') {
+      router.push(routeForSession(session, subjects));
       return;
     }
-    alert(`This ${session.subject} session is scheduled for ${selected}, not today.`);
+    alert(getLockedMessage());
   }
 
   return (
@@ -111,39 +142,34 @@ export default function SchedulePage() {
 
       <div className="g-left">
         <div>
-          <div className="card-title" style={{ marginBottom: 16 }}>{heading}</div>
+          <SectionHeader title={heading} subtitle="Tap a lesson to start learning" />
 
           <div className="schedule-session-list">
-            {sessions.map((session) => {
-              const meta = getSubjectMeta(session.subject);
+            {sessions.length === 0 ? (
+              <div className="card-sub">No sessions today</div>
+            ) : null}
+            {sessions.map((session, idx) => {
+              const meta = getSubjectMeta(session.subject, subjects);
               return (
-                <div
-                  key={session.id}
-                  className={`schedule-session-card${session.status === 'available' ? ' schedule-session-card--active' : ''}`}
+                <TimetableCard
+                  key={`${session.id}-${idx}`}
+                  title={session.title}
+                  subject={session.subject}
+                  icon={<SubjectIcon subject={session.subject} emoji={meta.icon} size={20} />}
+                  iconBg={meta.bg}
+                  accentColor={meta.color}
+                  status={session.status}
+                  statusLabel={statusLabel(session.status)}
+                  active={session.status === 'available'}
                   onClick={() => handleSessionClick(session)}
-                  style={{ borderLeftColor: meta.color }}
-                >
-                  <div className="schedule-session-card__time">{session.time}</div>
-                  <div className="schedule-session-card__icon" style={{ background: meta.bg }}>
-                    {meta.icon}
-                  </div>
-                  <div className="schedule-session-card__body">
-                    <div className="schedule-session-card__title">{session.title}</div>
-                    <div className="schedule-session-card__meta">{session.subject}</div>
-                  </div>
-                  <span className={statusClass(session.status)}>{statusLabel(session.status)}</span>
-                </div>
+                />
               );
             })}
           </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div className="card">
-            <div className="card-title">This Week</div>
-            <div className="card-sub">
-              {sessionCount} sessions · {WEEK_DAYS.length} days
-            </div>
+          <DashboardWidget title="This Week" subtitle={`${sessionCount} sessions · ${WEEK_DAYS.length} days`}>
             <div className="schedule-week-active">Weekly schedule active</div>
             <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
               {WEEK_DAYS.map((day) => (
@@ -160,31 +186,37 @@ export default function SchedulePage() {
                     {day}
                     {day === todayName ? ' · Today' : ''}
                   </span>
-                  <span className="schedule-week-row__count">2 sessions</span>
+                  <span className="schedule-week-row__count">
+                    {(apiWeek[day]?.length ?? 0)} sessions
+                  </span>
                 </button>
               ))}
             </div>
-          </div>
+          </DashboardWidget>
 
-          <div className="card">
-            <div className="card-title">My Subjects</div>
-            <div className="card-sub">Enrolled this term</div>
-            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {subjects.map((subject) => {
-                const meta = getSubjectMeta(subject);
-                return (
-                  <div key={subject} className="schedule-subject-row">
-                    <div
-                      className="schedule-subject-row__dot"
-                      style={{ background: meta.color }}
-                    />
-                    <span className="schedule-subject-row__name">{subject}</span>
-                    <span className="schedule-subject-row__code">{meta.code}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <DashboardWidget title="My Subjects" subtitle="Enrolled this term">
+            {subjectsLoading ? (
+              <div className="card-sub" style={{ marginTop: 12 }}>Loading…</div>
+            ) : subjects.length === 0 ? (
+              <div className="card-sub" style={{ marginTop: 12 }}>No enrolled subjects yet.</div>
+            ) : (
+              <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {subjects.map((subject) => {
+                  const meta = getSubjectMeta(subject.subject_name, subjects);
+                  return (
+                    <div key={subject.subject_id} className="schedule-subject-row">
+                      <div
+                        className="schedule-subject-row__dot"
+                        style={{ background: meta.color }}
+                      />
+                      <span className="schedule-subject-row__name">{subject.subject_name}</span>
+                      <span className="schedule-subject-row__code">{subject.subject_code}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </DashboardWidget>
         </div>
       </div>
     </div>

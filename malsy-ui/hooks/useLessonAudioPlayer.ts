@@ -8,6 +8,9 @@ import {
   dispatchSpeaking,
   loadAudioProgress,
   paragraphsForTTS,
+  prepareAudioElement,
+  resolveTtsAudioUrl,
+  verifyTtsAudioUrl,
   saveAudioProgress,
   type LessonAudioProgress,
   type LessonAudioState,
@@ -82,18 +85,44 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
   }, [teacherText]);
 
   // Returns a memoized promise so each paragraph is generated only once.
-  const fetchChunkUrl = useCallback((index: number): Promise<string | null> => {
+  const fetchChunkUrl = useCallback((index: number, bust = false): Promise<string | null> => {
+    if (bust) urlCacheRef.current.delete(index);
     const cached = urlCacheRef.current.get(index);
-    if (cached) return cached;
+    if (cached && !bust) return cached;
     const chunks = chunksRef.current;
     if (index >= chunks.length) return Promise.resolve(null);
     const p = api.tts
       .speak(chunks[index])
-      .then(({ audio_url }) => (audio_url.startsWith('http') ? audio_url : `${API_BASE}${audio_url}`))
-      .catch(() => null);
+      .then(({ audio_url }) => {
+        const url = resolveTtsAudioUrl(audio_url, API_BASE);
+        console.debug('[lesson-audio] tts url', { index, url });
+        return url;
+      })
+      .catch((err) => {
+        console.error('[lesson-audio] tts speak failed', { index, err });
+        return null;
+      });
     urlCacheRef.current.set(index, p);
     return p;
   }, []);
+
+  /** Resolve a paragraph audio URL; regenerate once if the static file 404s. */
+  const resolveChunkSrc = useCallback(async (index: number, token: number): Promise<string | null> => {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      if (token !== sessionRef.current) return null;
+      const src = await fetchChunkUrl(index, attempt > 0);
+      if (!src) return null;
+      const probe = await verifyTtsAudioUrl(src);
+      if (probe === 'ok') return src;
+      if (probe === 'missing') {
+        console.warn('[lesson-audio] audio file 404 — regenerating TTS', { index, src, attempt });
+        continue;
+      }
+      // Network/CORS probe failed — still try HTMLAudio playback.
+      return src;
+    }
+    return null;
+  }, [fetchChunkUrl]);
 
   const sleep = useCallback((ms: number, token: number) => {
     return new Promise<void>((resolve) => {
@@ -107,19 +136,87 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
   }, []);
 
   const playElement = useCallback(
-    (
-      el: HTMLAudioElement,
+    async (
+      src: string,
       token: number,
       startTime: number,
       text?: string,
-    ): Promise<'ended' | 'paused' | 'aborted'> => {
-      audioRef.current = el;
-      if (startTime > 0) {
-        try { el.currentTime = startTime; } catch { /* before metadata */ }
+    ): Promise<'ended' | 'paused' | 'aborted' | 'error'> => {
+      if (token !== sessionRef.current) return 'aborted';
+
+      let el: HTMLAudioElement;
+      let stopLipSync: (() => void) | null = null;
+      try {
+        el = await prepareAudioElement(src, startTime);
+        // Same AudioSource drives playback and lip sync (before play() starts).
+        stopLipSync = attachLipSync(el, text);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error('[lesson-audio] audio load failed', { src, err });
+        if (msg.includes('404')) {
+          setTtsError('Audio file not found. Click Read Aloud to try again.');
+        } else {
+          setTtsError('Could not load lesson audio.');
+        }
+        dispatchSpeaking(false, 0);
+        return 'error';
       }
 
-      let stopLipSync: (() => void) | null = null;
+      if (token !== sessionRef.current) {
+        stopLipSync?.();
+        return 'aborted';
+      }
+
+      audioRef.current = el;
+
       let progressRaf = 0;
+
+      const startProgressLoop = () => {
+        if (progressRaf) return;
+        const tick = () => {
+          if (token !== sessionRef.current) return;
+          const d = el.duration;
+          if (Number.isFinite(d) && d > 0) {
+            setSegmentProgress(Math.min(1, el.currentTime / d));
+          }
+          progressRaf = requestAnimationFrame(tick);
+        };
+        progressRaf = requestAnimationFrame(tick);
+      };
+
+      const syncProgressToAudio = () => {
+        const d = el.duration;
+        if (Number.isFinite(d) && d > 0) {
+          setSegmentProgress(Math.min(1, el.currentTime / d));
+        }
+      };
+
+      if (Number.isFinite(el.duration) && el.duration > 0 && startTime > 0) {
+        syncProgressToAudio();
+      }
+
+      try {
+        console.debug('[lesson-audio] play()', {
+          src,
+          volume: el.volume,
+          muted: el.muted,
+          readyState: el.readyState,
+        });
+        await el.play();
+        syncProgressToAudio();
+        startProgressLoop();
+      } catch (err) {
+        stopLipSync?.();
+        const name = err instanceof DOMException ? err.name : (err instanceof Error ? err.name : 'Error');
+        console.error('[lesson-audio] play() rejected', { src, name, err, volume: el.volume, muted: el.muted });
+        if (name === 'NotAllowedError') {
+          setTtsError('Audio was blocked. Click Read Aloud again to start.');
+        } else {
+          setTtsError('Could not play lesson audio.');
+        }
+        dispatchSpeaking(false, 0);
+        return 'error';
+      }
 
       return new Promise((resolve) => {
         let settled = false;
@@ -134,7 +231,7 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
           el.onerror = null;
           dispatchSpeaking(false, 0);
         };
-        const finish = (result: 'ended' | 'paused' | 'aborted') => {
+        const finish = (result: 'ended' | 'paused' | 'aborted' | 'error') => {
           if (settled) return;
           settled = true;
           pauseRef.current = null;
@@ -151,23 +248,9 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
           finish('paused');
         };
 
-        // Lip-sync starts once audio is producing sound.
-        // Text drives per-letter RPM viseme shapes synced to the clip duration.
         el.onplaying = () => {
           if (token !== sessionRef.current) return;
-          if (!stopLipSync) stopLipSync = attachLipSync(el, text);
-          // Smoothly drive whiteboard word reveal off real playback position.
-          if (!progressRaf) {
-            const tick = () => {
-              if (token !== sessionRef.current) return;
-              const d = el.duration;
-              if (Number.isFinite(d) && d > 0) {
-                setSegmentProgress(Math.min(1, el.currentTime / d));
-              }
-              progressRaf = requestAnimationFrame(tick);
-            };
-            progressRaf = requestAnimationFrame(tick);
-          }
+          startProgressLoop();
           console.debug(
             `[lesson-audio] segment=${paragraphIndexRef.current} ` +
             `duration=${Number.isFinite(el.duration) ? el.duration.toFixed(2) : '?'}s isLipSyncing=true`,
@@ -183,10 +266,15 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
           }
         };
         el.onended = () => { currentTimeRef.current = 0; finish('ended'); };
-        el.onerror = () => finish('ended');
-        el.play().catch(() => finish('ended'));
-
-        if (token !== sessionRef.current) finish('aborted');
+        el.onerror = () => {
+          console.error('[lesson-audio] playback error during play', {
+            src,
+            code: el.error?.code,
+            message: el.error?.message,
+          });
+          setTtsError('Lesson audio stopped unexpectedly.');
+          finish('error');
+        };
       });
     },
     [persistProgress, setState],
@@ -210,23 +298,28 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
         if (token !== sessionRef.current) return;
 
         paragraphIndexRef.current = i;
-        setCurrentSegment(i);
-        setSegmentProgress(0);
         const seek = i === startIndex ? startTime : 0;
         if (i !== startIndex) currentTimeRef.current = 0;
 
-        const src = await fetchChunkUrl(i);
+        const src = await resolveChunkSrc(i, token);
         if (token !== sessionRef.current) return;
         if (!src) {
-          setTtsError('Could not load lesson audio.');
+          setTtsError('Could not load lesson audio (file not found).');
           setState('idle');
           dispatchSpeaking(false, 0);
           return;
         }
 
+        // Reveal this paragraph exactly when playback is about to start — not while TTS loads.
+        setCurrentSegment(i);
+        setSegmentProgress(0);
         setState('speaking');
-        const result = await playElement(new Audio(src), token, seek, chunks[i]);
+        const result = await playElement(src, token, seek, chunks[i]);
         if (token !== sessionRef.current) return;
+        if (result === 'error') {
+          setState('idle');
+          return;
+        }
         if (result === 'paused' || result === 'aborted') return;
 
         // Short, natural transition pause with the mouth CLOSED.
@@ -249,7 +342,7 @@ export function useLessonAudioPlayer(lessonId: string, teacherText: string) {
       dispatchSpeaking(false, 0);
       audioRef.current = null;
     },
-    [fetchChunkUrl, persistProgress, playElement, setState, sleep],
+    [fetchChunkUrl, persistProgress, playElement, resolveChunkSrc, setState, sleep],
   );
 
   const listen = useCallback(() => {

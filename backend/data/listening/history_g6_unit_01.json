@@ -1,0 +1,43 @@
+{
+  "unit_id": "history_g6:unit_01",
+  "title": "The Gift of the Nile: Ancient Egypt",
+  "transcript": "Welcome, class! Today, we're going to explore the incredible world of Ancient Egypt. Picture a time long ago when Egypt was a thriving civilization, leaving behind monumental tombs and structures that still amaze us today, even after thousands of years! Situated in the northeast corner of Africa, Egypt was blessed with the mighty River Nile flowing through the country, providing essential water, food, and a means of travel. The Ancient Egyptians settled along the Nile's banks around 5000 B.C., with most of the population residing in the Nile valley due to the river's significance. The Nile, often called the 'gift of the Nile,' flooded and left fertile mud, ideal for farming and raising animals, crucial for a land mainly covered in hot deserts with minimal rainfall. Two kingdoms emerged along the Nile: Upper Egypt with the white crown and Lower Egypt with the red crown. In 3200 BC, King Narmer, also known as Menes, united Egypt by conquering the south and establishing the capital, Memphis, meaning 'Balance of the Two Lands' in Greek. The Egyptians divided their land into the red land, acting as a barrier against invasions, and the black land near the Nile, providing vital resources like food and water for the people. It's fascinating how the Ancient Egyptians built their civilization around the Nile, relying on its gifts for survival and prosperity.",
+  "narration_text": "Welcome, class! Today, we're going to explore the incredible world of Ancient Egypt. Picture a time long ago when Egypt was a thriving civilization, leaving behind monumental tombs and structures that still amaze us today, even after thousands of years! Situated in the northeast corner of Africa, Egypt was blessed with the mighty River Nile flowing through the country, providing essential water, food, and a means of travel. The Ancient Egyptians settled along the Nile's banks around 5000 B.C., with most of the population residing in the Nile valley due to the river's significance. The Nile, often called the 'gift of the Nile,' flooded and left fertile mud, ideal for farming and raising animals, crucial for a land mainly covered in hot deserts with minimal rainfall. Two kingdoms emerged along the Nile: Upper Egypt with the white crown and Lower Egypt with the red crown. In 3200 BC, King Narmer, also known as Menes, united Egypt by conquering the south and establishing the capital, Memphis, meaning 'Balance of the Two Lands' in Greek. The Egyptians divided their land into the red land, acting as a barrier against invasions, and the black land near the Nile, providing vital resources like food and water for the people. It's fascinating how the Ancient Egyptians built their civilization around the Nile, relying on its gifts for survival and prosperity.",
+  "story": "Welcome, class! Today, we're going to explore the incredible world of Ancient Egypt. Picture a time long ago when Egypt was a thriving civilization, leaving behind monumental tombs and structures that still amaze us today, even after thousands of years! Situated in the northeast corner of Africa, Egypt was blessed with the mighty River Nile flowing through the country, providing essential water, food, and a means of travel. The Ancient Egyptians settled along the Nile's banks around 5000 B.C., with most of the population residing in the Nile valley due to the river's significance. The Nile, often called the 'gift of the Nile,' flooded and left fertile mud, ideal for farming and raising animals, crucial for a land mainly covered in hot deserts with minimal rainfall. Two kingdoms emerged along the Nile: Upper Egypt with the white crown and Lower Egypt with the red crown. In 3200 BC, King Narmer, also known as Menes, united Egypt by conquering the south and establishing the capital, Memphis, meaning 'Balance of the Two Lands' in Greek. The Egyptians divided their land into the red land, acting as a barrier against invasions, and the black land near the Nile, providing vital resources like food and water for the people. It's fascinating how the Ancient Egyptians built their civilization around the Nile, relying on its gifts for survival and prosperity.",
+  "questions": [
+    {
+      "id": "q1",
+      "question": "Where and who were the Ancient Egyptians?",
+      "options": [
+        "In the northeast corner of Africa along the River Nile",
+        "In the southwest corner of Africa along the River Nile",
+        "In the northeast corner of Asia along the River Nile",
+        "In the northeast corner of Africa along the Amazon River"
+      ],
+      "correct_answer": "In the northeast corner of Africa along the River Nile",
+      "explanation": "The transcript mentions that the Ancient Egyptians were situated in the northeast corner of Africa along the River Nile.",
+      "skill": "understanding"
+    },
+    {
+      "id": "q2",
+      "question": "Why was the Nile referred to as the 'gift of the Nile'?",
+      "options": [
+        "Because it provided water, food, and transportation",
+        "Because it was a dangerous river",
+        "Because it was a small river",
+        "Because it was a dry river"
+      ],
+      "correct_answer": "Because it provided water, food, and transportation",
+      "explanation": "The transcript states that the Nile was called the 'gift of the Nile' because it provided water, food, and a means of transportation for the Egyptians.",
+      "skill": "understanding"
+    }
+  ],
+  "answers": {
+    "q1": "In the northeast corner of Africa along the River Nile",
+    "q2": "Because it provided water, food, and transportation"
+  },
+  "grade": 6,
+  "word_count": 225,
+  "source_hash": "7460dbe8ef741f6f9a3e6a69f4b5062f465a8e3de5670cb38b0d9bb7f27cc32a",
+  "generated_at": "2026-07-01T22:39:48.707588Z"
+}

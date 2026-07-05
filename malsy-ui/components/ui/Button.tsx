@@ -7,12 +7,24 @@ interface Props {
   onClick?: () => void;
   style?: React.CSSProperties;
   disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
+  className?: string;
 }
 
-export default function Button({ variant = 'v', small, children, onClick, style, disabled }: Props) {
+export default function Button({
+  variant = 'v',
+  small,
+  children,
+  onClick,
+  style,
+  disabled,
+  type = 'button',
+  className = '',
+}: Props) {
   return (
     <button
-      className={`btn btn-${variant}${small ? ' btn-sm' : ''}`}
+      type={type}
+      className={`btn btn-${variant}${small ? ' btn-sm' : ''}${className ? ` ${className}` : ''}`}
       onClick={onClick}
       style={style}
       disabled={disabled}

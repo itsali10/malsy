@@ -17,17 +17,21 @@ import uuid
 from datetime import time
 
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import Schedule, StudentScheduleEnrollment, Subject
+from .schedule_sync_service import registry_key_from_db_subject
 
 # ── Canonical subject definitions ─────────────────────────────────────────────
 
 _SUBJECTS = [
-    {"subject_name": "English",   "subject_code": "ENG",  "subject_type": "Core"},
-    {"subject_name": "Chemistry", "subject_code": "CHEM", "subject_type": "Core"},
-    {"subject_name": "History",   "subject_code": "HIST", "subject_type": "Core"},
+    {"subject_name": "English",   "subject_code": "ENG",  "subject_type": "English"},
+    {"subject_name": "Chemistry", "subject_code": "CHEM", "subject_type": "Chemistry"},
+    {"subject_name": "History",   "subject_code": "HIST", "subject_type": "History"},
 ]
+
+_TYPE_BY_CODE = {s["subject_code"]: s["subject_type"] for s in _SUBJECTS}
 
 # ── Canonical schedule slots ──────────────────────────────────────────────────
 # Each entry references a subject_code so we can look up the FK at runtime.
@@ -97,10 +101,14 @@ async def _ensure_subjects(db: AsyncSession) -> dict[str, uuid.UUID]:
     code_to_id: dict[str, uuid.UUID] = {}
 
     for s in _SUBJECTS:
+        subject_type = _TYPE_BY_CODE[s["subject_code"]]
         result = await db.execute(
-            select(Subject).where(Subject.subject_code == s["subject_code"])
+            select(Subject).where(
+                (Subject.subject_code == s["subject_code"])
+                | (Subject.subject_type == subject_type)
+            ).limit(1)
         )
-        subject = result.scalar_one_or_none()
+        subject = result.scalars().first()
         if subject is None:
             subject = Subject(**s)
             db.add(subject)
@@ -110,37 +118,88 @@ async def _ensure_subjects(db: AsyncSession) -> dict[str, uuid.UUID]:
     return code_to_id
 
 
+async def _active_schedule_ids(db: AsyncSession) -> list[uuid.UUID]:
+    """Return all active schedule IDs already present in the database."""
+    result = await db.execute(
+        select(Schedule.schedule_id).where(Schedule.is_active.is_(True))
+    )
+    return [row[0] for row in result]
+
+
 async def _ensure_schedules(
     db: AsyncSession, code_to_id: dict[str, uuid.UUID]
 ) -> list[uuid.UUID]:
-    """Return list of all 7 default schedule IDs, creating missing slots."""
+    """Return canonical timetable slot IDs — match real DB rows, never all active schedules."""
+    from .timetable_service import is_sync_spread_slot
+
+    _SESSION_TYPE_MAP = {
+        "Grammar": "Lesson",
+        "Comprehension": "Lesson",
+        "Pronunciation": "Lesson",
+        "Theoretical": "Lesson",
+        "Practical Lab": "Lab",
+        "Videos": "Video",
+    }
+
     schedule_ids: list[uuid.UUID] = []
 
     for slot in _SLOTS:
         subject_id = code_to_id[slot["subject_code"]]
+        session_type = _SESSION_TYPE_MAP.get(slot["session_type"], "Lesson")
         result = await db.execute(
             select(Schedule).where(
-                Schedule.subject_id   == subject_id,
-                Schedule.day_of_week  == slot["day_of_week"],
-                Schedule.session_type == slot["session_type"],
+                Schedule.subject_id == subject_id,
+                Schedule.day_of_week == slot["day_of_week"],
+                Schedule.start_time == slot["start_time"],
+                Schedule.is_active.is_(True),
             )
         )
         schedule = result.scalar_one_or_none()
         if schedule is None:
+            result = await db.execute(
+                select(Schedule).where(
+                    Schedule.subject_id == subject_id,
+                    Schedule.day_of_week == slot["day_of_week"],
+                    Schedule.session_type == session_type,
+                    Schedule.is_active.is_(True),
+                )
+            )
+            schedule = result.scalar_one_or_none()
+        if schedule is None:
             schedule = Schedule(
-                subject_id   = subject_id,
-                day_of_week  = slot["day_of_week"],
-                start_time   = slot["start_time"],
-                end_time     = slot["end_time"],
-                session_type = slot["session_type"],
-                location     = slot["location"],
-                is_active    = True,
+                subject_id=subject_id,
+                day_of_week=slot["day_of_week"],
+                start_time=slot["start_time"],
+                end_time=slot["end_time"],
+                session_type=session_type,
+                location=slot["location"],
+                is_active=True,
             )
             db.add(schedule)
             await db.flush()
-        schedule_ids.append(schedule.schedule_id)
+        if not is_sync_spread_slot(schedule):
+            schedule_ids.append(schedule.schedule_id)
 
-    return schedule_ids
+    # Also pick up real timetable rows for visible subjects (English Literature, World History, etc.)
+    code_to_registry = {"ENG": "english", "CHEM": "science", "HIST": "history"}
+    result = await db.execute(
+        select(Schedule)
+        .where(Schedule.is_active.is_(True))
+        .options(selectinload(Schedule.subject))
+    )
+    for schedule in result.scalars().all():
+        if is_sync_spread_slot(schedule):
+            continue
+        if schedule.schedule_id in schedule_ids:
+            continue
+        subj = schedule.subject
+        if not subj:
+            continue
+        key = registry_key_from_db_subject(subj.subject_name)
+        if key in code_to_registry.values():
+            schedule_ids.append(schedule.schedule_id)
+
+    return list(dict.fromkeys(schedule_ids))
 
 
 async def enroll_user_in_default_schedules(

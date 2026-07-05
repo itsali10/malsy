@@ -20,6 +20,6 @@ else:
 
 print("Cleared. Now re-ingesting...")
 
-from app.ingest_books import ingest_book
-result = ingest_book("data/books/history_g6", chroma_path="chroma_db")
-print(f"Done! units ingested: {result['units_ingested']}, pages: {result['pdf_pages']}")
+from app.ingest_books import ingest_book_by_key
+result = ingest_book_by_key("history_g6", chroma_path="chroma_db")
+print(f"Done! {result}")

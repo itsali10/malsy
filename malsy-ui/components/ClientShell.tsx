@@ -4,18 +4,22 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
+import MalsyLogo from './MalsyLogo';
 import { ThemeProvider } from '../lib/theme';
 
 const AUTH_PATHS = ['/login'];
+const ADMIN_PREFIX = '/admin';
 
 export default function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const isAuthPage = AUTH_PATHS.some(p => pathname.startsWith(p));
-  const [ready, setReady] = useState(isAuthPage);
+  const isAdminRoute = pathname.startsWith(ADMIN_PREFIX);
+  const isAuthPage =
+    AUTH_PATHS.some(p => pathname.startsWith(p)) || pathname.startsWith('/admin/login');
+  const [ready, setReady] = useState(isAuthPage || isAdminRoute);
 
   useEffect(() => {
-    if (isAuthPage) {
+    if (isAuthPage || isAdminRoute) {
       setReady(true);
       return;
     }
@@ -25,18 +29,19 @@ export default function ClientShell({ children }: { children: React.ReactNode })
     } else {
       setReady(true);
     }
-  }, [pathname, isAuthPage, router]);
+  }, [pathname, isAuthPage, isAdminRoute, router]);
 
   if (!ready) {
     return (
-      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--navy)' }}>
-        <div style={{ fontFamily: 'var(--fd)', color: 'var(--vl)', fontSize: 14, letterSpacing: '.05em' }}>Loading…</div>
+      <div className="app-loading">
+        <MalsyLogo variant="loading" />
+        <span>Loading…</span>
       </div>
     );
   }
 
-  if (isAuthPage) {
-    return <>{children}</>;
+  if (isAuthPage || isAdminRoute) {
+    return <ThemeProvider>{children}</ThemeProvider>;
   }
 
   return (

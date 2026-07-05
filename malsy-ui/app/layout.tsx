@@ -1,25 +1,19 @@
 import type { Metadata } from 'next';
-import { Syne, DM_Sans, Roboto } from 'next/font/google';
+import { Nunito, Quicksand } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import ClientShell from '../components/ClientShell';
 
-const syne = Syne({
+const nunito = Nunito({
   subsets: ['latin'],
-  variable: '--font-syne',
-  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-nunito',
+  weight: ['400', '500', '600', '700'],
 });
 
-const dmSans = DM_Sans({
+const quicksand = Quicksand({
   subsets: ['latin'],
-  variable: '--font-dm-sans',
-  weight: ['300', '400', '500', '600'],
-  style: ['normal', 'italic'],
-});
-
-const roboto = Roboto({
-  subsets: ['latin'],
-  variable: '--font-roboto',
-  weight: ['400', '500', '700'],
+  variable: '--font-quicksand',
+  weight: ['400', '500', '600', '700'],
 });
 
 export const metadata: Metadata = {
@@ -29,8 +23,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${syne.variable} ${dmSans.variable} ${roboto.variable}`}>
+    <html lang="en" className={`${nunito.variable} ${quicksand.variable}`}>
       <body>
+        <Script id="malsy-theme-init" strategy="beforeInteractive">
+          {`(function(){try{var t=localStorage.getItem('malsy_theme')||'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();`}
+        </Script>
         <ClientShell>{children}</ClientShell>
       </body>
     </html>

@@ -2,7 +2,7 @@ import uuid
 from datetime import date, datetime, time
 from typing import Optional
 
-from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text, Time, func
+from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text, Time, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -36,6 +36,45 @@ class User(Base):
     lesson_evaluations: Mapped[list["LessonEvaluation"]] = relationship(back_populates="user")
     experiment_sessions: Mapped[list["ExperimentSession"]] = relationship(back_populates="user")
     notifications: Mapped[list["ParentNotification"]] = relationship(back_populates="user")
+    lesson_schedule_items: Mapped[list["StudentLessonScheduleItem"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+
+class StudentLessonScheduleItem(Base):
+    """Sequential randomized lesson order for a student (no fixed clock times)."""
+
+    __tablename__ = "student_lesson_schedule_items"
+    __table_args__ = (
+        UniqueConstraint("user_id", "lesson_id", name="uq_student_lesson_schedule_lesson"),
+        UniqueConstraint("user_id", "order_index", name="uq_student_lesson_schedule_order"),
+    )
+
+    schedule_item_id: Mapped[uuid.UUID] = mapped_column(
+        PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PG_UUID(as_uuid=True), ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False
+    )
+    subject_id: Mapped[uuid.UUID] = mapped_column(
+        PG_UUID(as_uuid=True), ForeignKey("subjects.subject_id"), nullable=False
+    )
+    lesson_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    lesson_title: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    day_of_week: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    week_start_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+    order_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="locked")
+    unlocked_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+    user: Mapped["User"] = relationship(back_populates="lesson_schedule_items")
+    subject: Mapped["Subject"] = relationship()
 
 
 class Subject(Base):

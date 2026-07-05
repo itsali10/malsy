@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { api, Quiz, SessionAnswerResponse, SessionStartResponse } from '../../../lib/api';
+import { api, ListeningActivity, Quiz, SessionAnswerResponse, SessionStartResponse } from '../../../lib/api';
 import { auth } from '../../../lib/auth';
 import LessonPartVideoPanel from '../../../components/LessonPartVideoPanel';
 import HistoryInteractiveImages from '../../../components/HistoryInteractiveImages';
@@ -10,7 +10,24 @@ import AvatarWidget from '../../../components/AvatarWidget';
 import { unitVideoFilename } from '../../../lib/unit-video';
 import { subjectPathFromChapter, nextLessonFromChapter } from '../../../lib/learning-config';
 import { useLessonAudioPlayer } from '../../../hooks/useLessonAudioPlayer';
-import { attachLipSync, dispatchSpeaking } from '../../../lib/lesson-audio';
+import { attachLipSync, dispatchSpeaking, prepareAudioElement, resolveTtsAudioUrl, verifyTtsAudioUrl } from '../../../lib/lesson-audio';
+import LessonSectionNav from '../../../components/LessonSectionNav';
+import PronunciationRecorder from '../../../components/PronunciationRecorder';
+import {
+  clampPartIndex,
+  lastPartIndex,
+  sectionDef,
+  usesLanguageSections,
+} from '../../../lib/lesson-sections';
+import {
+  ArrowRight,
+  BookOpen,
+  ChevronLeft,
+  Pause,
+  Play,
+  RotateCcw,
+  Volume2,
+} from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────
 
@@ -40,14 +57,16 @@ function LessonLearn() {
   const chapter      = params.get('chapter') ?? '';
   const lessonTitle  = params.get('lesson_title') ?? '';
   const lessonDesc   = params.get('lesson_desc') ?? '';
+  const resumeSectionRaw = params.get('unit_part') ?? params.get('section');
   const user      = auth.getUser();
   const studentId = user?.user_id ?? 'student';
 
   const [phase,       setPhase]       = useState<Phase>('loading');
   const [teacherText, setTeacherText] = useState('');
+  const [listening,   setListening]   = useState<ListeningActivity | null>(null);
   const [quiz,        setQuiz]        = useState<Quiz | null>(null);
-  const [unitPart,    setUnitPart]    = useState<0 | 1>(0);
-  const [maxUnlocked, setMaxUnlocked] = useState<0 | 1>(0);
+  const [unitPart,    setUnitPart]    = useState(0);
+  const [maxUnlocked, setMaxUnlocked] = useState(0);
   const [switching,   setSwitching]   = useState(false);
   const [answer,      setAnswer]      = useState('');
   const [answerIndex, setAnswerIndex] = useState(-1);
@@ -55,6 +74,7 @@ function LessonLearn() {
   const [errorMsg,    setErrorMsg]    = useState('');
   const [completeMsg, setCompleteMsg] = useState('');
   const [feedbackSpeaking, setFeedbackSpeaking] = useState(false);
+  const [nextLesson, setNextLesson] = useState<{ chapter: string; title: string; description: string } | null>(null);
 
   const feedbackAudioRef = useRef<HTMLAudioElement | null>(null);
   const feedbackTokenRef = useRef(0);
@@ -73,7 +93,10 @@ function LessonLearn() {
 
   // ── lesson audio (Listen / Pause / Continue / Restart) ─────────
 
-  const lessonAudio = useLessonAudioPlayer(chapter, teacherText);
+  const isListeningMode = quiz?.type === 'listening';
+  const isSpeakingMode = quiz?.type === 'speaking';
+  const storyText = (listening?.transcript || listening?.narration_text || teacherText).trim();
+  const lessonAudio = useLessonAudioPlayer(chapter, isListeningMode ? storyText : teacherText);
 
   async function playFeedbackTTS(text: string) {
     if (!text.trim()) return;
@@ -86,11 +109,17 @@ function LessonLearn() {
       const { audio_url } = await api.tts.speak(text);
       if (token !== feedbackTokenRef.current) return;
       const base = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000').replace(/\/$/, '');
-      const src = audio_url.startsWith('http') ? audio_url : `${base}${audio_url}`;
-      const el = new Audio(src);
+      let src = resolveTtsAudioUrl(audio_url, base);
+      if (await verifyTtsAudioUrl(src) === 'missing') {
+        console.warn('[lesson-audio] feedback audio 404 — regenerating', src);
+        const regen = await api.tts.speak(text);
+        if (token !== feedbackTokenRef.current) return;
+        src = resolveTtsAudioUrl(regen.audio_url, base);
+      }
+      const el = await prepareAudioElement(src);
       feedbackAudioRef.current = el;
-      let stopLipSync: (() => void) | null = null;
-      el.onplaying = () => { if (!stopLipSync) stopLipSync = attachLipSync(el, text); };
+      let stopLipSync: (() => void) | null = attachLipSync(el, text);
+      await el.play();
       const stop = () => {
         setFeedbackSpeaking(false);
         stopLipSync?.();
@@ -98,9 +127,16 @@ function LessonLearn() {
         dispatchSpeaking(false, 0);
       };
       el.onended = stop;
-      el.onerror = stop;
-      el.play().catch(stop);
-    } catch {
+      el.onerror = () => {
+        console.error('[lesson-audio] feedback playback error', {
+          src,
+          code: el.error?.code,
+          message: el.error?.message,
+        });
+        stop();
+      };
+    } catch (err) {
+      console.error('[lesson-audio] feedback TTS failed', err);
       if (token === feedbackTokenRef.current) setFeedbackSpeaking(false);
     }
   }
@@ -110,31 +146,35 @@ function LessonLearn() {
   // ── session ───────────────────────────────────────────────────
 
   const isHistory = chapter.toLowerCase().includes('history');
+  const isLanguageLesson = usesLanguageSections(chapter);
   const videoFilename = isHistory ? unitVideoFilename(chapter) : null;
   const lessonsBackPath = subjectPathFromChapter(chapter);
+  const currentSection = isLanguageLesson ? sectionDef(unitPart) : null;
 
   function applySession(res: SessionStartResponse) {
     setTeacherText(res.teacher_text ?? '');
+    setListening(res.listening ?? null);
     setQuiz(res.quiz ?? null);
-    setUnitPart((res.unit_part ?? 0) as 0 | 1);
-    setMaxUnlocked(Math.min(1, Math.max(0, res.max_unlocked_part ?? 0)) as 0 | 1);
+    setUnitPart(clampPartIndex(chapter, res.unit_part ?? 0));
+    setMaxUnlocked(clampPartIndex(chapter, res.max_unlocked_part ?? 0));
     setFeedback(null);
     setAnswer('');
     setAnswerIndex(-1);
     setPhase('active');
   }
 
-  async function goToPart(target: 0 | 1) {
-    if (target > maxUnlocked || target === unitPart || switching) return;
+  async function goToPart(target: number) {
+    const clamped = clampPartIndex(chapter, target);
+    if (clamped > maxUnlocked || clamped === unitPart || switching) return;
     lessonAudio.pauseAndSave();
     setSwitching(true);
     setPhase('loading');
     try {
-      let res = await api.session.switchPart(studentId, target);
+      let res = await api.session.switchPart(studentId, clamped);
       // Session was lost (e.g. server reload) — restart the chapter, then retry the switch.
       if ((res as { need_restart?: boolean }).need_restart) {
         await api.session.start(studentId, chapter, lessonTitle, lessonDesc);
-        res = await api.session.switchPart(studentId, target);
+        res = await api.session.switchPart(studentId, clamped);
       }
       if ((res as { error?: string }).error) {
         setErrorMsg((res as { error?: string }).error ?? 'Could not switch part');
@@ -143,7 +183,7 @@ function LessonLearn() {
       }
       applySession(res);
       // Switching parts stays within the same unit, so unlock state must never regress.
-      setMaxUnlocked(prev => Math.max(prev, res.max_unlocked_part ?? 0) as 0 | 1);
+      setMaxUnlocked(prev => clampPartIndex(chapter, Math.max(prev, res.max_unlocked_part ?? 0)));
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : 'Could not switch part');
       setPhase('error');
@@ -160,7 +200,7 @@ function LessonLearn() {
     setErrorMsg('');
 
     api.session.start(studentId, chapter, lessonTitle, lessonDesc)
-      .then(res => {
+      .then(async res => {
         if (loadId !== sessionLoadIdRef.current) return;
         if ((res as { error?: string }).error) {
           setErrorMsg((res as { error?: string }).error ?? 'Error');
@@ -169,6 +209,24 @@ function LessonLearn() {
         }
         if (res.done) { setPhase('complete'); return; }
         applySession(res);
+
+        const targetSection = resumeSectionRaw != null
+          ? clampPartIndex(chapter, parseInt(resumeSectionRaw, 10))
+          : null;
+        if (targetSection != null && !Number.isNaN(targetSection) && targetSection !== (res.unit_part ?? 0)) {
+          try {
+            let switched = await api.session.switchPart(studentId, targetSection);
+            if ((switched as { need_restart?: boolean }).need_restart) {
+              await api.session.start(studentId, chapter, lessonTitle, lessonDesc);
+              switched = await api.session.switchPart(studentId, targetSection);
+            }
+            if (!(switched as { error?: string }).error) {
+              applySession(switched);
+            }
+          } catch {
+            /* keep session at default section */
+          }
+        }
       })
       .catch(e => {
         if (loadId !== sessionLoadIdRef.current) return;
@@ -178,22 +236,68 @@ function LessonLearn() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chapter]);
 
-  async function submitAnswer() {
-    if (!answer.trim()) return;
+  useEffect(() => {
+    if (!chapter) return;
+    api.books.lessonNav(chapter)
+      .then(res => {
+        if (res.next_lesson) {
+          setNextLesson({
+            chapter: res.next_lesson.chapter,
+            title: res.next_lesson.title,
+            description: res.next_lesson.description,
+          });
+        } else {
+          setNextLesson(nextLessonFromChapter(chapter));
+        }
+      })
+      .catch(() => setNextLesson(nextLessonFromChapter(chapter)));
+  }, [chapter]);
+
+  async function submitAnswer(audioBase64?: string) {
+    const isSpeaking = quiz?.type === 'speaking';
+    if (!isSpeaking && !answer.trim()) return;
+    if (isSpeaking && !audioBase64) return;
     lessonAudio.pauseAndSave();
     setPhase('answering');
     try {
       const res: SessionAnswerResponse = await api.session.answer(
         studentId,
-        answer,
+        isSpeaking ? (answer.trim() || quiz?.question || '') : answer,
         quiz?.options?.length ? answerIndex : undefined,
+        audioBase64,
       );
       setAnswer('');
       setAnswerIndex(-1);
       if (res.correct) {
-        const unlocked = Math.min(1, Math.max(maxUnlocked, res.max_unlocked_part ?? 0)) as 0 | 1;
+        const unlocked = clampPartIndex(chapter, Math.max(maxUnlocked, res.max_unlocked_part ?? 0));
         setMaxUnlocked(unlocked);
         if (res.message) setCompleteMsg(res.message);
+
+        if (res.next_action === 'listening_next_question') {
+          setQuiz(res.quiz ?? null);
+          if (res.listening) setListening(res.listening);
+          setFeedback({
+            text: res.evaluation?.feedback ?? res.advance_text ?? 'Correct!',
+            kind: 'correct',
+            nextAction: 'listening_next_question',
+          });
+          setPhase('active');
+          return;
+        }
+
+        if (res.next_action === 'listening_activity') {
+          setTeacherText(res.teacher_text ?? res.listening?.transcript ?? '');
+          if (res.listening) setListening(res.listening);
+          setQuiz(res.quiz ?? null);
+          setFeedback({
+            text: res.message ?? 'Now listen to the story and answer the questions.',
+            kind: 'correct',
+            nextAction: 'listening_activity',
+          });
+          setPhase('active');
+          return;
+        }
+
         setFeedback({
           text: res.message ?? res.advance_text ?? 'Great job!',
           kind: 'correct',
@@ -222,6 +326,11 @@ function LessonLearn() {
     if (!feedback) return;
     const action = feedback.nextAction;
     lessonAudio.pauseAndSave();
+    if (action === 'listening_next_question' || action === 'listening_activity') {
+      setFeedback(null);
+      setPhase('active');
+      return;
+    }
     if (action === 'all_complete' || action === 'lesson_complete') { setPhase('complete'); return; }
     setPhase('loading');
     try {
@@ -240,9 +349,12 @@ function LessonLearn() {
     } catch { setPhase('complete'); }
   }
 
-  const paragraphs  = lessonParagraphs(teacherText);
+  const paragraphs  = lessonParagraphs(isListeningMode ? storyText : teacherText);
   const canListen = paragraphs.length > 0;
-  const nextLesson = nextLessonFromChapter(chapter);
+  const listeningTitle = listening?.title;
+  const listeningQuestionLabel = quiz?.type === 'listening' && quiz.listening_question_total
+    ? `Question ${(quiz.listening_question_index ?? 0) + 1} of ${quiz.listening_question_total}`
+    : null;
 
   function goToNextLesson() {
     if (!nextLesson) return;
@@ -257,76 +369,106 @@ function LessonLearn() {
   const hasFeedback = phase === 'hint' || phase === 'remediation' || phase === 'correct';
   const canRetry    = phase === 'hint' || phase === 'remediation';
 
+  const audioStatusText =
+    lessonAudio.audioState === 'loading'
+      ? 'Preparing audio…'
+      : lessonAudio.audioState === 'speaking'
+        ? (isListeningMode ? 'Reading the story aloud…' : 'Reading lesson aloud…')
+        : lessonAudio.audioState === 'transitioning'
+          ? 'Next part…'
+          : lessonAudio.audioState === 'paused'
+            ? 'Paused — pick up where you left off'
+            : lessonAudio.audioState === 'completed'
+              ? 'Lesson audio finished'
+              : 'Press Read Aloud to start';
+
+  const segsForProgress = lessonAudio.segments.length ? lessonAudio.segments : paragraphs;
+  const lessonProgressPct = (() => {
+    if (!segsForProgress.length) return 0;
+    if (lessonAudio.audioState === 'completed') return 100;
+    if (lessonAudio.currentSegment < 0) return 0;
+    const base = lessonAudio.currentSegment / segsForProgress.length;
+    const part = lessonAudio.segmentProgress / segsForProgress.length;
+    return Math.min(100, Math.round((base + part) * 100));
+  })();
+
+  const learningCardTitle = (() => {
+    if (isListeningMode) return 'Listening Time';
+    if (isSpeakingMode) return 'Pronunciation Time';
+    if (isLanguageLesson && currentSection) {
+      if (currentSection.key === 'grammar') return 'Grammar Time';
+      if (currentSection.key === 'reading') return 'Reading Time';
+    }
+    return 'Learning Time';
+  })();
+
+  const tutorBubbleText =
+    hasFeedback && feedback?.kind === 'hint'
+      ? "Here's a hint — read it below!"
+      : hasFeedback && feedback?.kind === 'correct'
+        ? 'Great job! You got it!'
+        : quiz && phase === 'active'
+          ? "Let's think together! What do you think is the best answer?"
+          : avatarSpeaking
+            ? audioStatusText
+            : "I'm here to help you learn!";
+
+  const continueLabel = (() => {
+    if (feedback?.nextAction === 'all_complete' || feedback?.nextAction === 'lesson_complete') {
+      return 'Finish Lesson';
+    }
+    if (feedback?.nextAction === 'continue_unit_part2') {
+      if (isLanguageLesson) {
+        const next = sectionDef(unitPart + 1);
+        return `Continue to ${next.title}`;
+      }
+      return 'Continue to Part 2';
+    }
+    return 'Next';
+  })();
+
   // ── render ────────────────────────────────────────────────────
 
   return (
     <div className="page-enter lesson-page">
 
       {/* Breadcrumb header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div className="lesson-page__header">
+        <div className="lesson-breadcrumb">
           <button
+            type="button"
+            className="lesson-breadcrumb__back"
             onClick={() => { lessonAudio.abort(); router.push(lessonsBackPath); }}
-            style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '5px 14px', color: 'var(--g2)', cursor: 'pointer', fontSize: 12, fontFamily: 'var(--fb)' }}
           >
-            ← Back to Lessons
+            <ChevronLeft size={16} aria-hidden />
+            Back to Lessons
           </button>
-          <span style={{ fontSize: 13, color: 'var(--g5)' }}>/</span>
-          <span style={{ fontSize: 13, color: 'var(--vl)', fontWeight: 600 }}>{subjectLabel}</span>
-          <span style={{ fontSize: 13, color: 'var(--g5)' }}>/</span>
-          <span style={{ fontSize: 13, color: 'var(--w)' }}>{unitLabel}</span>
+          <span className="lesson-breadcrumb__sep">/</span>
+          <span className="lesson-breadcrumb__subject">{subjectLabel}</span>
+          <span className="lesson-breadcrumb__sep">/</span>
+          <span className="lesson-breadcrumb__unit">{unitLabel}</span>
         </div>
 
-        {/* Part progress pills — click to switch unlocked parts.
-            History has NO parts (one lesson = one unit), so pills are hidden. */}
         {!isHistory && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 10, color: 'var(--g4)', textTransform: 'uppercase', letterSpacing: '.06em' }}>
-            Part {unitPart + 1} of 2
-          </span>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {([0, 1] as const).map(p => {
-              const unlocked = p <= maxUnlocked;
-              const active = p === unitPart;
-              return (
-                <button
-                  key={p}
-                  type="button"
-                  disabled={!unlocked || active || switching}
-                  onClick={() => goToPart(p)}
-                  title={unlocked ? `Go to Part ${p + 1}` : `Pass Part ${p} quiz to unlock`}
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: 99,
-                    fontSize: 10,
-                    fontWeight: 700,
-                    cursor: unlocked && !active ? 'pointer' : 'default',
-                    border: `1px solid ${active ? 'var(--vl)' : unlocked ? 'rgba(255,255,255,.2)' : 'rgba(255,255,255,.08)'}`,
-                    background: active ? 'rgba(91,33,245,.35)' : unlocked ? 'rgba(255,255,255,.06)' : 'transparent',
-                    color: active ? 'var(--w)' : unlocked ? 'var(--g2)' : 'var(--g5)',
-                    opacity: unlocked ? 1 : 0.5,
-                  }}
-                >
-                  {unlocked ? '' : '🔒 '}Part {p + 1}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+          <LessonSectionNav
+            chapterId={chapter}
+            unitPart={unitPart}
+            maxUnlocked={maxUnlocked}
+            switching={switching}
+            onSelect={goToPart}
+          />
         )}
       </div>
 
       {/* Loading / answering spinner */}
       {(phase === 'loading' || phase === 'answering') && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '100px 0' }}>
+        <div className="lesson-loading">
           <div className="modal-spinner" />
-          <div style={{ marginTop: 18, color: 'var(--g3)', fontSize: 13 }}>
+          <div className="lesson-loading__text">
             {phase === 'answering' ? 'Checking your answer…' : 'Loading lesson…'}
           </div>
           {phase === 'loading' && (
-            <div style={{ marginTop: 8, color: 'var(--g5)', fontSize: 11 }}>
-              Connecting to the server…
-            </div>
+            <div className="lesson-loading__sub">Connecting to the server…</div>
           )}
         </div>
       )}
@@ -345,61 +487,55 @@ function LessonLearn() {
           )}
 
           {/* Teaching content card */}
-          <div className="lesson-card board-card" style={{ overflow: 'hidden', marginBottom: 32 }}>
-            {/* Card top bar */}
+          <div className="lesson-card">
             <div className="lesson-card__header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{
-                  width: 36, height: 36, borderRadius: '50%', flexShrink: 0, fontSize: 16,
-                  background: 'linear-gradient(135deg,#3D1FA8,#5B21F5)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  border: avatarSpeaking ? '2px solid var(--mint)' : '2px solid rgba(255,255,255,.12)',
-                  boxShadow: avatarSpeaking ? '0 0 14px rgba(0,229,160,.3)' : 'none',
-                  transition: 'all .3s',
-                }}>🧑‍🏫</div>
+              <div className="lesson-card__title-row">
+                <div className={`lesson-card__icon${avatarSpeaking ? ' lesson-card__icon--speaking' : ''}`}>
+                  <BookOpen size={22} aria-hidden />
+                </div>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--vl)' }}>Jassmine · AI Tutor</div>
-                  <div style={{ fontSize: 10, color: avatarSpeaking ? 'var(--mint)' : 'var(--g4)', transition: 'color .3s' }}>
-                    {lessonAudio.audioState === 'loading'
-                      ? 'Preparing audio…'
-                      : lessonAudio.audioState === 'speaking'
-                        ? 'Reading lesson aloud…'
-                        : lessonAudio.audioState === 'transitioning'
-                          ? 'Next part…'
-                          : lessonAudio.audioState === 'paused'
-                            ? 'Paused — pick up where you left off'
-                            : lessonAudio.audioState === 'completed'
-                              ? 'Lesson audio finished'
-                              : 'AI-guided lesson'}
+                  <div className="lesson-card__title">
+                    {learningCardTitle}
                   </div>
+                  <div className="lesson-card__subtitle">{audioStatusText}</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              <div className="lesson-card__controls">
+                <div className="lesson-card__control-row">
                   {lessonAudio.audioState === 'idle' && (
                     <button
-                      className="btn btn-o btn-sm"
+                      type="button"
+                      className="lesson-ctrl-btn"
                       onClick={lessonAudio.listen}
                       disabled={!canListen}
                     >
-                      🔊 Listen
+                      <Volume2 size={16} aria-hidden />
+                      Read Aloud
                     </button>
                   )}
                   {(lessonAudio.audioState === 'speaking'
                     || lessonAudio.audioState === 'loading'
                     || lessonAudio.audioState === 'transitioning') && (
-                    <button className="btn btn-o btn-sm" onClick={lessonAudio.pause}>
-                      ⏸ Pause
+                    <button type="button" className="lesson-ctrl-btn" onClick={lessonAudio.pause}>
+                      <Pause size={16} aria-hidden />
+                      Pause
                     </button>
                   )}
                   {lessonAudio.audioState === 'paused' && (
-                    <button className="btn btn-o btn-sm" onClick={lessonAudio.continuePlayback}>
-                      ▶ Continue
+                    <button type="button" className="lesson-ctrl-btn" onClick={lessonAudio.continuePlayback}>
+                      <Play size={16} aria-hidden />
+                      Continue
                     </button>
                   )}
                   {lessonAudio.audioState === 'completed' && (
-                    <button className="btn btn-o btn-sm" onClick={lessonAudio.listen} disabled={!canListen}>
-                      🔊 Listen Again
+                    <button
+                      type="button"
+                      className="lesson-ctrl-btn"
+                      onClick={lessonAudio.listen}
+                      disabled={!canListen}
+                    >
+                      <Volume2 size={16} aria-hidden />
+                      Read Again
                     </button>
                   )}
                   {(lessonAudio.audioState === 'speaking'
@@ -408,24 +544,27 @@ function LessonLearn() {
                     || lessonAudio.audioState === 'paused'
                     || lessonAudio.audioState === 'completed'
                     || lessonAudio.hasSavedProgress) && (
-                    <button
-                      className="btn btn-o btn-sm"
-                      onClick={lessonAudio.restart}
-                      style={{ opacity: 0.9 }}
-                    >
-                      ↺ Restart Lesson
+                    <button type="button" className="lesson-ctrl-btn" onClick={lessonAudio.restart}>
+                      <RotateCcw size={16} aria-hidden />
+                      Restart
                     </button>
                   )}
                 </div>
                 {lessonAudio.ttsError && (
-                  <div style={{ fontSize: 10, color: '#ff7070', maxWidth: 220, textAlign: 'right', lineHeight: 1.3 }}>
+                  <div style={{ fontSize: 12, color: 'var(--color-error-text)', maxWidth: 220, textAlign: 'right', lineHeight: 1.3 }}>
                     {lessonAudio.ttsError}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Lesson whiteboard — text appears word-by-word as Jassmine speaks */}
+            {isListeningMode && listeningTitle && (
+              <div className="lesson-listening-banner">
+                <div className="lesson-listening-banner__label">Listening Activity</div>
+                <div className="lesson-listening-banner__title">{listeningTitle}</div>
+              </div>
+            )}
+
             <div className="lesson-whiteboard">
               <div className="lesson-whiteboard__outer">
                 <div className="lesson-whiteboard__inner">
@@ -438,14 +577,12 @@ function LessonLearn() {
 
                       if (!started) {
                         return (
-                          <div style={{
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                            minHeight: 124, textAlign: 'center', color: '#8a93a3',
-                            fontFamily: "var(--font-roboto),'Helvetica Neue',Arial,sans-serif",
-                          }}>
-                            <div style={{ fontSize: 34, marginBottom: 10 }}>📝</div>
-                            <div style={{ fontSize: 14, fontWeight: 500 }}>
-                              Press <strong style={{ color: '#5B21F5' }}>🔊 Listen</strong> and the lesson will appear here as Jassmine teaches.
+                          <div className="lesson-reading-empty">
+                            <div className="lesson-reading-empty__icon">
+                              <BookOpen size={26} aria-hidden />
+                            </div>
+                            <div className="lesson-reading-empty__text">
+                              Press <strong>Read Aloud</strong> and the lesson will appear here as Jasmine teaches.
                             </div>
                           </div>
                         );
@@ -457,22 +594,22 @@ function LessonLearn() {
                         let content = seg;
                         if (isCurrent) {
                           const words = seg.split(/\s+/).filter(Boolean);
-                          const shown = Math.max(0, Math.min(words.length, Math.round(lessonAudio.segmentProgress * words.length)));
+                          let shown = Math.floor(lessonAudio.segmentProgress * words.length);
+                          // First word appears with audio — never wait for a later progress tick.
+                          if (
+                            shown === 0 &&
+                            words.length > 0 &&
+                            (lessonAudio.audioState === 'speaking' || lessonAudio.segmentProgress > 0)
+                          ) {
+                            shown = 1;
+                          }
                           content = words.slice(0, shown).join(' ');
                         }
                         return (
-                          <p key={i} style={{
-                            fontFamily: "var(--font-roboto),'Helvetica Neue',Arial,sans-serif",
-                            fontSize: 16.5,
-                            lineHeight: 1.85,
-                            color: '#1f2733',
-                            margin: 0,
-                            marginBottom: i < segs.length - 1 ? 16 : 0,
-                            animation: 'wb-fade .25s ease',
-                          }}>
+                          <p key={i} className="lesson-reading-p">
                             {content}
                             {isCurrent && content.length > 0 && (
-                              <span style={{ color: '#5B21F5', fontWeight: 700, animation: 'wb-caret 1s steps(1) infinite', marginLeft: 1 }}>▍</span>
+                              <span className="lesson-reading-caret">▍</span>
                             )}
                           </p>
                         );
@@ -482,120 +619,138 @@ function LessonLearn() {
                 </div>
               </div>
             </div>
+
+            <div className="lesson-progress-footer">
+              <div className="lesson-progress-footer__row">
+                <BookOpen size={18} className="lesson-progress-footer__icon" aria-hidden />
+                <span className="lesson-progress-footer__text">
+                  {lessonProgressPct >= 100
+                    ? "Great job! You've finished reading."
+                    : "Great job! You're making progress"}
+                </span>
+              </div>
+              <div className="lesson-progress-bar" role="progressbar" aria-valuenow={lessonProgressPct} aria-valuemin={0} aria-valuemax={100}>
+                <div className="lesson-progress-bar__fill" style={{ width: `${lessonProgressPct}%` }} />
+              </div>
+            </div>
           </div>
-          <style>{`@keyframes wb-fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}@keyframes wb-caret{0%,50%{opacity:1}50.01%,100%{opacity:0}}`}</style>
 
           {/* AI-generated interactive images — 2 per History lesson */}
-          {isHistory && teacherText && (
+          {isHistory && teacherText && !isListeningMode && (
             <HistoryInteractiveImages unitId={chapter} teacherText={teacherText} />
           )}
 
           {/* Quiz section */}
           {quiz && (
-            <>
-              {/* Section divider */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
-                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,.07)' }} />
-                <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.1em', color: 'var(--g4)' }}>Quiz</span>
-                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,.07)' }} />
+            <div className="lesson-quiz-section">
+              <div className="lesson-quiz-divider">
+                <div className="lesson-quiz-divider__line" />
+                <span className="lesson-quiz-divider__label">
+                  {isListeningMode ? 'Listening Questions' : 'Quiz Time'}
+                </span>
+                <div className="lesson-quiz-divider__line" />
               </div>
 
-              {/* Question card */}
-              <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 18, padding: '22px 28px', marginBottom: 20 }}>
-                <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.1em', color: 'var(--sky)', marginBottom: 14 }}>Question</div>
-                <div style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.55, color: 'var(--w)' }}>{quiz.question}</div>
+              <div className="lesson-quiz-card">
+                <div className="lesson-quiz-card__meta">
+                  {listeningQuestionLabel ?? 'Question'}
+                </div>
+                <div className="lesson-quiz-card__question">{quiz.question}</div>
               </div>
 
-              {/* Multiple choice options */}
               {quiz.options && quiz.options.length > 0 ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 24 }}>
+                <div className="lesson-quiz-options">
                   {quiz.options.map((opt, idx) => {
                     const sel = answer === opt;
                     return (
                       <button
                         key={opt}
+                        type="button"
                         onClick={() => { if (phase !== 'correct') { setAnswer(opt); setAnswerIndex(idx); } }}
-                        style={{
-                          padding: '16px 18px', borderRadius: 14, textAlign: 'left', cursor: phase === 'correct' ? 'default' : 'pointer',
-                          border: `1px solid ${sel ? 'rgba(91,33,245,.55)' : 'rgba(255,255,255,.08)'}`,
-                          background: sel ? 'rgba(91,33,245,.2)' : 'rgba(255,255,255,.03)',
-                          display: 'flex', alignItems: 'flex-start', gap: 12, transition: 'all .15s',
-                        }}
+                        disabled={phase === 'correct'}
+                        className={['lesson-quiz-option', sel ? 'lesson-quiz-option--selected' : ''].filter(Boolean).join(' ')}
                       >
-                        <span style={{
-                          width: 26, height: 26, borderRadius: 8, flexShrink: 0, fontSize: 11, fontWeight: 800, marginTop: 1,
-                          background: sel ? 'var(--vl)' : 'rgba(255,255,255,.08)',
-                          color: sel ? 'white' : 'var(--g3)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s',
-                        }}>
+                        <span className="lesson-quiz-option__badge">
                           {String.fromCharCode(65 + idx)}
                         </span>
-                        <span style={{ fontSize: 14, color: 'var(--w)', lineHeight: 1.45 }}>{opt}</span>
+                        <span className="lesson-quiz-option__text">{opt}</span>
                       </button>
                     );
                   })}
                 </div>
+              ) : isSpeakingMode ? (
+                <PronunciationRecorder
+                  sentence={quiz.question}
+                  disabled={phase === 'correct'}
+                  onRecorded={b64 => submitAnswer(b64)}
+                />
               ) : (
-                /* Open-ended text input */
-                <div style={{ marginBottom: 24 }}>
+                <div className="lesson-quiz-open">
                   <textarea
-                    rows={4} className="field-input"
+                    rows={4}
+                    className="field-input"
                     placeholder="Type your answer here…"
-                    value={answer} onChange={e => setAnswer(e.target.value)}
+                    value={answer}
+                    onChange={e => setAnswer(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && e.ctrlKey) submitAnswer(); }}
                     style={{ resize: 'vertical', display: 'block', width: '100%' }}
                     disabled={phase === 'correct'}
                   />
-                  <div style={{ fontSize: 10, color: 'var(--g5)', marginTop: 5 }}>Ctrl + Enter to submit</div>
+                  <div className="lesson-quiz-open__hint">Ctrl + Enter to submit</div>
                 </div>
               )}
 
-              {/* Inline feedback */}
               {hasFeedback && feedback && (
-                <div style={{
-                  borderRadius: 14, padding: '16px 20px', marginBottom: 22,
-                  border: `1px solid ${feedback.kind === 'correct' ? 'rgba(0,229,160,.22)' : feedback.kind === 'hint' ? 'rgba(59,191,255,.22)' : 'rgba(255,184,48,.22)'}`,
-                  background: `${feedback.kind === 'correct' ? 'rgba(0,229,160,.06)' : feedback.kind === 'hint' ? 'rgba(59,191,255,.06)' : 'rgba(255,184,48,.06)'}`,
-                }}>
-                  <div style={{
-                    fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 9,
-                    color: feedback.kind === 'correct' ? 'var(--mint)' : feedback.kind === 'hint' ? 'var(--sky)' : 'var(--amber)',
-                  }}>
-                    {feedback.kind === 'correct' ? '✅ Correct!' : feedback.kind === 'hint' ? `Hint ${(feedback.hintCount ?? 0) + 1}` : 'Let me explain that again'}
+                <div className={`lesson-feedback lesson-feedback--${feedback.kind}`}>
+                  <div className="lesson-feedback__label">
+                    {feedback.kind === 'correct'
+                      ? 'Correct!'
+                      : feedback.kind === 'hint'
+                        ? `Hint ${(feedback.hintCount ?? 0) + 1}`
+                        : 'Let me explain that again'}
                   </div>
-                  <div style={{ fontSize: 13.5, lineHeight: 1.75, color: 'var(--w)' }}>{feedback.text}</div>
+                  <div className="lesson-feedback__text">{feedback.text}</div>
                 </div>
               )}
 
-              {/* Action button */}
-              {phase === 'correct'
-                ? (
-                  <button className="auth-submit" onClick={handleNext}>
-                    {feedback?.nextAction === 'all_complete' || feedback?.nextAction === 'lesson_complete' ? '🎉 Finish Lesson'
-                      : feedback?.nextAction === 'continue_unit_part2' ? 'Continue to Part 2 →'
-                      : 'Next →'}
-                  </button>
-                ) : (
-                  <button className="auth-submit" onClick={submitAnswer} disabled={!answer.trim()}>
-                    {canRetry ? 'Try Again →' : 'Submit Answer →'}
-                  </button>
-                )
-              }
-            </>
+              {phase === 'correct' ? (
+                <button type="button" className="lesson-submit-btn" onClick={handleNext}>
+                  {continueLabel}
+                  <ArrowRight size={18} aria-hidden />
+                </button>
+              ) : !isSpeakingMode ? (
+                <button
+                  type="button"
+                  className="lesson-submit-btn"
+                  onClick={() => submitAnswer()}
+                  disabled={!answer.trim()}
+                >
+                  {canRetry ? 'Try Again' : 'Submit Answer'}
+                  <ArrowRight size={18} aria-hidden />
+                </button>
+              ) : null}
+            </div>
           )}
 
-          {/* No quiz — just Continue */}
           {!quiz && phase === 'active' && (
-            <div style={{ textAlign: 'center' }}>
-              <button className="auth-submit" style={{ maxWidth: 320, margin: '0 auto' }} onClick={handleNext}>
-                Continue →
+            <div className="lesson-continue-wrap">
+              <button type="button" className="lesson-submit-btn" onClick={handleNext}>
+                Continue
+                <ArrowRight size={18} aria-hidden />
               </button>
             </div>
           )}
           </div>
 
           <aside className={`teacher-stage${avatarSpeaking ? ' teacher-stage--speaking' : ''}`}>
-            <div className="avatar-wrapper">
+            <p className="lesson-tutor__greeting">
+              Hi! I&apos;m Jasmine — Your AI Learning Buddy
+            </p>
+            <div className="lesson-tutor__bubble">{tutorBubbleText}</div>
+            <div
+              className="avatar-wrapper"
+              style={{ width: '100%', maxWidth: 420, height: 400, minHeight: 400 }}
+            >
               <AvatarWidget variant="lesson" />
             </div>
           </aside>
@@ -604,33 +759,38 @@ function LessonLearn() {
 
       {/* Complete */}
       {phase === 'complete' && (
-        <div style={{ textAlign: 'center', padding: '80px 0' }}>
-          <div style={{ fontSize: 60, marginBottom: 18 }}>🎉</div>
-          <div style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 26, marginBottom: 10 }}>Lesson Complete!</div>
-          <div style={{ fontSize: 14, color: 'var(--g3)', marginBottom: 36 }}>
+        <div className="lesson-complete">
+          <div className="lesson-complete__emoji" aria-hidden>🎉</div>
+          <div className="lesson-complete__title">Lesson Complete!</div>
+          <div className="lesson-complete__msg">
             {completeMsg || (
-              <>Great work on <strong style={{ color: 'var(--vl)' }}>{subjectLabel}</strong>. Your progress has been saved.</>
+              <>Great work on <strong>{subjectLabel}</strong>. Your progress has been saved.</>
             )}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+          <div className="lesson-complete__actions">
+            <div className="lesson-complete__row">
               {!isHistory && (
-              <button className="btn btn-v" onClick={() => {
-                setPhase('loading');
-                api.session.start(studentId, chapter)
-                  .then(r => { if (!r.done) applySession(r); else setPhase('complete'); })
-                  .catch(() => setPhase('complete'));
-              }}>
+              <button
+                type="button"
+                className="btn btn-v"
+                onClick={() => {
+                  setPhase('loading');
+                  api.session.start(studentId, chapter)
+                    .then(r => { if (!r.done) applySession(r); else setPhase('complete'); })
+                    .catch(() => setPhase('complete'));
+                }}
+              >
                 Start Next Unit
               </button>
               )}
-              <button className="btn btn-o" onClick={() => { lessonAudio.abort(); router.push(lessonsBackPath); }}>
-                ← Back to Lessons
+              <button type="button" className="btn btn-o" onClick={() => { lessonAudio.abort(); router.push(lessonsBackPath); }}>
+                Back to Lessons
               </button>
             </div>
             {nextLesson && (
-              <button className="btn btn-v" onClick={goToNextLesson} style={{ minWidth: 260 }}>
-                Next Lesson: {nextLesson.title} →
+              <button type="button" className="btn btn-v" onClick={goToNextLesson} style={{ minWidth: 260 }}>
+                Next Lesson: {nextLesson.title}
+                <ArrowRight size={16} style={{ marginLeft: 6 }} aria-hidden />
               </button>
             )}
           </div>

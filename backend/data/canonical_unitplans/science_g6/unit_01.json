@@ -1,0 +1,89 @@
+{
+  "unit_title": "Introduction to Science",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "Basics of science",
+        "Grade 6 science",
+        "Introduction to scientific concepts"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "Understanding basics of science",
+        "Identifying Grade 6 science topics",
+        "Grasping scientific concepts"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "other",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "Basics of science",
+        "Grade 6 science",
+        "Scientific concepts"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "vocab",
+      "title": "Scientific Vocabulary",
+      "must_cover": true,
+      "keywords": [
+        "Hypothesis",
+        "Experiment",
+        "Observation"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": [
+        "Science lab equipment illustration",
+        "Scientific method flowchart"
+      ]
+    },
+    {
+      "id": "6",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "Conducting a simple experiment",
+        "Hands-on activity on observation"
+      ]
+    },
+    {
+      "id": "7",
+      "type": "wrap_up",
+      "title": "Summary/Wrap-up",
+      "must_cover": true,
+      "keywords": [
+        "Recap of key concepts",
+        "Review of scientific vocabulary"
+      ]
+    },
+    {
+      "id": "8",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": [
+        "Multiple-choice questions on basics of science",
+        "Short answer questions on scientific concepts"
+      ]
+    }
+  ]
+}

@@ -27,10 +27,11 @@ async function request<T>(
 ): Promise<T> {
   const maxAttempts = 1 + (opts.retries ?? 0);
   let lastErr: unknown;
+  const isAuthRequest = path === '/auth/login' || path === '/auth/register';
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
-      const token = getToken();
+      const token = isAuthRequest ? null : getToken();
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -38,14 +39,21 @@ async function request<T>(
       };
       const res = await fetch(`${BASE}${path}`, { ...init, headers });
       if (res.status === 401) {
-        if (typeof window !== 'undefined') {
+        if (!isAuthRequest && typeof window !== 'undefined') {
           localStorage.removeItem('malsy_token');
           localStorage.removeItem('malsy_user');
           if (!window.location.pathname.startsWith('/login')) {
             window.location.replace('/login?expired=1');
           }
         }
-        throw new Error('Your session has expired. Please sign in again.');
+        const body = await res.json().catch(() => ({ detail: res.statusText }));
+        const detail = (body as { detail?: unknown }).detail;
+        const msg = typeof detail === 'string'
+          ? detail
+          : isAuthRequest
+            ? 'Login failed. Check your credentials.'
+            : 'Your session has expired. Please sign in again.';
+        throw new Error(msg);
       }
       if (!res.ok) {
         const body = await res.json().catch(() => ({ detail: res.statusText }));
@@ -98,10 +106,33 @@ export interface RegisterPayload {
 
 export interface MySubjectRead {
   subject_id: string;
+  subject_key?: string;
   subject_name: string;
   subject_code: string;
   subject_type?: string;
-  enrolled_sessions_count: number;
+  enrolled_sessions_count?: number;
+  available_lessons_count: number;
+  icon?: string;
+  grade?: number;
+  primary_book_id?: string;
+  route?: string;
+  scheduled_today?: boolean;
+}
+
+export interface StudentPortalSubjectRead {
+  subject_id: string;
+  subject_key: string;
+  subject_name: string;
+  subject_code: string;
+  subject_type?: string;
+  icon: string;
+  grade: number;
+  primary_book_id?: string | null;
+  route: string;
+  enrolled_sessions_count?: number;
+  available_lessons_count: number;
+  scheduled_today: boolean;
+  search_terms?: string[];
 }
 
 export interface ScheduleSessionRead {
@@ -116,9 +147,27 @@ export interface ScheduleSessionRead {
   is_active: boolean;
 }
 
+export interface EnrollmentRead {
+  enrollment_id: string;
+  schedule: ScheduleSessionRead;
+  enrollment_status?: string;
+}
+
+export interface LessonScheduleSessionRead {
+  schedule_item_id: string;
+  lesson_id: string;
+  lesson_title: string;
+  subject_id: string;
+  subject_name: string;
+  subject_key: string;
+  order_index: number;
+  status: 'locked' | 'available' | 'completed' | 'missed';
+  day_of_week: string;
+}
+
 export interface WeekDayRead {
   day_of_week: string;
-  sessions: ScheduleSessionRead[];
+  sessions: LessonScheduleSessionRead[];
 }
 
 export interface LessonEvaluationRead {
@@ -163,6 +212,26 @@ export interface Quiz {
   type?: string;
   options?: string[];
   expected_points?: string[];
+  listening_question_index?: number;
+  listening_question_total?: number;
+  explanation?: string;
+  skill?: string;
+}
+
+export interface ListeningQuestion {
+  id?: string;
+  question?: string;
+  options?: string[];
+  skill?: string;
+}
+
+export interface ListeningActivity {
+  unit_id?: string;
+  title?: string;
+  transcript?: string;
+  narration_text?: string;
+  questions?: ListeningQuestion[];
+  word_count?: number;
 }
 
 export interface HistoryLessonCard {
@@ -193,6 +262,58 @@ export interface BookLessonProgress {
   completed_lesson_numbers: number[];
 }
 
+export interface LessonNavResponse {
+  lesson: {
+    chapter_id: string;
+    book_id: string;
+    title: string;
+    description?: string;
+    lesson_number?: number;
+    part_count?: number;
+    uses_language_sections?: boolean;
+    source?: string;
+  };
+  next_lesson: {
+    chapter: string;
+    title: string;
+    description: string;
+  } | null;
+}
+
+export interface ContinueLearningSectionRead {
+  index: number;
+  key: string;
+  title: string;
+  completed: boolean;
+  active: boolean;
+}
+
+export interface ContinueLearningSubjectRead {
+  subject_id?: string;
+  subject_key: string;
+  subject_name: string;
+  book_id?: string | null;
+  unlocked: boolean;
+  locked: boolean;
+  chapter_id?: string | null;
+  lesson_title?: string | null;
+  lesson_number?: number | null;
+  unit_part: number;
+  section_title?: string | null;
+  progress_percent: number;
+  section_statuses?: ContinueLearningSectionRead[];
+  updated_at?: string | null;
+  continue_available: boolean;
+  icon?: string | null;
+  available_lessons_count?: number;
+}
+
+export interface ContinueLearningRead {
+  student_id: string;
+  subjects: ContinueLearningSubjectRead[];
+  primary?: ContinueLearningSubjectRead | null;
+}
+
 export interface InteractiveImageCard {
   id?: string;
   tap_label: string;
@@ -214,6 +335,7 @@ export interface SessionStartResponse {
   done: boolean;
   teacher_text?: string;
   quiz?: Quiz;
+  listening?: ListeningActivity;
   next_action?: string;
   session_units?: unknown[];
   unit_part?: number;
@@ -235,6 +357,8 @@ export interface SessionAnswerResponse {
   remediation_text?: string;
   advance_text?: string;
   next_action?: string;
+  teacher_text?: string;
+  listening?: ListeningActivity;
   max_unlocked_part?: number;
   max_unlocked_lesson_index?: number;
   completed_lesson_numbers?: number[];
@@ -283,8 +407,19 @@ export interface LabSession {
 
 export const api = {
   auth: {
-    login: (email: string, password: string) =>
-      request<Token>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+    login: (email: string, password: string) => {
+      const payload = { email: email.trim(), password };
+      console.info('[auth.login] endpoint:', `${BASE}/auth/login`);
+      console.info('[auth.login] payload keys:', Object.keys(payload));
+      console.info('[auth.login] role:', 'student');
+      if (!payload.email || !payload.password) {
+        return Promise.reject(new Error('Please enter your email and password.'));
+      }
+      return request<Token>('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+    },
     register: (data: RegisterPayload) =>
       request<UserRead>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
     me: () => request<UserRead>('/auth/me'),
@@ -294,12 +429,23 @@ export const api = {
     subjects: () => request<MySubjectRead[]>('/dashboard/my-subjects'),
     week: () => request<WeekDayRead[]>('/dashboard/my-week'),
     nextSession: () => request<ScheduleSessionRead | null>('/dashboard/next-session'),
+    continueLearning: () => request<ContinueLearningRead>('/dashboard/continue-learning'),
+  },
+
+  portal: {
+    subjects: () => request<StudentPortalSubjectRead[]>('/portal/subjects'),
+    search: (q: string) =>
+      request<StudentPortalSubjectRead[]>(`/portal/search?q=${encodeURIComponent(q)}`),
   },
 
   evaluations: {
     mine: () => request<LessonEvaluationRead[]>('/evaluations/me'),
     create: (data: EvaluationCreate) =>
       request<LessonEvaluationRead>('/evaluations', { method: 'POST', body: JSON.stringify(data) }),
+  },
+
+  enrollments: {
+    mine: () => request<EnrollmentRead[]>('/enrollments/me'),
   },
 
   // AI teacher session (single-student in-memory)
@@ -318,13 +464,14 @@ export const api = {
         },
         { retries: 4 },
       ),
-    answer: (studentId: string, studentAnswer: string, optionIndex?: number) =>
+    answer: (studentId: string, studentAnswer: string, optionIndex?: number, audioBase64?: string) =>
       request<SessionAnswerResponse>('/session/answer', {
         method: 'POST',
         body: JSON.stringify({
           student_id: studentId,
           student_answer: studentAnswer,
           option_index: optionIndex != null && optionIndex >= 0 ? optionIndex : undefined,
+          audio_base64: audioBase64,
         }),
       }),
     continuePart2: (studentId: string) =>
@@ -332,7 +479,7 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ student_id: studentId }),
       }),
-    switchPart: (studentId: string, targetPart: 0 | 1) =>
+    switchPart: (studentId: string, targetPart: number) =>
       request<SessionStartResponse>('/session/switch_part', {
         method: 'POST',
         body: JSON.stringify({ student_id: studentId, target_part: targetPart }),
@@ -352,6 +499,8 @@ export const api = {
       request<BookLessonProgress>(
         `/books/${encodeURIComponent(bookId)}/lesson-progress?student_id=${encodeURIComponent(studentId)}`,
       ),
+    lessonNav: (chapterId: string) =>
+      request<LessonNavResponse>(`/books/lesson-nav/${encodeURIComponent(chapterId)}`),
   },
 
   lesson: {

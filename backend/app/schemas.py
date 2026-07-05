@@ -1,8 +1,8 @@
 import uuid
 from datetime import date, datetime, time
-from typing import Optional
+from typing import Dict, List, Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 # ─── Auth ───────────────────────────────────────────────────────────────────
@@ -286,10 +286,67 @@ class NotificationRead(BaseModel):
 
 class MySubjectRead(BaseModel):
     subject_id: uuid.UUID
+    subject_key: str = ""
     subject_name: str
     subject_code: str
     subject_type: Optional[str] = None
-    enrolled_sessions_count: int
+    enrolled_sessions_count: int = 0  # deprecated: use available_lessons_count
+    available_lessons_count: int = 0
+    icon: Optional[str] = None
+    grade: Optional[int] = None
+    primary_book_id: Optional[str] = None
+    route: Optional[str] = None
+    scheduled_today: bool = False
+
+
+class StudentPortalSubjectRead(BaseModel):
+    subject_id: uuid.UUID
+    subject_key: str
+    subject_name: str
+    subject_code: str
+    subject_type: Optional[str] = None
+    icon: str = "📖"
+    grade: int = 6
+    primary_book_id: Optional[str] = None
+    route: str
+    enrolled_sessions_count: int = 0  # deprecated: use available_lessons_count
+    available_lessons_count: int = 0
+    scheduled_today: bool = False
+    search_terms: List[str] = Field(default_factory=list)
+
+
+class ContinueLearningSectionRead(BaseModel):
+    index: int
+    key: str
+    title: str
+    completed: bool = False
+    active: bool = False
+
+
+class ContinueLearningSubjectRead(BaseModel):
+    subject_id: str = ""
+    subject_key: str
+    subject_name: str
+    book_id: Optional[str] = None
+    unlocked: bool = True
+    locked: bool = False
+    chapter_id: Optional[str] = None
+    lesson_title: Optional[str] = None
+    lesson_number: Optional[int] = None
+    unit_part: int = 0
+    section_title: Optional[str] = None
+    progress_percent: int = 0
+    section_statuses: List[ContinueLearningSectionRead] = Field(default_factory=list)
+    updated_at: Optional[str] = None
+    continue_available: bool = False
+    icon: Optional[str] = None
+    available_lessons_count: int = 0
+
+
+class ContinueLearningRead(BaseModel):
+    student_id: str
+    subjects: List[ContinueLearningSubjectRead] = Field(default_factory=list)
+    primary: Optional[ContinueLearningSubjectRead] = None
 
 
 class WeekDayRead(BaseModel):
@@ -306,7 +363,10 @@ class StudentSummaryRead(BaseModel):
     email: str
     grade_level: Optional[int] = None
     account_status: str
-    enrollment_count: int
+    enrollment_count: int = 0  # deprecated: use scheduled_lessons_count
+    subjects_assigned_count: int = 0
+    scheduled_lessons_count: int = 0
+    completed_lessons_count: int = 0
     created_at: datetime
 
 
@@ -332,11 +392,83 @@ class LabStats(BaseModel):
     avg_final_score: Optional[float] = None
 
 
+class PortalLessonRead(BaseModel):
+    id: int
+    name: str
+    description: str
+    chapter_id: str
+    completed: bool = False
+    overall_score: Optional[float] = None
+
+
+class PortalModuleRead(BaseModel):
+    subject_key: str
+    subject_title: str
+    module_key: str
+    module_title: str
+    icon: str = ""
+    lessons: List["PortalLessonRead"] = []
+
+
+class StudentQuizScoreRead(BaseModel):
+    content_id: str
+    subject_name: Optional[str] = None
+    overall_score: Optional[float] = None
+    grammar_score: Optional[float] = None
+    comprehension_score: Optional[float] = None
+    pronunciation_score: Optional[float] = None
+    lesson_completed: bool = False
+    number_of_attempts: Optional[int] = None
+    created_at: Optional[datetime] = None
+
+
+class StudentProgressItemRead(BaseModel):
+    content_id: str
+    lesson_completed: bool
+    overall_score: Optional[float] = None
+    completion_date: Optional[datetime] = None
+
+
+class StudentParentRead(BaseModel):
+    available: bool
+    message: Optional[str] = None
+    parent_name: Optional[str] = None
+    parent_email: Optional[str] = None
+    parent_phone: Optional[str] = None
+    relationship: Optional[str] = None
+    emergency_contact: Optional[str] = None
+    emergency_contact_note: Optional[str] = None
+
+
+class StudentSessionRead(BaseModel):
+    session_date: Optional[str] = None
+    day_of_week: Optional[str] = None
+    subject: str
+    module: str
+    scheduled_start: Optional[str] = None
+    scheduled_end: Optional[str] = None
+    location: Optional[str] = None
+    attendance_status: Optional[str] = None
+    status: str
+    completion_time: Optional[str] = None
+    quiz_score: Optional[float] = None
+    chapter_id: Optional[str] = None
+    schedule_id: Optional[str] = None
+    attendance_id: Optional[str] = None
+
+
 class StudentOverviewRead(BaseModel):
     student: UserRead
     attendance: AttendanceStats
     evaluations: EvaluationStats
     labs: LabStats
+    enrollment_count: int = 0  # deprecated: use scheduled_lessons_count
+    subjects_assigned_count: int = 0
+    scheduled_lessons_count: int = 0
+    completed_lessons_count: int = 0
+    enrolled_modules: List[PortalModuleRead] = []
+    quiz_scores: List[StudentQuizScoreRead] = []
+    progress: List[StudentProgressItemRead] = []
 
 
 class AttendanceReportItem(BaseModel):
@@ -376,3 +508,249 @@ class LabReportItem(BaseModel):
 
 class AccountStatusUpdate(BaseModel):
     account_status: str
+
+
+class AdminLoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class AdminMeRead(BaseModel):
+    username: str
+    role: str = "admin"
+    display_name: str = "Admin"
+
+
+class BookRecordRead(BaseModel):
+    book_id: str
+    title: str
+    subject: str
+    grade: int
+    status: str
+    visible_to_students: bool
+    archived: bool
+    pdf_filename: Optional[str] = None
+    uploaded_at: Optional[str] = None
+    processed_at: Optional[str] = None
+    error_message: Optional[str] = None
+    unit_count: Optional[int] = None
+    lesson_count: Optional[int] = None
+    chunk_count: Optional[int] = None
+    plan_status: Optional[str] = None
+    plan_generated_at: Optional[str] = None
+    plan_approved_at: Optional[str] = None
+    plan_error: Optional[str] = None
+    schedule_in_student_portal: Optional[bool] = None
+    schedule_sync_at: Optional[str] = None
+    schedule_students_affected: Optional[int] = None
+    schedule_entries_created: Optional[int] = None
+    processing: Optional[Dict[str, bool]] = None
+    structure_status: Optional[str] = None
+    structure_warning: Optional[str] = None
+    structure_detection_method: Optional[str] = None
+    structure_extracted_at: Optional[str] = None
+    structure_approved_at: Optional[str] = None
+
+
+class BookStructureLessonUpdate(BaseModel):
+    lesson_id: str
+    title: Optional[str] = None
+    start_page: Optional[int] = None
+    end_page: Optional[int] = None
+
+
+class BookStructureUnitUpdate(BaseModel):
+    unit_id: str
+    title: Optional[str] = None
+    start_page: Optional[int] = None
+    end_page: Optional[int] = None
+    lessons: Optional[List[BookStructureLessonUpdate]] = None
+
+
+class BookStructureUpdate(BaseModel):
+    units: List[BookStructureUnitUpdate]
+
+
+class BookStructureRead(BaseModel):
+    book_id: str
+    title: str
+    subject: str
+    grade: int
+    structure_status: Optional[str] = None
+    structure_warning: Optional[str] = None
+    structure_detection_method: Optional[str] = None
+    page_count: Optional[int] = None
+    units: List[dict] = []
+
+
+class BookPlanUnitUpdate(BaseModel):
+    unit_id: str
+    title: Optional[str] = None
+    module_key: Optional[str] = None
+
+
+class BookPlanUpdate(BaseModel):
+    units: List[BookPlanUnitUpdate]
+
+
+class BookPlanUnitRead(BaseModel):
+    unit_id: str
+    title: Optional[str] = None
+    keywords: Optional[List[str]] = None
+    minutes: Optional[int] = None
+    module_key: Optional[str] = None
+    real_unit_id: Optional[str] = None
+    unit_plan: Optional[dict] = None
+
+
+class BookPlanRead(BaseModel):
+    book_id: str
+    plan_status: Optional[str] = None
+    plan_generated_at: Optional[str] = None
+    plan_approved_at: Optional[str] = None
+    plan_error: Optional[str] = None
+    objectives: List[str] = []
+    modules: List[dict] = []
+    subject_key: Optional[str] = None
+    plan_layout: Optional[str] = None
+    units: List[BookPlanUnitRead] = []
+
+
+class BookVisibilityUpdate(BaseModel):
+    visible_to_students: bool
+
+
+class BookArchiveUpdate(BaseModel):
+    archived: bool
+
+
+class AdminDashboardRead(BaseModel):
+    total_students: int
+    active_students: int
+    total_books: int
+    visible_books: int
+    processed_books: int
+    processing_books: int
+    failed_books: int
+    archived_books: int
+
+
+class AdminAnalyticsRead(BaseModel):
+    students_by_grade: dict
+    books_by_status: dict
+    books_by_subject: dict
+    recent_uploads: list
+
+
+class SubjectBookSummary(BaseModel):
+    book_id: Optional[str] = None
+    title: Optional[str] = None
+    status: Optional[str] = None
+    visible_to_students: bool = False
+    archived: bool = False
+    unit_count: Optional[int] = None
+    chunk_count: Optional[int] = None
+    error_message: Optional[str] = None
+    uploaded_at: Optional[str] = None
+    plan_status: Optional[str] = None
+
+
+class SubjectContentRead(BaseModel):
+    subject_key: str
+    subject_name: str
+    icon: str
+    grade: int = 6
+    student_session_count: int = 0
+    generated_lesson_count: int = 0
+    uploaded_book_count: int = 0
+    has_book: bool = False
+    book: Optional[SubjectBookSummary] = None
+    books: List[SubjectBookSummary] = []
+    visible_to_students: bool = True
+    archived: bool = False
+    builtin: bool = False
+
+
+class SubjectRecordRead(BaseModel):
+    subject_key: str
+    subject_name: str
+    icon: str
+    grade: int = 6
+    visible_to_students: bool = False
+    archived: bool = False
+    builtin: bool = False
+    created_at: Optional[str] = None
+    book: Optional[SubjectBookSummary] = None
+
+
+class SubjectCreate(BaseModel):
+    subject_name: str
+    grade: int = 6
+    icon: str = "📚"
+    visible_to_students: bool = False
+
+
+class SubjectVisibilityUpdate(BaseModel):
+    visible_to_students: bool
+
+
+class AdminPreviewSessionRequest(BaseModel):
+    lesson_title: str = ""
+    lesson_desc: str = ""
+    unit_part: int = 0
+
+
+class AdminPreviewSwitchPartRequest(BaseModel):
+    unit_part: int = 0
+
+
+class AdminRegenerateLessonRequest(BaseModel):
+    lesson_title: str = ""
+    lesson_desc: str = ""
+    unit_part: Optional[int] = None
+
+
+class GenerateRandomScheduleResponse(BaseModel):
+    students_total: int = 0
+    created: int = 0
+    skipped: int = 0
+    appended: int = 0
+    regenerated: int = 0
+    errors: int = 0
+    details: List[dict] = []
+
+
+class StudentLessonScheduleItemRead(BaseModel):
+    schedule_item_id: uuid.UUID
+    user_id: uuid.UUID
+    subject_id: uuid.UUID
+    lesson_id: str
+    lesson_title: Optional[str] = None
+    day_of_week: Optional[str] = None
+    order_index: int
+    status: str
+    unlocked_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class LessonScheduleSessionRead(BaseModel):
+    """Day-based lesson session (no fixed clock time)."""
+    schedule_item_id: uuid.UUID
+    lesson_id: str
+    lesson_title: str
+    subject_id: uuid.UUID
+    subject_name: str
+    subject_key: str
+    order_index: int
+    status: str
+    day_of_week: str
+
+
+class WeekDayLessonScheduleRead(BaseModel):
+    day_of_week: str
+    sessions: List[LessonScheduleSessionRead]
+

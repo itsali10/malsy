@@ -30,6 +30,8 @@ export interface SectionsSubject {
 export type SubjectConfig = LinearSubject | SectionsSubject;
 
 export const learningConfig: Record<string, SubjectConfig> = {
+  // Legacy fallback when book catalog API is unavailable.
+  // Source of truth for uploaded books: GET /books/{book_id}/lessons (lessons.json).
   english: {
     kind: 'sections',
     title: 'English',

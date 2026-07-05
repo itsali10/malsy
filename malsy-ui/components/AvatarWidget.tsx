@@ -242,14 +242,19 @@ export default function AvatarWidget({ variant }: { variant?: 'lesson' | 'dashbo
       const target   = targetRef.current;
       const smooth   = smoothRef.current;
 
-      // Attack (rising): fast so the mouth opens promptly with the audio.
-      // Release (falling): slower so consonants and short gaps don't snap shut.
-      const ATK = Math.min(1, dt * 28); // ~35 ms rise time
-      const REL = Math.min(1, dt * 10); // ~100 ms fall time
+      // Attack (rising): fast so the mouth opens with the first audio frame.
+      // Release (falling): faster shut so the mouth does not lag after speech ends.
+      const ATK = Math.min(1, dt * 32);
+      const REL = Math.min(1, dt * 24);
 
-      if (speaking && (target.amp ?? 0) > 0.02 && target.rpm) {
+      const hasRpm = Boolean(target.rpm && Object.keys(target.rpm).length > 0);
+      const hasLegacy = (target.aa ?? 0) > 0 || (target.jaw ?? 0) > 0 || (target.FF ?? 0) > 0;
+
+      if (speaking && (target.amp ?? 0) > 0.02 && (hasRpm || hasLegacy)) {
         talkTime += dt;
-        const rpm = target.rpm;
+
+        if (hasRpm) {
+        const rpm = target.rpm!;
 
         // Smooth every RPM viseme weight + jaw toward target.
         for (const id of RPM_IDS) {
@@ -283,18 +288,38 @@ export default function AvatarWidget({ variant }: { variant?: 'lesson' | 'dashbo
         setMorph('jaw_open',   outJaw * 0.35);
         setMorph('Mouth_Open', outJaw * 0.35);
 
+        } else {
+          // Legacy {aa,E,O,FF,SS,jaw} frame fallback.
+          const aa = target.aa ?? 0;
+          const ee = Math.max(target.E ?? 0, 0);
+          const oo = Math.max(target.O ?? 0, 0);
+          const ff = target.FF ?? 0;
+          const ss = target.SS ?? 0;
+          const jaw = target.jaw ?? 0;
+          setViseme('aa', aa);
+          setViseme('E', ee);
+          setViseme('I', ee * 0.85);
+          setViseme('O', oo);
+          setViseme('U', oo * 0.85);
+          setViseme('FF', ff);
+          setViseme('SS', ss);
+          setMorph('jawOpen', jaw * 0.35);
+          setMorph('mouthOpen', jaw * 0.35);
+        }
+
       } else {
-        // Smoothly close mouth when silent.
+        // Smoothly close mouth when silent — fast release to avoid frozen/delayed mouth.
         talkTime = 0;
+        const REL_FAST = Math.min(1, dt * 24);
         let maxV = 0;
         for (const id of RPM_IDS) {
-          const v = (smooth[id] ?? 0) * (1 - REL);
+          const v = (smooth[id] ?? 0) * (1 - REL_FAST);
           smooth[id] = v;
           if (v > maxV) maxV = v;
         }
-        smooth.jaw = (smooth.jaw ?? 0) * (1 - REL);
+        smooth.jaw = (smooth.jaw ?? 0) * (1 - REL_FAST);
 
-        if ((smooth.jaw ?? 0) < 0.01 && maxV < 0.01) {
+        if ((smooth.jaw ?? 0) < 0.005 && maxV < 0.005) {
           closeMouth();
           smoothRef.current = {};
         } else {

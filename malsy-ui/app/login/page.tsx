@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, FormEvent } from 'react';
-import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import MalsyLogo from '../../components/MalsyLogo';
+import ThemeToggle from '../../components/ThemeToggle';
 import { api } from '../../lib/api';
 import { auth } from '../../lib/auth';
 
@@ -44,7 +46,14 @@ export default function LoginPage() {
     e.preventDefault();
     setError(''); setLoading(true);
     try {
-      const { access_token } = await api.auth.login(lf.email, lf.password);
+      const email = lf.email.trim();
+      const password = lf.password;
+      if (!email || !password) {
+        setError('Please enter your email and password.');
+        setLoading(false);
+        return;
+      }
+      const { access_token } = await api.auth.login(email, password);
       auth.setToken(access_token);
       const user = await api.auth.me();
       auth.setUser(user);
@@ -79,17 +88,16 @@ export default function LoginPage() {
 
   return (
     <div className="auth-root">
+      <div className="auth-theme-toggle">
+        <ThemeToggle />
+      </div>
       {/* Decorative background blobs */}
       <div className="auth-blob auth-blob-1" />
       <div className="auth-blob auth-blob-2" />
 
       <div className="auth-center">
-        {/* Logo above the card */}
         <div className="auth-top">
-          <div className="auth-logo-img">
-            <Image src="/logos/1.png" alt="MALSY" width={64} height={64} style={{ objectFit: 'contain' }} unoptimized />
-          </div>
-          <div className="auth-wordmark">MAL<span>SY</span></div>
+          <MalsyLogo variant="auth" />
           <div className="auth-sub">Your AI-powered learning companion</div>
         </div>
 
@@ -113,12 +121,12 @@ export default function LoginPage() {
             <form onSubmit={handleLogin} autoComplete="on">
               <div className="field-group">
                 <label className="field-label">Email address</label>
-                <input className="field-input" type="email" placeholder="your@email.com" required autoComplete="email"
+                <input className="field-input" type="email" name="email" placeholder="your@email.com" required autoComplete="email"
                   value={lf.email} onChange={e => setLf(p => ({ ...p, email: e.target.value }))} />
               </div>
               <div className="field-group">
                 <label className="field-label">Password</label>
-                <input className="field-input" type="password" placeholder="••••••••" required autoComplete="current-password"
+                <input className="field-input" type="password" name="password" placeholder="••••••••" required autoComplete="current-password"
                   value={lf.password} onChange={e => setLf(p => ({ ...p, password: e.target.value }))} />
               </div>
               <button type="submit" className="auth-submit" disabled={loading}>
@@ -128,6 +136,9 @@ export default function LoginPage() {
                 Don&apos;t have an account?{' '}
                 <button type="button" onClick={() => switchTab('register')}>Create one</button>
               </div>
+              <Link href="/admin/login" className="auth-admin-link">
+                Administrator Login
+              </Link>
             </form>
           )}
 

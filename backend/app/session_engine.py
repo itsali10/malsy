@@ -1,4 +1,5 @@
 from typing import Dict, Any, List, Tuple, Optional
+from datetime import datetime, timezone
 from .storage import load_json, save_json
 from .lesson_planner import build_chapter_plan
 
@@ -45,12 +46,51 @@ def _progress_key(student_id: str) -> str:
     return f"progress_{student_id}.json"
 
 def get_or_create_plan(chapter_id: str, lesson_title: str = "", lesson_description: str = "") -> Dict[str, Any]:
+    book_id = chapter_id.split(":")[0] if ":" in chapter_id else chapter_id
+    from .canonical_plan_store import load_book_plan, save_book_plan
+
+    stored = load_book_plan(book_id)
+    if stored:
+        from .lesson_content_mapping import plan_is_stale, refresh_plan_units_from_chroma
+
+        if plan_is_stale(book_id, stored):
+            stored = refresh_plan_units_from_chroma(book_id, stored)
+            save_book_plan(book_id, stored)
+        return stored
     key = _plan_key(chapter_id, lesson_title)
     plan = load_json(key, default=None)
     if plan is None:
         plan = build_chapter_plan(chapter_id, lesson_title=lesson_title, lesson_description=lesson_description)
         save_json(key, plan)
     return plan
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _build_section_statuses(unit_part: int, max_unlocked_part: int, chapter_id: str) -> List[Dict[str, Any]]:
+    from .language_lesson_sections import LANGUAGE_LESSON_SECTIONS, last_part_index, section_title_for_index, uses_language_sections
+
+    part_count = last_part_index(chapter_id) + 1
+    statuses: List[Dict[str, Any]] = []
+    for i in range(part_count):
+        if uses_language_sections(chapter_id) and i < len(LANGUAGE_LESSON_SECTIONS):
+            sec = LANGUAGE_LESSON_SECTIONS[i]
+            title = sec["title"]
+            key = sec["key"]
+        else:
+            title = f"Part {i + 1}"
+            key = f"part_{i}"
+        completed = i < unit_part or i < max_unlocked_part
+        statuses.append({
+            "index": i,
+            "key": key,
+            "title": title,
+            "completed": completed,
+            "active": i == unit_part and not completed,
+        })
+    return statuses
+
 
 def load_progress(student_id: str) -> Dict[str, Any]:
     return load_json(_progress_key(student_id), default={
@@ -59,6 +99,10 @@ def load_progress(student_id: str) -> Dict[str, Any]:
         "unit_index": 0,
         "unit_part": 0,
         "max_unlocked_part": 0,
+        "lesson_chapter_id": None,
+        "lesson_title": None,
+        "section_statuses": [],
+        "updated_at": None,
     })
 
 def save_progress(
@@ -68,22 +112,31 @@ def save_progress(
     unit_part: int = 0,
     *,
     max_unlocked_part: Optional[int] = None,
+    lesson_chapter_id: Optional[str] = None,
+    lesson_title: Optional[str] = None,
 ) -> None:
     existing = load_progress(student_id)
     same_unit = int(existing.get("unit_index", -1)) == int(unit_index)
     existing_max = int(existing.get("max_unlocked_part", 0)) if same_unit else 0
     if max_unlocked_part is None:
         max_unlocked_part = existing_max
-    # Monotonic per unit: once a part is unlocked for this unit, it can never re-lock.
-    # Only moving to a different unit (same_unit == False) resets the unlock state.
     if same_unit:
         max_unlocked_part = max(int(max_unlocked_part), existing_max)
+    from .language_lesson_sections import clamp_part_index, last_part_index
+
+    max_part = last_part_index(chapter_id)
+    clamped_part = clamp_part_index(chapter_id, unit_part)
+    clamped_max = max(0, min(max_part, int(max_unlocked_part)))
     save_json(_progress_key(student_id), {
         "student_id": student_id,
         "chapter_id": chapter_id,
         "unit_index": unit_index,
-        "unit_part": unit_part,
-        "max_unlocked_part": max(0, min(1, int(max_unlocked_part))),
+        "unit_part": clamped_part,
+        "max_unlocked_part": clamped_max,
+        "lesson_chapter_id": lesson_chapter_id or existing.get("lesson_chapter_id"),
+        "lesson_title": lesson_title or existing.get("lesson_title"),
+        "section_statuses": _build_section_statuses(clamped_part, clamped_max, chapter_id),
+        "updated_at": _now_iso(),
     })
 
 def select_units_for_session(plan: Dict[str, Any], start_index: int) -> Tuple[List[Dict[str, Any]], int]:
@@ -117,6 +170,8 @@ def load_book_lesson_progress(student_id: str, book_id: str) -> Dict[str, Any]:
 
 
 def save_book_lesson_progress(student_id: str, book_id: str, data: Dict[str, Any]) -> None:
+    data = dict(data)
+    data["updated_at"] = _now_iso()
     save_json(_book_lesson_progress_key(student_id, book_id), data)
 
 

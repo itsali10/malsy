@@ -27,3 +27,18 @@ def get_teacher_llm(streaming: bool = False):
         max_tokens=4096,  # Allow longer, more detailed explanations
         streaming=streaming,
     )
+
+
+def get_deterministic_llm():
+    """Low-variance LLM for cached artifacts (e.g. listening stories)."""
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if not openai_key:
+        raise ValueError("OPENAI_API_KEY is missing. Set it in backend/.env")
+    model = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+    return ChatOpenAI(
+        model=model,
+        api_key=openai_key,
+        temperature=0,
+        max_tokens=4096,
+        streaming=False,
+    )

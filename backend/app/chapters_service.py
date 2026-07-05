@@ -3,7 +3,7 @@ from .db import get_chroma_client
 
 
 
-def list_units(chroma_path="chroma_db") -> List[Dict]:
+def list_units(chroma_path="chroma_db", *, student_visible_only: bool = False) -> List[Dict]:
     client = get_chroma_client(chroma_path)
     col = client.get_or_create_collection("units")  
 
@@ -54,6 +54,12 @@ def list_units(chroma_path="chroma_db") -> List[Dict]:
         return 0
     
     units.sort(key=lambda x: (x.get("book_id", ""), extract_unit_num(x.get("unit_id", ""))))
+
+    if student_visible_only:
+        from .book_registry import is_book_visible_to_students
+
+        units = [u for u in units if is_book_visible_to_students(u.get("book_id"))]
+
     return units
 
 

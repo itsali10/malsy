@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user
 from ..database import get_db
+from ..lesson_schedule_service import mark_schedule_lesson_completed
 from ..models import LessonEvaluation, User
 from ..schemas import LessonEvaluationCreate, LessonEvaluationRead
 
@@ -51,6 +52,16 @@ async def create_evaluation(
         **payload.model_dump(),
     )
     db.add(evaluation)
+    await db.flush()
+
+    if payload.lesson_completed and payload.content_id:
+        await mark_schedule_lesson_completed(
+            db,
+            current_user.user_id,
+            payload.content_id,
+            completed_at=payload.completion_date,
+        )
+
     await db.commit()
     await db.refresh(evaluation)
     return evaluation

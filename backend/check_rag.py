@@ -48,7 +48,7 @@ if "pdf_chunks" in colnames:
         print(f"  unit_id: {m0.get('unit_id')}  |  page: {m0.get('pdf_page')}")
         print(f"  text: {hist_chunks['documents'][0][:300]}")
     else:
-        print("  [ERROR] No chunks found — re-run ingest_history.py!")
+        print("  [ERROR] No chunks found — re-run: python run_ingest_books.py --book history")
 else:
     print("\n[ERROR] 'pdf_chunks' collection is MISSING!")
 

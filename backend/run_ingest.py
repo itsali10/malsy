@@ -1,3 +1,6 @@
-from app.ingest import ingest_pdf
+"""CLI entry point — delegates to run_ingest_books."""
 
-print(ingest_pdf("my_book.pdf"))
+from run_ingest_books import main
+
+if __name__ == "__main__":
+    raise SystemExit(main())

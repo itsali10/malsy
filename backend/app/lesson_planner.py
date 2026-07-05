@@ -56,16 +56,19 @@ def build_chapter_plan(chapter_id: str, lesson_title: str = "", lesson_descripti
         return plan
     
     # Use REAL units from manifest - convert to plan format
+    from .unit_detection import full_unit_id, normalize_manifest_unit_id
+
     plan_units = []
     for u in real_units:
-        # Extract short unit_id (e.g., "english_g6:unit_01" -> "unit_01")
-        short_id = u["unit_id"].split(":")[-1] if ":" in u["unit_id"] else u["unit_id"]
+        raw_id = u["unit_id"]
+        short_id = normalize_manifest_unit_id(raw_id, book_id)
+        full_id = full_unit_id(book_id, short_id)
         plan_units.append({
-            "unit_id": short_id,  # "unit_01", "unit_02", etc.
-            "title": u["title"],
-            "keywords": [],  # Can be filled by LLM later if needed
+            "unit_id": short_id,
+            "title": u.get("title") or short_id.replace("_", " ").title(),
+            "keywords": [],
             "minutes": SESSION_UNIT_MINUTES,
-            "real_unit_id": u["unit_id"]  # Keep full ID for reference
+            "real_unit_id": full_id,
         })
     
     return {

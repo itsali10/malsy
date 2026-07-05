@@ -39,6 +39,149 @@ export function dispatchSpeaking(
   );
 }
 
+// ── Audio element helpers (TTS playback) ─────────────────────────
+
+const AUDIO_LOAD_TIMEOUT_MS = 30_000;
+
+/** Build an absolute URL for a TTS static path or passthrough absolute URL. */
+export function resolveTtsAudioUrl(audioUrl: string, apiBase?: string): string {
+  const fallback = 'http://localhost:8000';
+  const rawBase = apiBase ?? process.env.NEXT_PUBLIC_API_URL ?? fallback;
+  const base = (rawBase.trim() || fallback).replace(/\/$/, '');
+  const trimmed = audioUrl?.trim() ?? '';
+  if (!trimmed) return '';
+  if (/^(https?:|blob:)/i.test(trimmed)) return trimmed;
+  const path = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  return `${base}${path}`;
+}
+
+/** HEAD probe — 200/304 means the clip exists; 404 means stale/missing file. */
+export async function verifyTtsAudioUrl(src: string): Promise<'ok' | 'missing' | 'unknown'> {
+  if (!src) return 'missing';
+  try {
+    const resp = await fetch(src, { method: 'HEAD', mode: 'cors', cache: 'no-cache' });
+    if (resp.ok || resp.status === 304) return 'ok';
+    if (resp.status === 404) return 'missing';
+    return 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}
+
+/**
+ * Load a TTS clip into an Audio element and wait until it can play.
+ * Browser cache hits (HTTP 304) are handled by the media loader — not fetch().
+ */
+export function prepareAudioElement(src: string, startTime = 0): Promise<HTMLAudioElement> {
+  return new Promise((resolve, reject) => {
+    if (!src) {
+      reject(new Error('[audio] empty src'));
+      return;
+    }
+
+    const el = new Audio();
+    el.preload = 'auto';
+    el.volume = 1;
+    el.muted = false;
+    el.crossOrigin = 'anonymous';
+
+    let settled = false;
+    const finish = (fn: () => void) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      fn();
+    };
+
+    const applySeek = () => {
+      if (startTime <= 0) return;
+      try {
+        if (Number.isFinite(el.duration) && startTime < el.duration) {
+          el.currentTime = startTime;
+        }
+      } catch {
+        /* seek before metadata — ignore */
+      }
+    };
+
+    const onReady = () => {
+      applySeek();
+      finish(() => resolve(el));
+    };
+
+    const onError = () => {
+      const code = el.error?.code;
+      const message = el.error?.message ?? 'unknown';
+      finish(() => reject(new Error(`[audio] load error code=${code} message=${message} src=${src}`)));
+    };
+
+    const onCanPlayFallback = () => {
+      if (el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) onReady();
+    };
+
+    const cleanup = () => {
+      clearTimeout(timer);
+      el.removeEventListener('canplaythrough', onReady);
+      el.removeEventListener('canplay', onCanPlayFallback);
+      el.removeEventListener('loadeddata', onCanPlayFallback);
+      el.removeEventListener('error', onError);
+    };
+
+    el.addEventListener('canplaythrough', onReady, { once: true });
+    el.addEventListener('canplay', onCanPlayFallback, { once: true });
+    el.addEventListener('loadeddata', onCanPlayFallback, { once: true });
+    el.addEventListener('error', onError, { once: true });
+
+    const timer = setTimeout(() => {
+      if (el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        console.warn('[audio] load timeout — playing with readyState', el.readyState, src);
+        onReady();
+      } else {
+        finish(() =>
+          reject(new Error(`[audio] load timeout readyState=${el.readyState} src=${src}`)),
+        );
+      }
+    }, AUDIO_LOAD_TIMEOUT_MS);
+
+    console.debug('[audio] loading', { src, startTime });
+    el.src = src;
+  });
+}
+
+/** Load then call play() — surfaces autoplay / decode errors to the caller. */
+export async function playAudioSrc(src: string, startTime = 0): Promise<HTMLAudioElement> {
+  const el = await prepareAudioElement(src, startTime);
+  console.debug('[audio] play()', {
+    src,
+    volume: el.volume,
+    muted: el.muted,
+    readyState: el.readyState,
+    duration: Number.isFinite(el.duration) ? el.duration : null,
+  });
+  try {
+    await el.play();
+  } catch (err) {
+    const name = err instanceof DOMException ? err.name : (err instanceof Error ? err.name : 'Error');
+    console.error('[audio] play() rejected', { src, name, err, volume: el.volume, muted: el.muted });
+    throw err;
+  }
+  return el;
+}
+
+async function fetchAudioArrayBuffer(url: string): Promise<ArrayBuffer | null> {
+  // Lip-sync analysis only — 304 Not Modified means the browser cache has the file.
+  const resp = await fetch(url, { mode: 'cors', cache: 'default' });
+  if (resp.ok) return resp.arrayBuffer();
+  if (resp.status === 304) {
+    const cached = await fetch(url, { mode: 'cors', cache: 'force-cache' });
+    if (cached.ok) return cached.arrayBuffer();
+    console.debug('[audio-bands] 304 with empty body — skipping band analysis', url);
+    return null;
+  }
+  console.debug('[audio-bands] fetch failed', resp.status, url);
+  return null;
+}
+
 // ── Pre-computed frequency-band data ────────────────────────────
 
 export interface AudioBands {
@@ -62,9 +205,8 @@ export async function precomputeAudioBands(
 ): Promise<AudioBands | null> {
   if (typeof window === 'undefined') return null;
   try {
-    const resp = await fetch(url, { mode: 'cors' });
-    if (!resp.ok) return null;
-    const buf = await resp.arrayBuffer();
+    const buf = await fetchAudioArrayBuffer(url);
+    if (!buf || buf.byteLength === 0) return null;
 
     const dummyCtx = new OfflineAudioContext(1, 1, 22050);
     const decoded  = await dummyCtx.decodeAudioData(buf);
@@ -169,15 +311,16 @@ export function makeBandSampler(bands: AudioBands): (t: number) => BandSample {
  * Bilabials (m/p/b) reach full-strength PP shape (lips meet) and the jaw is
  * closed; fricatives nearly close; word gaps / silence close the mouth.
  *
- * Without `text` (or before metadata) a gentle synthetic motion keeps the mouth
- * moving so the avatar never looks frozen while speaking.
+ * Without `text` (or before metadata) the mouth stays closed until the clip
+ * is ready — no synthetic motion during silence.
  */
 export function attachLipSync(el: HTMLAudioElement, text?: string): () => void {
   let alive = true;
   let raf = 0;
   let timeline: LipSyncTimeline | null = null;
   let sampleBand: ((t: number) => BandSample) | null = null;
-  const t0 = performance.now();
+  /** True while the element is actively playing (play/playing → pause/ended). */
+  let playing = false;
 
   const build = () => {
     if (text && Number.isFinite(el.duration) && el.duration > 0) {
@@ -185,13 +328,24 @@ export function attachLipSync(el: HTMLAudioElement, text?: string): () => void {
     }
   };
   build();
-  const onMeta = () => build();
-  el.addEventListener('loadedmetadata', onMeta);
-  el.addEventListener('durationchange', onMeta);
 
-  // Wav2Lip-style: analyse the real audio so the mouth follows the sound.
-  // This is best-effort — if it fails (CORS, decode error) we silently keep the
-  // text-only behaviour, so lip-sync never breaks.
+  const onPlay = () => {
+    playing = true;
+  };
+  const onStop = () => {
+    playing = false;
+    dispatchSpeaking(false, 0);
+  };
+
+  el.addEventListener('play', onPlay);
+  el.addEventListener('playing', onPlay);
+  el.addEventListener('pause', onStop);
+  el.addEventListener('ended', onStop);
+  el.addEventListener('loadedmetadata', build);
+  el.addEventListener('durationchange', build);
+
+  // Analyse the same WAV/URL the AudioSource plays (Oculus OVRLipSync pattern:
+  // one clip drives both playback and mouth shape).
   const src = el.currentSrc || el.src;
   if (src) {
     void precomputeAudioBands(src).then((bands) => {
@@ -203,53 +357,64 @@ export function attachLipSync(el: HTMLAudioElement, text?: string): () => void {
     if (!alive) return;
     raf = requestAnimationFrame(loop);
 
-    const audible = !el.paused && !el.ended && (el.volume ?? 1) > 0;
+    const audible = playing && !el.paused && !el.ended;
     if (!audible) {
-      dispatchSpeaking(false, 0);
       return;
     }
 
     if (!timeline) build();
-
-    if (timeline) {
-      const t = el.currentTime;
-      const textW = visemeAtTime(timeline, t);
-      // Condition the text shape on the real audio when analysis is ready.
-      const band = sampleBand ? sampleBand(t) : null;
-      const w = band ? applyAudioBands(textW, band) : textW;
-
-      // Legacy frame for any morph paths that still read {aa,E,O,FF,SS,jaw}.
-      const frame: VisemeFrame = {
-        aa: Math.min(1, w.aa ?? 0),
-        E:  Math.min(1, Math.max(w.E ?? 0, w.I ?? 0)),
-        O:  Math.min(1, Math.max(w.O ?? 0, w.U ?? 0)),
-        FF: Math.min(1, w.FF ?? 0),
-        SS: Math.min(1, Math.max(w.SS ?? 0, w.CH ?? 0)),
-        jaw: w.jaw,
-      };
-
-      const closure = Math.max(w.PP ?? 0, (w.FF ?? 0) * 0.6);
-      // With audio, amplitude tracks real loudness (mouth closes in gaps);
-      // closures still register so p/b/m frames press the lips.
-      const amp = band
-        ? Math.min(0.6, Math.max(band.energy * 0.7, closure * 0.35) + Math.max(frame.FF, frame.SS) * 0.1)
-        : Math.min(0.6, frame.jaw * 0.7 + closure * 0.2 + Math.max(frame.FF, frame.SS) * 0.2);
-
-      dispatchSpeaking(true, amp, frame, w);
-    } else {
-      const t = (performance.now() - t0) / 1000;
-      const amp = 0.18 + 0.12 * Math.abs(Math.sin(t * 6.0)) + 0.06 * Math.sin(t * 11.0);
-      dispatchSpeaking(true, Math.max(0, Math.min(0.55, amp)));
+    if (!timeline) {
+      // Wait for metadata — do not animate during silence or before audio is ready.
+      dispatchSpeaking(false, 0);
+      return;
     }
+
+    const t = el.currentTime;
+    const textW = visemeAtTime(timeline, t);
+    const band = sampleBand ? sampleBand(t) : null;
+
+    // Close mouth on silent gaps in the real waveform (even mid-word in the text timeline).
+    if (band && band.energy < 0.06) {
+      dispatchSpeaking(false, 0);
+      return;
+    }
+
+    const w = band ? applyAudioBands(textW, band) : textW;
+
+    const frame: VisemeFrame = {
+      aa: Math.min(1, w.aa ?? 0),
+      E:  Math.min(1, Math.max(w.E ?? 0, w.I ?? 0)),
+      O:  Math.min(1, Math.max(w.O ?? 0, w.U ?? 0)),
+      FF: Math.min(1, w.FF ?? 0),
+      SS: Math.min(1, Math.max(w.SS ?? 0, w.CH ?? 0)),
+      jaw: w.jaw,
+    };
+
+    const closure = Math.max(w.PP ?? 0, (w.FF ?? 0) * 0.6);
+    const amp = band
+      ? Math.min(0.6, Math.max(band.energy * 0.7, closure * 0.35) + Math.max(frame.FF, frame.SS) * 0.1)
+      : Math.min(0.6, frame.jaw * 0.7 + closure * 0.2 + Math.max(frame.FF, frame.SS) * 0.2);
+
+    if (amp < AMP_THRESHOLD && !closure) {
+      dispatchSpeaking(false, 0);
+      return;
+    }
+
+    dispatchSpeaking(true, amp, frame, w);
   };
 
   raf = requestAnimationFrame(loop);
 
   return () => {
     alive = false;
+    playing = false;
     cancelAnimationFrame(raf);
-    el.removeEventListener('loadedmetadata', onMeta);
-    el.removeEventListener('durationchange', onMeta);
+    el.removeEventListener('play', onPlay);
+    el.removeEventListener('playing', onPlay);
+    el.removeEventListener('pause', onStop);
+    el.removeEventListener('ended', onStop);
+    el.removeEventListener('loadedmetadata', build);
+    el.removeEventListener('durationchange', build);
     dispatchSpeaking(false, 0);
   };
 }
