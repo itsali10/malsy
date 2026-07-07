@@ -1,0 +1,171 @@
+{
+  "student_id": "swagger_test_1",
+  "chapter_id": "history_g6:unit_01",
+  "current_item_index": 3,
+  "done_items": [
+    "unit_opening",
+    "reading_1",
+    "discussion_questions"
+  ],
+  "last_quiz": null,
+  "hint_count": 1,
+  "attempt_history": [
+    {
+      "ts": "2026-07-07T20:18:35.459786Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the significance of the River Nile for the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:21:50.424111Z",
+      "item_id": "reading_1",
+      "quiz_question": "Where did the Ancient Egyptians live and why was this location significant for their civilization?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:23:35.248556Z",
+      "item_id": "reading_1",
+      "quiz_question": "Who unified Upper and Lower Egypt, and what was the name of the new capital city established?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:25:15.298630Z",
+      "item_id": "reading_1",
+      "quiz_question": "Why was the division of Ancient Egypt into the red land and the black land important?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:25:59.915216Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "What was the significance of the River Nile to the Ancient Egyptians?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:29:01.688529Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "What was the significance of the River Nile to the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:29:55.256071Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "Who united Upper Egypt and Lower Egypt into one kingdom?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:31:43.485177Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "How did the Ancient Egyptians divide their land for strategic purposes?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:33:14.970260Z",
+      "item_id": "discussion_questions",
+      "quiz_question": "How did the Ancient Egyptians divide their land for strategic purposes?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:34:52.458576Z",
+      "item_id": "visual_elements",
+      "quiz_question": "What was the name of the pharaoh who united Upper and Lower Egypt?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:35:09.020325Z",
+      "item_id": "visual_elements",
+      "quiz_question": "Why was the Nile referred to as the 'gift of the Nile' by the Ancient Egyptians?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:35:50.533348Z",
+      "item_id": "visual_elements",
+      "quiz_question": "Why was the Nile referred to as the 'gift of the Nile' by the Ancient Egyptians?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    }
+  ],
+  "lesson_question_index": 1,
+  "lesson_questions": [
+    {
+      "question": "What was the name of the pharaoh who united Upper and Lower Egypt?",
+      "options": [
+        "Pharaoh Akhenaten",
+        "King Narmer",
+        "Ramesses II",
+        "Queen Hatshepsut"
+      ],
+      "correct_answer": "King Narmer",
+      "expected_points": [
+        "King Narmer united Upper and Lower Egypt, establishing a centralized authority."
+      ],
+      "source_quote": "The pharaoh's name was King Narmer or Menes. He built a new capital called Memphis which in Greek translates to ‘Balance of the Two Lands’.",
+      "correct_index": 1
+    },
+    {
+      "question": "Why was the Nile referred to as the 'gift of the Nile' by the Ancient Egyptians?",
+      "options": [
+        "It was the fastest river for transportation.",
+        "It was a sacred river for religious ceremonies.",
+        "It provided gold and precious stones.",
+        "It flooded, creating fertile land for farming."
+      ],
+      "correct_answer": "It flooded, creating fertile land for farming.",
+      "expected_points": [
+        "The Nile was crucial for providing water, food, and fertile land for the Egyptians."
+      ],
+      "source_quote": "The Nile flooded it created thick, wet mud, which provided fertile land which helped the Egyptians grow their crops and raise their animals.",
+      "correct_index": 3
+    },
+    {
+      "question": "What did the red land and black land represent in Ancient Egypt?",
+      "options": [
+        "Summer and winter",
+        "Defense and agriculture",
+        "Royalty and commoners",
+        "Day and night"
+      ],
+      "correct_answer": "Defense and agriculture",
+      "expected_points": [
+        "The division into red land (deserted areas) and black land (fertile areas) influenced settlement patterns and security measures."
+      ],
+      "source_quote": "The red land was the deserted area on the outskirts of Egypt, this was important land for preventing any invasions from neighbouring countries. The black land was the area close the Nile which was important for providing food and water for the people.",
+      "correct_index": 1
+    }
+  ],
+  "lesson_questions_item_id": "visual_elements"
+}

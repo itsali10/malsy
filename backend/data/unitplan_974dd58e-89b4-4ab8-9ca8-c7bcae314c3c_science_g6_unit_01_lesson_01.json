@@ -1,0 +1,139 @@
+{
+  "unit_title": "Grade 6 Basic Life Science",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction",
+      "must_cover": true,
+      "keywords": [
+        "overview",
+        "science",
+        "semester"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Lesson 1: Science and the Scientific Method",
+      "must_cover": true,
+      "keywords": [
+        "scientific method",
+        "experimentation"
+      ]
+    },
+    {
+      "id": "reading_2",
+      "type": "reading",
+      "title": "Lesson 2: The Environment",
+      "must_cover": true,
+      "keywords": [
+        "observation",
+        "change"
+      ]
+    },
+    {
+      "id": "reading_3",
+      "type": "reading",
+      "title": "Lesson 3: Biology",
+      "must_cover": true,
+      "keywords": [
+        "organisms",
+        "living things",
+        "growth",
+        "development"
+      ]
+    },
+    {
+      "id": "reading_4",
+      "type": "reading",
+      "title": "Lesson 4: Cells",
+      "must_cover": true,
+      "keywords": [
+        "cell structure",
+        "levels of organization"
+      ]
+    },
+    {
+      "id": "reading_5",
+      "type": "reading",
+      "title": "Unit II—Green Plants and Other Organisms",
+      "must_cover": true,
+      "keywords": [
+        "green plants",
+        "seed",
+        "soil",
+        "photosynthesis",
+        "plant reproduction"
+      ]
+    },
+    {
+      "id": "reading_6",
+      "type": "reading",
+      "title": "Unit III—Animals in Our Environment",
+      "must_cover": true,
+      "keywords": [
+        "animal kingdom",
+        "animal phyla",
+        "animal life cycles",
+        "ecology"
+      ]
+    },
+    {
+      "id": "reading_7",
+      "type": "reading",
+      "title": "Unit IV—The Human Body",
+      "must_cover": true,
+      "keywords": [
+        "human life",
+        "nutrition",
+        "digestive system",
+        "respiratory system",
+        "circulatory system"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "class activities",
+        "discussion",
+        "questions"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "pictures",
+        "illustrations",
+        "diagrams",
+        "charts"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "practice tasks",
+        "writing prompts",
+        "workbook activities"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Final Projects",
+      "must_cover": true,
+      "keywords": [
+        "final projects"
+      ]
+    }
+  ]
+}

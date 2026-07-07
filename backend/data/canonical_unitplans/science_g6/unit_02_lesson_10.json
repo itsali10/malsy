@@ -1,0 +1,69 @@
+{
+  "unit_title": "Flowers and Plant Reproduction",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "flowers",
+        "plant reproduction"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "identify parts of a flower"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "vocab",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "pollination",
+        "fertilization",
+        "germination"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": [
+        "flower structure"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "dissecting a flower"
+      ]
+    },
+    {
+      "id": "6",
+      "type": "wrap_up",
+      "title": "Summary",
+      "must_cover": true,
+      "keywords": [
+        "flower parts"
+      ]
+    },
+    {
+      "id": "7",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": []
+    }
+  ]
+}

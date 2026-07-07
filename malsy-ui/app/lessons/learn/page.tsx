@@ -6,13 +6,15 @@ import { api, ListeningActivity, Quiz, SessionAnswerResponse, SessionStartRespon
 import { auth } from '../../../lib/auth';
 import LessonPartVideoPanel from '../../../components/LessonPartVideoPanel';
 import HistoryInteractiveImages from '../../../components/HistoryInteractiveImages';
-import AvatarWidget from '../../../components/AvatarWidget';
 import { unitVideoFilename } from '../../../lib/unit-video';
+import { isHistorySubject } from '../../../lib/history-subject';
 import { subjectPathFromChapter, nextLessonFromChapter } from '../../../lib/learning-config';
 import { useLessonAudioPlayer } from '../../../hooks/useLessonAudioPlayer';
 import { attachLipSync, dispatchSpeaking, prepareAudioElement, resolveTtsAudioUrl, verifyTtsAudioUrl } from '../../../lib/lesson-audio';
 import LessonSectionNav from '../../../components/LessonSectionNav';
-import PronunciationRecorder from '../../../components/PronunciationRecorder';
+import PremiumQuizPanel from '../../../components/lesson/PremiumQuizPanel';
+import TutorPanel from '../../../components/lesson/TutorPanel';
+import QuizCompleteCelebration from '../../../components/lesson/QuizCompleteCelebration';
 import {
   clampPartIndex,
   lastPartIndex,
@@ -38,6 +40,12 @@ interface Feedback {
   kind: 'hint' | 'remediation' | 'correct';
   hintCount?: number;
   nextAction?: string;
+}
+
+function quizQuestionProgress(quiz: Quiz | null | undefined) {
+  const index = quiz?.lesson_question_index ?? quiz?.listening_question_index ?? 0;
+  const total = Math.max(1, quiz?.lesson_question_total ?? quiz?.listening_question_total ?? 1);
+  return { index, total };
 }
 
 const LESSON_SECTION_HEADING = /^\d+\.\s*(Hook|Explanation|Historical Example|Real-Life Connection|Quick Recap|Transition to Quiz)\s*$/i;
@@ -75,6 +83,12 @@ function LessonLearn() {
   const [completeMsg, setCompleteMsg] = useState('');
   const [feedbackSpeaking, setFeedbackSpeaking] = useState(false);
   const [nextLesson, setNextLesson] = useState<{ chapter: string; title: string; description: string } | null>(null);
+  const [answeredQuestionIndices, setAnsweredQuestionIndices] = useState<number[]>([]);
+  const [hintsUsedMax, setHintsUsedMax] = useState(0);
+  const [quizCorrectCount, setQuizCorrectCount] = useState(0);
+  const [quizQuestionsTotal, setQuizQuestionsTotal] = useState(0);
+  const [quizUnlocked, setQuizUnlocked] = useState(false);
+  const quizStartRef = useRef<number | null>(null);
 
   const feedbackAudioRef = useRef<HTMLAudioElement | null>(null);
   const feedbackTokenRef = useRef(0);
@@ -145,7 +159,12 @@ function LessonLearn() {
 
   // ── session ───────────────────────────────────────────────────
 
-  const isHistory = chapter.toLowerCase().includes('history');
+  const isHistory = isHistorySubject({
+    type: null,
+    name: subjectLabel,
+    subjectKey: chapter.split(':')[0],
+    chapterId: chapter,
+  });
   const isLanguageLesson = usesLanguageSections(chapter);
   const videoFilename = isHistory ? unitVideoFilename(chapter) : null;
   const lessonsBackPath = subjectPathFromChapter(chapter);
@@ -161,6 +180,17 @@ function LessonLearn() {
     setAnswer('');
     setAnswerIndex(-1);
     setPhase('active');
+    if (res.quiz) {
+      quizStartRef.current = Date.now();
+      const { index, total } = quizQuestionProgress(res.quiz);
+      setQuizQuestionsTotal(total);
+      setQuizUnlocked(index > 0 || res.quiz.type === 'listening');
+      setAnsweredQuestionIndices([]);
+      setHintsUsedMax(0);
+      setQuizCorrectCount(0);
+    } else {
+      setQuizUnlocked(false);
+    }
   }
 
   async function goToPart(target: number) {
@@ -191,6 +221,13 @@ function LessonLearn() {
       setSwitching(false);
     }
   }
+
+  useEffect(() => {
+    if (!quiz) return;
+    if (!quizStartRef.current) quizStartRef.current = Date.now();
+    const total = quizQuestionProgress(quiz).total;
+    setQuizQuestionsTotal(prev => Math.max(prev, total));
+  }, [quiz]);
 
   useEffect(() => {
     if (!chapter) { router.replace('/lessons'); return; }
@@ -266,14 +303,31 @@ function LessonLearn() {
         quiz?.options?.length ? answerIndex : undefined,
         audioBase64,
       );
-      setAnswer('');
-      setAnswerIndex(-1);
       if (res.correct) {
         const unlocked = clampPartIndex(chapter, Math.max(maxUnlocked, res.max_unlocked_part ?? 0));
         setMaxUnlocked(unlocked);
         if (res.message) setCompleteMsg(res.message);
+        const qIdx = quizQuestionProgress(quiz).index;
+        setAnsweredQuestionIndices(prev => (prev.includes(qIdx) ? prev : [...prev, qIdx]));
+        setQuizCorrectCount(c => c + 1);
+
+        if (res.next_action === 'lesson_next_question') {
+          setAnswer('');
+          setAnswerIndex(-1);
+          setQuiz(res.quiz ?? null);
+          setQuizUnlocked(true);
+          setFeedback({
+            text: res.evaluation?.feedback ?? res.advance_text ?? 'Correct!',
+            kind: 'correct',
+            nextAction: 'lesson_next_question',
+          });
+          setPhase('active');
+          return;
+        }
 
         if (res.next_action === 'listening_next_question') {
+          setAnswer('');
+          setAnswerIndex(-1);
           setQuiz(res.quiz ?? null);
           if (res.listening) setListening(res.listening);
           setFeedback({
@@ -305,6 +359,7 @@ function LessonLearn() {
         });
         setPhase('correct');
       } else if (res.hint) {
+        setHintsUsedMax(prev => Math.max(prev, res.hint_count ?? 0));
         setFeedback({ text: res.hint, kind: 'hint', hintCount: res.hint_count });
         setPhase('hint');
         playFeedbackTTS(res.hint);
@@ -312,6 +367,9 @@ function LessonLearn() {
         setFeedback({ text: res.remediation_text, kind: 'remediation' });
         setPhase('remediation');
         playFeedbackTTS(res.remediation_text);
+      } else if (res.error) {
+        setErrorMsg(res.error);
+        setPhase('error');
       } else {
         setFeedback({ text: 'Think about it and try again.', kind: 'hint' });
         setPhase('hint');
@@ -326,7 +384,7 @@ function LessonLearn() {
     if (!feedback) return;
     const action = feedback.nextAction;
     lessonAudio.pauseAndSave();
-    if (action === 'listening_next_question' || action === 'listening_activity') {
+    if (action === 'lesson_next_question' || action === 'listening_next_question' || action === 'listening_activity') {
       setFeedback(null);
       setPhase('active');
       return;
@@ -352,9 +410,14 @@ function LessonLearn() {
   const paragraphs  = lessonParagraphs(isListeningMode ? storyText : teacherText);
   const canListen = paragraphs.length > 0;
   const listeningTitle = listening?.title;
-  const listeningQuestionLabel = quiz?.type === 'listening' && quiz.listening_question_total
-    ? `Question ${(quiz.listening_question_index ?? 0) + 1} of ${quiz.listening_question_total}`
-    : null;
+  const { total: quizTotal } = quizQuestionProgress(quiz);
+  const isSequentialLessonQuiz = Boolean(
+    quiz && !isListeningMode && !isSpeakingMode && quizTotal > 1,
+  );
+  const showReadingCard = !quiz || isListeningMode || !isSequentialLessonQuiz || !quizUnlocked;
+  const showQuizPanel = Boolean(quiz && (isListeningMode || !isSequentialLessonQuiz || quizUnlocked));
+  const canStartQuiz = isSequentialLessonQuiz && !quizUnlocked
+    && (lessonAudio.audioState === 'completed' || !canListen);
 
   function goToNextLesson() {
     if (!nextLesson) return;
@@ -366,8 +429,8 @@ function LessonLearn() {
     });
     router.push(`/lessons/learn?${params.toString()}`);
   }
+
   const hasFeedback = phase === 'hint' || phase === 'remediation' || phase === 'correct';
-  const canRetry    = phase === 'hint' || phase === 'remediation';
 
   const audioStatusText =
     lessonAudio.audioState === 'loading'
@@ -405,13 +468,15 @@ function LessonLearn() {
   const tutorBubbleText =
     hasFeedback && feedback?.kind === 'hint'
       ? "Here's a hint — read it below!"
-      : hasFeedback && feedback?.kind === 'correct'
-        ? 'Great job! You got it!'
-        : quiz && phase === 'active'
-          ? "Let's think together! What do you think is the best answer?"
-          : avatarSpeaking
-            ? audioStatusText
-            : "I'm here to help you learn!";
+      : hasFeedback && feedback?.kind === 'remediation'
+        ? "No worries — let's go through it together!"
+        : hasFeedback && feedback?.kind === 'correct'
+          ? 'Great job! You got it!'
+          : quiz && (phase === 'active' || phase === 'answering')
+            ? "Let's think together! What do you think is the best answer?"
+            : avatarSpeaking
+              ? audioStatusText
+              : "I'm here to help you learn!";
 
   const continueLabel = (() => {
     if (feedback?.nextAction === 'all_complete' || feedback?.nextAction === 'lesson_complete') {
@@ -424,8 +489,29 @@ function LessonLearn() {
       }
       return 'Continue to Part 2';
     }
+    if (feedback?.nextAction === 'lesson_next_question' || feedback?.nextAction === 'listening_next_question') {
+      return 'Next Question';
+    }
     return 'Next';
   })();
+
+  const tutorExpression: 'idle' | 'happy' | 'encourage' | 'speaking' =
+    avatarSpeaking
+      ? 'speaking'
+      : hasFeedback && feedback?.kind === 'correct'
+        ? 'happy'
+        : hasFeedback && (feedback?.kind === 'hint' || feedback?.kind === 'remediation')
+          ? 'encourage'
+          : 'idle';
+
+  const quizTimeSpentSec = quizStartRef.current
+    ? Math.max(1, Math.round((Date.now() - quizStartRef.current) / 1000))
+    : 0;
+  const quizAccuracy = quizQuestionsTotal > 0
+    ? Math.round((quizCorrectCount / quizQuestionsTotal) * 100)
+    : 100;
+  const quizXpEarned = Math.max(10, quizCorrectCount * 25 - hintsUsedMax * 5);
+  const quizCoinsEarned = Math.max(0, quizCorrectCount * 10 - hintsUsedMax * 2);
 
   // ── render ────────────────────────────────────────────────────
 
@@ -460,25 +546,21 @@ function LessonLearn() {
         )}
       </div>
 
-      {/* Loading / answering spinner */}
-      {(phase === 'loading' || phase === 'answering') && (
+      {/* Loading spinner */}
+      {phase === 'loading' && (
         <div className="lesson-loading">
           <div className="modal-spinner" />
-          <div className="lesson-loading__text">
-            {phase === 'answering' ? 'Checking your answer…' : 'Loading lesson…'}
-          </div>
-          {phase === 'loading' && (
-            <div className="lesson-loading__sub">Connecting to the server…</div>
-          )}
+          <div className="lesson-loading__text">Loading lesson…</div>
+          <div className="lesson-loading__sub">Connecting to the server…</div>
         </div>
       )}
 
       {/* Main lesson content */}
-      {(phase === 'active' || hasFeedback) && (
+      {(phase === 'active' || phase === 'answering' || hasFeedback) && (
         <div className="lesson-main">
           <div className="lesson-column">
           {/* Lesson video — one video per History lesson (no parts) */}
-          {isHistory && (
+          {isHistory && showReadingCard && (
             <LessonPartVideoPanel
               unitId={chapter}
               lessonTitle={unitLabel}
@@ -487,6 +569,7 @@ function LessonLearn() {
           )}
 
           {/* Teaching content card */}
+          {showReadingCard && (
           <div className="lesson-card">
             <div className="lesson-card__header">
               <div className="lesson-card__title-row">
@@ -634,107 +717,53 @@ function LessonLearn() {
               </div>
             </div>
           </div>
+          )}
+
+          {canStartQuiz && (
+            <div className="lesson-continue-wrap">
+              <button
+                type="button"
+                className="pq-submit lesson-continue-wrap__btn"
+                onClick={() => setQuizUnlocked(true)}
+              >
+                Start Quiz
+                <ArrowRight size={18} aria-hidden />
+              </button>
+            </div>
+          )}
 
           {/* AI-generated interactive images — 2 per History lesson */}
-          {isHistory && teacherText && !isListeningMode && (
+          {isHistory && teacherText && !isListeningMode && showReadingCard && (
             <HistoryInteractiveImages unitId={chapter} teacherText={teacherText} />
           )}
 
           {/* Quiz section */}
-          {quiz && (
-            <div className="lesson-quiz-section">
-              <div className="lesson-quiz-divider">
-                <div className="lesson-quiz-divider__line" />
-                <span className="lesson-quiz-divider__label">
-                  {isListeningMode ? 'Listening Questions' : 'Quiz Time'}
-                </span>
-                <div className="lesson-quiz-divider__line" />
-              </div>
-
-              <div className="lesson-quiz-card">
-                <div className="lesson-quiz-card__meta">
-                  {listeningQuestionLabel ?? 'Question'}
-                </div>
-                <div className="lesson-quiz-card__question">{quiz.question}</div>
-              </div>
-
-              {quiz.options && quiz.options.length > 0 ? (
-                <div className="lesson-quiz-options">
-                  {quiz.options.map((opt, idx) => {
-                    const sel = answer === opt;
-                    return (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => { if (phase !== 'correct') { setAnswer(opt); setAnswerIndex(idx); } }}
-                        disabled={phase === 'correct'}
-                        className={['lesson-quiz-option', sel ? 'lesson-quiz-option--selected' : ''].filter(Boolean).join(' ')}
-                      >
-                        <span className="lesson-quiz-option__badge">
-                          {String.fromCharCode(65 + idx)}
-                        </span>
-                        <span className="lesson-quiz-option__text">{opt}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : isSpeakingMode ? (
-                <PronunciationRecorder
-                  sentence={quiz.question}
-                  disabled={phase === 'correct'}
-                  onRecorded={b64 => submitAnswer(b64)}
-                />
-              ) : (
-                <div className="lesson-quiz-open">
-                  <textarea
-                    rows={4}
-                    className="field-input"
-                    placeholder="Type your answer here…"
-                    value={answer}
-                    onChange={e => setAnswer(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter' && e.ctrlKey) submitAnswer(); }}
-                    style={{ resize: 'vertical', display: 'block', width: '100%' }}
-                    disabled={phase === 'correct'}
-                  />
-                  <div className="lesson-quiz-open__hint">Ctrl + Enter to submit</div>
-                </div>
-              )}
-
-              {hasFeedback && feedback && (
-                <div className={`lesson-feedback lesson-feedback--${feedback.kind}`}>
-                  <div className="lesson-feedback__label">
-                    {feedback.kind === 'correct'
-                      ? 'Correct!'
-                      : feedback.kind === 'hint'
-                        ? `Hint ${(feedback.hintCount ?? 0) + 1}`
-                        : 'Let me explain that again'}
-                  </div>
-                  <div className="lesson-feedback__text">{feedback.text}</div>
-                </div>
-              )}
-
-              {phase === 'correct' ? (
-                <button type="button" className="lesson-submit-btn" onClick={handleNext}>
-                  {continueLabel}
-                  <ArrowRight size={18} aria-hidden />
-                </button>
-              ) : !isSpeakingMode ? (
-                <button
-                  type="button"
-                  className="lesson-submit-btn"
-                  onClick={() => submitAnswer()}
-                  disabled={!answer.trim()}
-                >
-                  {canRetry ? 'Try Again' : 'Submit Answer'}
-                  <ArrowRight size={18} aria-hidden />
-                </button>
-              ) : null}
-            </div>
+          {showQuizPanel && quiz && (
+            <PremiumQuizPanel
+              quiz={quiz}
+              phase={
+                phase === 'answering' || phase === 'hint' || phase === 'remediation' || phase === 'correct'
+                  ? phase
+                  : 'active'
+              }
+              answer={answer}
+              answerIndex={answerIndex}
+              feedback={hasFeedback ? feedback : null}
+              isListeningMode={isListeningMode}
+              isSpeakingMode={isSpeakingMode}
+              sectionKey={currentSection?.key}
+              onAnswerChange={setAnswer}
+              onAnswerIndexChange={setAnswerIndex}
+              onSubmit={submitAnswer}
+              onContinue={handleNext}
+              continueLabel={continueLabel}
+              answeredQuestionIndices={answeredQuestionIndices}
+            />
           )}
 
           {!quiz && phase === 'active' && (
             <div className="lesson-continue-wrap">
-              <button type="button" className="lesson-submit-btn" onClick={handleNext}>
+              <button type="button" className="pq-submit lesson-continue-wrap__btn" onClick={handleNext}>
                 Continue
                 <ArrowRight size={18} aria-hidden />
               </button>
@@ -742,59 +771,41 @@ function LessonLearn() {
           )}
           </div>
 
-          <aside className={`teacher-stage${avatarSpeaking ? ' teacher-stage--speaking' : ''}`}>
-            <p className="lesson-tutor__greeting">
-              Hi! I&apos;m Jasmine — Your AI Learning Buddy
-            </p>
-            <div className="lesson-tutor__bubble">{tutorBubbleText}</div>
-            <div
-              className="avatar-wrapper"
-              style={{ width: '100%', maxWidth: 420, height: 400, minHeight: 400 }}
-            >
-              <AvatarWidget variant="lesson" />
-            </div>
-          </aside>
+          <TutorPanel
+            bubbleText={tutorBubbleText}
+            speaking={avatarSpeaking}
+            expression={tutorExpression}
+          />
         </div>
       )}
 
       {/* Complete */}
       {phase === 'complete' && (
-        <div className="lesson-complete">
-          <div className="lesson-complete__emoji" aria-hidden>🎉</div>
-          <div className="lesson-complete__title">Lesson Complete!</div>
-          <div className="lesson-complete__msg">
-            {completeMsg || (
+        <QuizCompleteCelebration
+          message={
+            completeMsg || (
               <>Great work on <strong>{subjectLabel}</strong>. Your progress has been saved.</>
-            )}
-          </div>
-          <div className="lesson-complete__actions">
-            <div className="lesson-complete__row">
-              {!isHistory && (
-              <button
-                type="button"
-                className="btn btn-v"
-                onClick={() => {
-                  setPhase('loading');
-                  api.session.start(studentId, chapter)
-                    .then(r => { if (!r.done) applySession(r); else setPhase('complete'); })
-                    .catch(() => setPhase('complete'));
-                }}
-              >
-                Start Next Unit
-              </button>
-              )}
-              <button type="button" className="btn btn-o" onClick={() => { lessonAudio.abort(); router.push(lessonsBackPath); }}>
-                Back to Lessons
-              </button>
-            </div>
-            {nextLesson && (
-              <button type="button" className="btn btn-v" onClick={goToNextLesson} style={{ minWidth: 260 }}>
-                Next Lesson: {nextLesson.title}
-                <ArrowRight size={16} style={{ marginLeft: 6 }} aria-hidden />
-              </button>
-            )}
-          </div>
-        </div>
+            )
+          }
+          stats={{
+            scoreLabel: quizQuestionsTotal > 0 ? `${quizCorrectCount}/${quizQuestionsTotal}` : 'Complete',
+            xpEarned: quizXpEarned,
+            coinsEarned: quizCoinsEarned,
+            accuracyPct: quizAccuracy,
+            hintsUsed: hintsUsedMax,
+            timeSpentSec: quizTimeSpentSec,
+          }}
+          showNextUnit={!isHistory}
+          nextLessonTitle={nextLesson?.title ?? null}
+          onNextUnit={() => {
+            setPhase('loading');
+            api.session.start(studentId, chapter)
+              .then(r => { if (!r.done) applySession(r); else setPhase('complete'); })
+              .catch(() => setPhase('complete'));
+          }}
+          onNextLesson={nextLesson ? goToNextLesson : undefined}
+          onHome={() => { lessonAudio.abort(); router.push(lessonsBackPath); }}
+        />
       )}
 
       {/* Error */}

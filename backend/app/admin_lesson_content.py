@@ -312,6 +312,9 @@ def _build_student_view(
         for item in unit_plan.get("items") or []:
             if item.get("type") in ("vocab", "vocabulary") and item.get("title"):
                 vocabulary.append(str(item["title"]))
+    from .plan_deduplication import dedupe_strings
+
+    vocabulary = dedupe_strings(vocabulary)
 
     return {
         "teacher_text": teacher_text,
@@ -364,7 +367,10 @@ def get_admin_lesson_content(
 
     unit_plan = _find_any_unit_plan(chapter_id, student_id)
     if unit_plan:
+        from .plan_deduplication import dedupe_unit_plan
+
         unit_plan = filter_unit_plan_for_subject(unit_plan, subject_key) or unit_plan
+        unit_plan = dedupe_unit_plan(unit_plan)
     progress_samples = _find_progress_samples(chapter_id, student_id)
     student_view = _build_student_view(
         chapter_id, student_id, unit_plan, progress_samples, supports_listening=supports_listening
@@ -399,15 +405,16 @@ def get_admin_lesson_content(
         book_unit = None
 
     items = (unit_plan or {}).get("items") or []
-    quiz_items = [i for i in items if i.get("type") in ("quiz", "exercises", "mcq")]
-    vocab_items = [i for i in items if i.get("type") in ("vocab", "vocabulary")]
-    concept_items = [
-        i for i in items
-        if i.get("type") in ("other", "visual", "discussion", "wrap_up")
-        and "concept" in str(i.get("title") or "").lower()
-    ]
-    activity_items = [i for i in items if i.get("type") in ("exercises", "visual") and i not in quiz_items]
-    summary_items = [i for i in items if i.get("type") in ("wrap_up",) or "summary" in str(i.get("title") or "").lower()]
+    from .plan_deduplication import partition_plan_items_for_display
+
+    partitioned = partition_plan_items_for_display(items)
+    quiz_items = partitioned["quiz"]
+    vocab_items = partitioned["vocabulary"]
+    concept_items = partitioned["concepts"]
+    activity_items = partitioned["activities"] + partitioned["visual"]
+    summary_items = partitioned["summary"]
+    objective_items = partitioned["objectives"]
+    explanation_items = partitioned["explanation_items"]
 
     listening = _load_listening_activity(chapter_id) if supports_listening else None
     listening_questions = []
@@ -469,11 +476,8 @@ def get_admin_lesson_content(
             "has_stored_session": student_view.get("has_stored_session", False),
         },
         "generated_content": {
-            "explanation_items": [
-                i for i in items
-                if i.get("type") in ("unit_opening", "reading", "grammar", "discussion", "wrap_up", "other")
-                and i.get("type") not in ("listening", "speaking")
-            ],
+            "explanation_items": explanation_items,
+            "objectives": objective_items,
             "vocabulary": vocab_items,
             "concepts": concept_items,
             "activities": activity_items,

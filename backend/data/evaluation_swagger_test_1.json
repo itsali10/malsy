@@ -1,0 +1,161 @@
+{
+  "student_id": "swagger_test_1",
+  "updated_at": "2026-07-07T20:35:51.364516Z",
+  "totals": {
+    "attempts": 12,
+    "correct": 8,
+    "accuracy": 66.67
+  },
+  "recent_attempts": [
+    {
+      "ts": "2026-07-07T20:18:36.978213Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the significance of the River Nile for the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:21:50.424111Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Where did the Ancient Egyptians live and why was this location significant for their civilization?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:23:35.251064Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Who unified Upper and Lower Egypt, and what was the name of the new capital city established?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:25:16.140232Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Why was the division of Ancient Egypt into the red land and the black land important?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:26:00.673549Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "discussion_questions",
+      "quiz_question": "What was the significance of the River Nile to the Ancient Egyptians?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:29:01.703229Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "discussion_questions",
+      "quiz_question": "What was the significance of the River Nile to the Ancient Egyptians?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:29:55.256071Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "discussion_questions",
+      "quiz_question": "Who united Upper Egypt and Lower Egypt into one kingdom?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:31:44.739758Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "discussion_questions",
+      "quiz_question": "How did the Ancient Egyptians divide their land for strategic purposes?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:33:16.379264Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "discussion_questions",
+      "quiz_question": "How did the Ancient Egyptians divide their land for strategic purposes?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:34:52.458576Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "visual_elements",
+      "quiz_question": "What was the name of the pharaoh who united Upper and Lower Egypt?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:35:10.146389Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "visual_elements",
+      "quiz_question": "Why was the Nile referred to as the 'gift of the Nile' by the Ancient Egyptians?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T20:35:51.364516Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "visual_elements",
+      "quiz_question": "Why was the Nile referred to as the 'gift of the Nile' by the Ancient Egyptians?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    }
+  ],
+  "by_unit": {
+    "history_g6:unit_01": {
+      "attempts": 12,
+      "correct": 8,
+      "accuracy": 66.67
+    }
+  },
+  "by_item": {
+    "history_g6:unit_01:unit_opening": {
+      "attempts": 1,
+      "incorrect": 0,
+      "remediation_used": 0
+    },
+    "history_g6:unit_01:reading_1": {
+      "attempts": 3,
+      "incorrect": 0,
+      "remediation_used": 0
+    },
+    "history_g6:unit_01:discussion_questions": {
+      "attempts": 5,
+      "incorrect": 2,
+      "remediation_used": 0
+    },
+    "history_g6:unit_01:visual_elements": {
+      "attempts": 3,
+      "incorrect": 2,
+      "remediation_used": 0
+    }
+  },
+  "tutor_quality_events": []
+}

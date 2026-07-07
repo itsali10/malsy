@@ -1,85 +1,85 @@
 {
   "unit_id": "english_g6:unit_01",
-  "title": "The Bridge Challenge",
-  "transcript": "Once upon a time in the village of Koi, there was a grand challenge that involved a long bridge over the Black Water River. Sam and David, two adventurous friends, stood at the edge of the bridge, eager to test their courage. Sam, feeling bold, suggested a race across the bridge before the train arrived. David, more cautious, warned about the danger and the sign prohibiting pedestrians on the bridge. Undeterred, Sam confidently declared, 'Race you!' and dashed across the bridge. The author's purpose in this fantasy story is to entertain readers with a tale of bravery and friendship.",
-  "narration_text": "Once upon a time in the village of Koi, there was a grand challenge that involved a long bridge over the Black Water River. Sam and David, two adventurous friends, stood at the edge of the bridge, eager to test their courage. Sam, feeling bold, suggested a race across the bridge before the train arrived. David, more cautious, warned about the danger and the sign prohibiting pedestrians on the bridge. Undeterred, Sam confidently declared, 'Race you!' and dashed across the bridge. The author's purpose in this fantasy story is to entertain readers with a tale of bravery and friendship.",
-  "story": "Once upon a time in the village of Koi, there was a grand challenge that involved a long bridge over the Black Water River. Sam and David, two adventurous friends, stood at the edge of the bridge, eager to test their courage. Sam, feeling bold, suggested a race across the bridge before the train arrived. David, more cautious, warned about the danger and the sign prohibiting pedestrians on the bridge. Undeterred, Sam confidently declared, 'Race you!' and dashed across the bridge. The author's purpose in this fantasy story is to entertain readers with a tale of bravery and friendship.",
+  "title": "The Importance of Bridges and Tunnels",
+  "transcript": "Imagine a world without bridges and tunnels. How would we cross rivers or travel through mountains? These structures play a vital role in our daily lives. Let's listen to three different speakers and discover how bridges and tunnels are essential to them. The first speaker uses a tunnel to get home. It provides a direct path under the river, saving time and avoiding traffic. In contrast, the second speaker enjoys using bridges during the summer. They offer scenic views and a sense of adventure. Now, the third speaker opts for a bus ride through a tunnel. This underground passage allows for a smooth journey, shielded from harsh weather conditions. Despite their different preferences, all three speakers rely on bridges and tunnels for convenient transportation. In bustling cities like New York, these structures are lifelines, helping people traverse rivers and bypass heavy traffic. The subway system, utilizing bridges and tunnels, ensures swift commutes for millions of commuters. While all speakers appreciate bridges, only two use them for work purposes. Trains in New York heavily depend on bridges and tunnels to transport passengers efficiently. Bridges and tunnels are not just physical connections; they symbolize progress and innovation, shaping our modern world.",
+  "narration_text": "Imagine a world without bridges and tunnels. How would we cross rivers or travel through mountains? These structures play a vital role in our daily lives. Let's listen to three different speakers and discover how bridges and tunnels are essential to them. The first speaker uses a tunnel to get home. It provides a direct path under the river, saving time and avoiding traffic. In contrast, the second speaker enjoys using bridges during the summer. They offer scenic views and a sense of adventure. Now, the third speaker opts for a bus ride through a tunnel. This underground passage allows for a smooth journey, shielded from harsh weather conditions. Despite their different preferences, all three speakers rely on bridges and tunnels for convenient transportation. In bustling cities like New York, these structures are lifelines, helping people traverse rivers and bypass heavy traffic. The subway system, utilizing bridges and tunnels, ensures swift commutes for millions of commuters. While all speakers appreciate bridges, only two use them for work purposes. Trains in New York heavily depend on bridges and tunnels to transport passengers efficiently. Bridges and tunnels are not just physical connections; they symbolize progress and innovation, shaping our modern world.",
+  "story": "Imagine a world without bridges and tunnels. How would we cross rivers or travel through mountains? These structures play a vital role in our daily lives. Let's listen to three different speakers and discover how bridges and tunnels are essential to them. The first speaker uses a tunnel to get home. It provides a direct path under the river, saving time and avoiding traffic. In contrast, the second speaker enjoys using bridges during the summer. They offer scenic views and a sense of adventure. Now, the third speaker opts for a bus ride through a tunnel. This underground passage allows for a smooth journey, shielded from harsh weather conditions. Despite their different preferences, all three speakers rely on bridges and tunnels for convenient transportation. In bustling cities like New York, these structures are lifelines, helping people traverse rivers and bypass heavy traffic. The subway system, utilizing bridges and tunnels, ensures swift commutes for millions of commuters. While all speakers appreciate bridges, only two use them for work purposes. Trains in New York heavily depend on bridges and tunnels to transport passengers efficiently. Bridges and tunnels are not just physical connections; they symbolize progress and innovation, shaping our modern world.",
   "questions": [
     {
       "id": "q1",
-      "question": "Is it better to be safe or take risks? Why?",
+      "question": "Does the first speaker use a bridge or a tunnel to get home?",
       "options": [
-        "Being safe is better because it avoids danger.",
-        "Taking risks is better for personal growth.",
-        "Being safe is better to prevent accidents.",
-        "Taking risks is better for fun and excitement."
+        "Bridge",
+        "Tunnel",
+        "Train",
+        "Car"
       ],
-      "correct_answer": "Being safe is better because it avoids danger.",
-      "explanation": "David warns Sam about the danger of crossing the bridge, indicating that being safe is better to prevent accidents.",
+      "correct_answer": "Tunnel",
+      "explanation": "The first speaker uses a tunnel to get home.",
       "skill": "understanding"
     },
     {
       "id": "q2",
-      "question": "What are some benefits of meeting new people?",
+      "question": "How are bridges and tunnels important in your daily life?",
       "options": [
-        "Learning new things and gaining different perspectives.",
-        "Staying in your comfort zone.",
-        "Avoiding social interactions.",
-        "Being isolated from others."
+        "For shopping",
+        "For entertainment",
+        "For transportation",
+        "For gardening"
       ],
-      "correct_answer": "Learning new things and gaining different perspectives.",
-      "explanation": "Meeting new people allows individuals to learn new things and gain different perspectives, fostering personal growth.",
+      "correct_answer": "For transportation",
+      "explanation": "Bridges and tunnels are important for transportation in our daily lives.",
       "skill": "understanding"
     },
     {
       "id": "q3",
-      "question": "Why was the grandfather afraid for his people?",
+      "question": "Does the second speaker use bridges or tunnels to get around in the summer?",
       "options": [
-        "He feared for their safety and well-being.",
-        "He wanted to control their actions.",
-        "He was skeptical about their abilities.",
-        "He was isolated from them."
+        "Bridges",
+        "Tunnels",
+        "Subway",
+        "Bicycle"
       ],
-      "correct_answer": "He feared for their safety and well-being.",
-      "explanation": "The grandfather's fear stemmed from concern for the safety and well-being of his people in the isolated village of Koi.",
+      "correct_answer": "Bridges",
+      "explanation": "The second speaker uses bridges to get around in the summer.",
       "skill": "understanding"
     },
     {
       "id": "q4",
-      "question": "Think What kinds of vehicles use bridges and tunnels?",
+      "question": "Does the third speaker take a bus through a tunnel or over a bridge?",
       "options": [
-        "Cars, trains, and bicycles.",
-        "Boats, planes, and helicopters.",
-        "Submarines, rockets, and spaceships.",
-        "Horses, carts, and wagons."
+        "Through a tunnel",
+        "Over a bridge",
+        "On a boat",
+        "On foot"
       ],
-      "correct_answer": "Cars, trains, and bicycles.",
-      "explanation": "Bridges and tunnels are commonly used by vehicles like cars, trains, and bicycles to cross over water bodies or through mountains.",
+      "correct_answer": "Through a tunnel",
+      "explanation": "The third speaker takes a bus through a tunnel.",
       "skill": "understanding"
     },
     {
       "id": "q5",
-      "question": "What is the author’s purpose? How do you know?",
+      "question": "What do all three speakers use?",
       "options": [
-        "To inform readers about bridge safety.",
-        "To entertain readers with a tale of bravery and friendship.",
-        "To persuade readers to take risks.",
-        "To analyze the benefits of meeting new people."
+        "Cars",
+        "Bridges",
+        "Tunnels",
+        "Buses"
       ],
-      "correct_answer": "To entertain readers with a tale of bravery and friendship.",
-      "explanation": "The author's purpose in the story of Sam and David racing across the bridge is to entertain readers with a tale of bravery and friendship.",
+      "correct_answer": "Bridges",
+      "explanation": "All three speakers use bridges.",
       "skill": "understanding"
     }
   ],
   "answers": {
-    "q1": "Being safe is better because it avoids danger.",
-    "q2": "Learning new things and gaining different perspectives.",
-    "q3": "He feared for their safety and well-being.",
-    "q4": "Cars, trains, and bicycles.",
-    "q5": "To entertain readers with a tale of bravery and friendship."
+    "q1": "Tunnel",
+    "q2": "For transportation",
+    "q3": "Bridges",
+    "q4": "Through a tunnel",
+    "q5": "Bridges"
   },
   "grade": 6,
-  "word_count": 99,
-  "source_hash": "b3b022269c63a7c119667261c5e595e685769a002c9c137b1f05ac7d119be9b1",
-  "generated_at": "2026-07-01T22:40:50.755119Z"
+  "word_count": 199,
+  "source_hash": "14f46b80538a9894183036888c5f196ea62eee741fef8af4761f3e771cb128a0",
+  "generated_at": "2026-07-06T05:34:15.549965Z"
 }

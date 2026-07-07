@@ -2,7 +2,7 @@
 
 
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Link from 'next/link';
 
@@ -17,6 +17,8 @@ import {
   BookDetailResponse,
 
   BookPlan,
+
+  RagProgress,
 
   statusColor,
 
@@ -38,9 +40,19 @@ import { AdminLessonAccordionCard } from '../../../../components/admin/AdminLess
 
 import { AdminBookStructurePanel } from '../../../../components/admin/AdminBookStructurePanel';
 
-import { AdminBookProcessingChecklist } from '../../../../components/admin/AdminBookProcessingChecklist';
+import { AdminPublishingChecklist } from '../../../../components/admin/AdminPublishingChecklist';
+
+import { AdminPlanGenerationStatus } from '../../../../components/admin/AdminPlanGenerationStatus';
+
+import { AdminSubjectActions } from '../../../../components/admin/AdminSubjectActions';
 
 import { AdminPublishStatusBanner } from '../../../../components/admin/AdminPublishStatusBanner';
+
+import {
+  canGeneratePlan as canGeneratePlanWorkflow,
+  canRegeneratePlan as canRegeneratePlanWorkflow,
+  isPlanGenerating,
+} from '../../../../lib/admin-book-workflow';
 
 
 
@@ -100,6 +112,12 @@ export default function AdminBookDetailPage() {
 
   const [busy, setBusy] = useState('');
 
+  const [planFeedback, setPlanFeedback] = useState<'success' | 'error' | null>(null);
+
+  const prevPlanStatusRef = useRef<string | null | undefined>(undefined);
+  const [ragJobActive, setRagJobActive] = useState(false);
+  const [ragProgress, setRagProgress] = useState<RagProgress | null>(null);
+
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
   const [lessonCache, setLessonCache] = useState<Record<string, AdminLessonContent>>({});
@@ -130,39 +148,171 @@ export default function AdminBookDetailPage() {
 
 
 
+  const book = data?.book;
+
+
+
   useEffect(() => { load(); }, [load]);
 
 
 
   useEffect(() => {
-
-    if (plan?.plan_status !== 'generating') return;
-
-    const t = setInterval(load, 5000);
-
+    const planStatus = plan?.plan_status ?? book?.plan_status;
+    if (planStatus !== 'generating') return;
+    const t = setInterval(load, 3000);
     return () => clearInterval(t);
+  }, [plan?.plan_status, book?.plan_status, load]);
 
-  }, [plan?.plan_status, load]);
-
-
-
-  const book = data?.book;
+  useEffect(() => {
+    const current = plan?.plan_status ?? book?.plan_status;
+    const prev = prevPlanStatusRef.current;
+    if (prev === 'generating' && current === 'draft') {
+      setPlanFeedback('success');
+    } else if (prev === 'generating' && current === 'failed') {
+      setPlanFeedback('error');
+      setError(book?.plan_error || plan?.plan_error || 'Lesson plan generation failed.');
+    }
+    prevPlanStatusRef.current = current;
+  }, [plan?.plan_status, book?.plan_status, book?.plan_error, plan?.plan_error]);
 
 
 
   useEffect(() => {
+    const shouldPoll = ragJobActive || book?.structure_status === 'extracting';
+    if (!shouldPoll) return;
 
-    if (book?.status === 'processing' || book?.structure_status === 'extracting') {
+    const poll = async () => {
+      if (ragJobActive && book?.status === 'processing') {
+        try {
+          const st = await adminApi.books.processingStatus(bookId);
+          if (st.rag_progress) setRagProgress(st.rag_progress);
+          if (st.stale && !st.job_running) {
+            setRagJobActive(false);
+            setRagProgress(st.rag_progress ?? null);
+            setError(
+              st.error_message ||
+                'RAG processing stopped unexpectedly. Click Reprocess RAG to retry.',
+            );
+            load();
+            return;
+          }
+          if (st.status === 'processed') {
+            setRagJobActive(false);
+            setRagProgress(st.rag_progress ?? null);
+          } else if (st.status === 'failed') {
+            setRagJobActive(false);
+            setRagProgress(st.rag_progress ?? null);
+            setError(st.error_message || st.rag_progress?.error_message || 'RAG processing failed.');
+          }
+        } catch {
+          // keep polling on transient errors
+        }
+      }
+      load();
+    };
 
-      const t = setInterval(load, 5000);
+    const t = setInterval(poll, 2000);
+    void poll();
+    return () => clearInterval(t);
+  }, [ragJobActive, book?.status, book?.structure_status, bookId, load]);
 
-      return () => clearInterval(t);
 
+
+  async function runReprocessRag() {
+    setError('');
+    setBusy('reprocess');
+    try {
+      const updated = await adminApi.books.reprocess(bookId);
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              book: {
+                ...updated,
+                plan_status: null,
+                plan_approved_at: undefined,
+                plan_generated_at: undefined,
+              },
+            }
+          : prev,
+      );
+      setPlan((prev) => (prev ? { ...prev, plan_status: undefined } : prev));
+      setRagJobActive(true);
+      setRagProgress({
+        stage: 'extracting_pdf',
+        stage_label: 'Extracting PDF',
+        current: 0,
+        total: 0,
+        batch_current: 0,
+        batch_total: 0,
+        detail: 'Extracting PDF',
+      });
+      load();
+    } catch (e) {
+      setRagJobActive(false);
+      setRagProgress(null);
+      setError(e instanceof Error ? e.message : 'Reprocess failed');
+      load();
+    } finally {
+      setBusy('');
     }
+  }
 
-  }, [book?.status, book?.structure_status, load]);
+  async function runApproveStructure() {
+    setError('');
+    setBusy('approve-rag');
+    try {
+      const updated = await adminApi.books.approveStructure(bookId);
+      setData((prev) => (prev ? { ...prev, book: updated } : prev));
+      setRagJobActive(true);
+      setRagProgress({
+        stage: 'extracting_pdf',
+        stage_label: 'Extracting PDF',
+        current: 0,
+        total: 0,
+        batch_current: 0,
+        batch_total: 0,
+        detail: 'Extracting PDF',
+      });
+      load();
+    } catch (e) {
+      setRagJobActive(false);
+      setRagProgress(null);
+      setError(e instanceof Error ? e.message : 'Approve & Run RAG failed');
+      load();
+    } finally {
+      setBusy('');
+    }
+  }
 
 
+
+  async function runPlanGeneration(action: 'generate' | 'regen') {
+    setPlanFeedback(null);
+    setError('');
+    setBusy(action);
+    setData((prev) =>
+      prev?.book
+        ? { ...prev, book: { ...prev.book, plan_status: 'generating', plan_error: undefined } }
+        : prev,
+    );
+    setPlan((prev) => ({
+      ...(prev || { book_id: bookId, units: [], objectives: [], modules: [] }),
+      plan_status: 'generating',
+      plan_error: undefined,
+    }));
+    try {
+      if (action === 'generate') await adminApi.books.generatePlan(bookId);
+      else await adminApi.books.regeneratePlan(bookId);
+      load();
+    } catch (e) {
+      setPlanFeedback('error');
+      setError(e instanceof Error ? e.message : 'Plan generation failed');
+      load();
+    } finally {
+      setBusy('');
+    }
+  }
 
   async function run(action: string, fn: () => Promise<unknown>) {
 
@@ -194,9 +344,15 @@ export default function AdminBookDetailPage() {
 
   const planStatus = plan?.plan_status ?? book?.plan_status;
 
-  const canGeneratePlan = book?.status === 'processed' && (!planStatus || planStatus === 'failed');
+  const planGenerating = book ? isPlanGenerating(book, plan) : false;
 
-  const canRegeneratePlan = book?.status === 'processed' && (planStatus === 'draft' || planStatus === 'approved');
+  const canGeneratePlan =
+    book && (canGeneratePlanWorkflow(book, plan) || planGenerating);
+
+  const canRegeneratePlan =
+    book &&
+    ((canRegeneratePlanWorkflow(book, plan) && !canGeneratePlanWorkflow(book, plan)) ||
+      planGenerating);
 
 
 
@@ -356,12 +512,33 @@ export default function AdminBookDetailPage() {
 
 
 
-          <AdminBookProcessingChecklist book={book} />
+          <AdminPublishingChecklist book={book} plan={plan} ragProgress={ragProgress} />
+
+          <AdminPlanGenerationStatus book={book} plan={plan} feedback={planFeedback} />
+
+          <AdminSubjectActions
+            book={book}
+            plan={plan}
+            hasStructureUnits={(book.unit_count ?? 0) > 0 || (book.lesson_count ?? 0) > 0}
+            busy={busy}
+            subjectName={book.title}
+            showArchiveSubject={false}
+            ragProgress={ragProgress}
+            ragJobActive={ragJobActive}
+            onGeneratePlan={() => runPlanGeneration('generate')}
+            onRegeneratePlan={() => runPlanGeneration('regen')}
+            onApprovePlan={() => run('approve-plan', () => adminApi.books.approvePlan(bookId))}
+            onApproveStructure={runApproveStructure}
+            onReprocessRag={runReprocessRag}
+            onToggleVisibility={() => run('vis', () => adminApi.books.setVisibility(bookId, !book.visible_to_students))}
+            onArchiveSubject={() => undefined}
+          />
 
 
 
           <AdminPublishStatusBanner
             book={book}
+            plan={plan}
             busy={busy === 'vis'}
             onToggle={() => run('vis', () => adminApi.books.setVisibility(bookId, !book.visible_to_students))}
           />
@@ -402,44 +579,6 @@ export default function AdminBookDetailPage() {
 
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 28 }}>
 
-            {book.status === 'processed' && (
-
-              <button
-
-                className="btn btn-o btn-sm"
-
-                disabled={!!busy}
-
-                onClick={() => run('process', () => adminApi.books.process(bookId))}
-
-              >
-
-                {busy === 'process' ? 'Reprocessing…' : 'Reprocess RAG'}
-
-              </button>
-
-            )}
-
-            {book.status === 'processed' && !book.archived && (
-
-              <button
-
-                className="btn btn-o btn-sm"
-
-                disabled={!!busy || (plan?.plan_status ?? book.plan_status) !== 'approved'}
-
-                title={(plan?.plan_status ?? book.plan_status) !== 'approved' ? 'Approve the lesson plan first' : undefined}
-
-                onClick={() => run('vis', () => adminApi.books.setVisibility(bookId, !book.visible_to_students))}
-
-              >
-
-                {book.visible_to_students ? 'Hide from Students' : 'Show to Students'}
-
-              </button>
-
-            )}
-
             <button className="btn btn-o btn-sm" disabled={!!busy} onClick={() => run('arch', () => adminApi.books.setArchive(bookId, !book.archived))}>
 
               {book.archived ? 'Restore Book' : 'Archive Book'}
@@ -476,7 +615,7 @@ export default function AdminBookDetailPage() {
 
                   {canEditPlan && (
 
-                    <button className="btn btn-o btn-sm" disabled={!!busy} onClick={() => saveTitles()}>
+                    <button className="btn btn-o btn-sm" disabled={!!busy || planGenerating} onClick={() => saveTitles()}>
 
                       {busy === 'save' ? 'Saving…' : 'Save plan titles'}
 
@@ -486,9 +625,13 @@ export default function AdminBookDetailPage() {
 
                   {canEditPlan && (
 
-                    <button className="btn btn-p btn-sm" disabled={!!busy} onClick={() => run('approve', () => adminApi.books.approvePlan(bookId))}>
+                    <button
+                      className="btn btn-p btn-sm"
+                      disabled={!!busy || planGenerating}
+                      onClick={() => run('approve-plan', () => adminApi.books.approvePlan(bookId))}
+                    >
 
-                      {busy === 'approve' ? 'Approving…' : 'Approve plan'}
+                      {busy === 'approve-plan' ? 'Approving…' : 'Approve Plan'}
 
                     </button>
 
@@ -496,17 +639,25 @@ export default function AdminBookDetailPage() {
 
                   {canGeneratePlan && (
 
-                    <button className="btn btn-p btn-sm" disabled={!!busy || planStatus === 'generating'} onClick={() => run('generate', () => adminApi.books.generatePlan(bookId))}>
+                    <button
+                      className="btn btn-p btn-sm"
+                      disabled={!!busy || planGenerating}
+                      onClick={() => runPlanGeneration('generate')}
+                    >
 
-                      {busy === 'generate' ? 'Generating…' : 'Generate lesson plan'}
+                      {planGenerating || busy === 'generate' ? 'Generating lesson plans…' : 'Generate lesson plan'}
 
                     </button>
 
                   )}
 
-                  {canRegeneratePlan && (
+                  {canRegeneratePlan && !planGenerating && (
 
-                    <button className="btn btn-o btn-sm" disabled={!!busy || planStatus === 'generating'} onClick={() => run('regen', () => adminApi.books.regeneratePlan(bookId))}>
+                    <button
+                      className="btn btn-o btn-sm"
+                      disabled={!!busy || planGenerating}
+                      onClick={() => runPlanGeneration('regen')}
+                    >
 
                       {busy === 'regen' ? 'Regenerating…' : 'Regenerate plan'}
 
@@ -517,18 +668,6 @@ export default function AdminBookDetailPage() {
                 </div>
 
               </div>
-
-
-
-              {plan?.plan_status === 'generating' && (
-
-                <div className="card" style={{ padding: 20, color: 'var(--g3)', marginBottom: 16 }}>
-
-                  AI is building subject-specific lesson plans…
-
-                </div>
-
-              )}
 
 
 

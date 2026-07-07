@@ -1,0 +1,59 @@
+{
+  "unit_title": "Introduction to the Scientific Method",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to the Scientific Method",
+      "must_cover": true,
+      "keywords": [
+        "scientific method",
+        "introduction"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "scientific method",
+        "discussion",
+        "questions"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "scientific method",
+        "visuals",
+        "diagrams",
+        "charts"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "scientific method",
+        "practice tasks",
+        "writing prompts"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Wrap Up",
+      "must_cover": true,
+      "keywords": [
+        "scientific method",
+        "conclusion"
+      ]
+    }
+  ]
+}

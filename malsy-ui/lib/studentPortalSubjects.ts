@@ -1,8 +1,10 @@
 /**
  * Single source of truth for student portal subjects (API-backed).
+ * Always refetches from GET /portal/subjects so admin publish/hide changes appear promptly.
  */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api, StudentPortalSubjectRead } from './api';
+import { useRefreshOnWindowFocus } from './studentPortalRefresh';
 
 export type PortalSubject = StudentPortalSubjectRead;
 
@@ -11,7 +13,8 @@ let cachePromise: Promise<PortalSubject[]> | null = null;
 
 export async function loadPortalSubjects(force = false): Promise<PortalSubject[]> {
   if (!force && cachedSubjects) return cachedSubjects;
-  if (!force && cachePromise) return cachePromise;
+  if (cachePromise) return cachePromise;
+
   cachePromise = api.portal
     .subjects()
     .then((rows) => {
@@ -42,21 +45,36 @@ export function clearPortalSubjectsCache() {
   cachePromise = null;
 }
 
-export function usePortalSubjects() {
+export function usePortalSubjects(options?: { refreshOnFocus?: boolean }) {
+  const refreshOnFocus = options?.refreshOnFocus ?? true;
   const [subjects, setSubjects] = useState<PortalSubject[]>(cachedSubjects ?? []);
-  const [loading, setLoading] = useState(!cachedSubjects);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(() => {
+    setLoading(true);
+    return loadPortalSubjects(true)
+      .then((rows) => {
+        setSubjects(rows);
+        return rows;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
-    loadPortalSubjects().then((rows) => {
-      if (!cancelled) setSubjects(rows);
-    }).finally(() => {
-      if (!cancelled) setLoading(false);
+    refresh().then(() => {
+      if (cancelled) return;
     });
-    return () => { cancelled = true; };
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [refresh]);
 
-  return { subjects, loading };
+  useRefreshOnWindowFocus(refresh, refreshOnFocus);
+
+  return { subjects, loading, refresh };
 }
 
 export function routeForPortalSubject(subject: PortalSubject): string {
@@ -69,11 +87,11 @@ export function todaySubjectNames(subjects: PortalSubject[]): string[] {
 
 export async function searchPortalSubjects(query: string): Promise<PortalSubject[]> {
   const q = query.trim();
-  if (!q) return loadPortalSubjects();
+  if (!q) return loadPortalSubjects(true);
   try {
     return await api.portal.search(q);
   } catch {
-    const all = await loadPortalSubjects();
+    const all = await loadPortalSubjects(true);
     const lower = q.toLowerCase();
     return all.filter(
       (s) =>

@@ -1,0 +1,116 @@
+{
+  "student_id": "ad8ff7d0-90b0-4cfb-9da7-3cd397d81102",
+  "chapter_id": "history_g6:unit_01",
+  "current_item_index": 2,
+  "done_items": [
+    "unit_opening",
+    "reading_1"
+  ],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [
+    {
+      "ts": "2026-07-06T17:35:50.350160Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the name of the pharaoh who united Upper and Lower Egypt around 3200 BC?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T17:36:10.916434Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the name of the pharaoh who united Upper and Lower Egypt around 3200 BC?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T17:36:17.923844Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What was the name of the pharaoh who united Upper and Lower Egypt around 3200 BC?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T17:47:22.869832Z",
+      "item_id": "reading_1",
+      "quiz_question": "What was the significance of the red land in Ancient Egypt?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T17:47:36.118622Z",
+      "item_id": "reading_1",
+      "quiz_question": "What was the significance of the red land in Ancient Egypt?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T17:47:41.809575Z",
+      "item_id": "reading_1",
+      "quiz_question": "What was the significance of the red land in Ancient Egypt?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ],
+  "lesson_questions": [
+    {
+      "question": "What was the significance of the River Nile to the Ancient Egyptians?",
+      "options": [
+        "It was a source of gold and silver.",
+        "It was a place for religious ceremonies.",
+        "It provided water, food, and transportation.",
+        "It was used for military conquests."
+      ],
+      "correct_answer": "It provided water, food, and transportation.",
+      "expected_points": [
+        "The Nile was vital to the Egyptians for water, food, and transportation."
+      ],
+      "source_quote": "The Nile was and is so important to Egypt because it is mainly made up of hot deserts and receives little rainfall, therefore Egyptians have always depended on the Nile for water, food and transportation.",
+      "correct_index": 2
+    },
+    {
+      "question": "Who unified Egypt by conquering both Upper and Lower Egypt?",
+      "options": [
+        "Ramesses the Great",
+        "King Narmer or Menes",
+        "Pharaoh Tutankhamun",
+        "Queen Cleopatra"
+      ],
+      "correct_answer": "King Narmer or Menes",
+      "expected_points": [
+        "King Narmer, also known as Menes, unified Egypt by conquering the north and south."
+      ],
+      "source_quote": "In about 3200 BC the pharaoh of the north conquered the south and Egypt became united. The pharaoh's name was King Narmer or Menes.",
+      "correct_index": 1
+    },
+    {
+      "question": "What did the red land and black land represent in Ancient Egypt?",
+      "options": [
+        "Protection and resources",
+        "Military strategies",
+        "Religious beliefs",
+        "Trade routes and alliances"
+      ],
+      "correct_answer": "Protection and resources",
+      "expected_points": [
+        "The red land was the deserted area on the outskirts of Egypt, important for preventing invasions, while the black land near the Nile provided food and water."
+      ],
+      "source_quote": "The red land was the deserted area on the outskirts of Egypt, this was important land for preventing any invasions from neighbouring countries. The black land was the area close the Nile which was important for providing food and water for the people.",
+      "correct_index": 0
+    }
+  ],
+  "lesson_question_index": 0,
+  "lesson_questions_item_id": "discussion_questions"
+}

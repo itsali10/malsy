@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, time
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
@@ -66,12 +66,16 @@ async def next_session(
 
 @router.get("/my-week", response_model=List[WeekDayLessonScheduleRead])
 async def my_week(
+    selected_day: Optional[str] = None,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Return the student's day-based weekly lesson schedule (no fixed times)."""
     week_data = await fetch_student_weekly_schedule(
-        current_user.user_id, db, auto_generate=True
+        current_user.user_id,
+        db,
+        auto_generate=True,
+        selected_day=selected_day,
     )
     week = [
         WeekDayLessonScheduleRead(

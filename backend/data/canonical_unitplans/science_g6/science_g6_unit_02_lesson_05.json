@@ -1,0 +1,67 @@
+{
+  "unit_title": "Green Plants",
+  "items": [
+    {
+      "id": "lesson_explanation",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "green plants",
+        "seedling",
+        "leaves",
+        "plant parts"
+      ]
+    },
+    {
+      "id": "learning_objectives",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "observation skills",
+        "root structure",
+        "plant functions"
+      ]
+    },
+    {
+      "id": "diagrams_images",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": [
+        "cross section of a sponge",
+        "earthworm anatomy",
+        "coral reef formation"
+      ]
+    },
+    {
+      "id": "experiments_activities",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "worm handling activity",
+        "creating nutrient-rich soil"
+      ]
+    },
+    {
+      "id": "summary",
+      "type": "wrap_up",
+      "title": "Summary / Wrap-up",
+      "must_cover": true,
+      "keywords": [
+        "animal phyla",
+        "mollusks",
+        "parasites"
+      ]
+    },
+    {
+      "id": "quiz_review_questions",
+      "type": "exercises",
+      "title": "Quiz or Review Questions",
+      "must_cover": true,
+      "keywords": []
+    }
+  ]
+}

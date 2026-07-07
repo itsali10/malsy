@@ -64,27 +64,43 @@ def build_unit_sections(
     end_book: int,
     pdf_offset: int,
 ) -> Dict[str, Any]:
+    """Walk pages in order; carry section state so reading stories are not split."""
+    from .english_section_segmentation import split_text_into_section_blocks
+
     pages: List[Dict[str, Any]] = []
     section_pages: Dict[str, List[int]] = {}
     section_texts: Dict[str, List[str]] = {}
+    active_section = "other"
 
     for book_page in range(start_book, end_book + 1):
         pdf_idx = book_page_to_pdf_index(book_page, pdf_offset)
         if pdf_idx < 0 or pdf_idx >= len(reader.pages):
             continue
         text = (reader.pages[pdf_idx].extract_text() or "").strip()
-        section_type, section_title = detect_page_section(text)
-        pages.append(
-            {
-                "book_page": book_page,
-                "pdf_index": pdf_idx,
-                "section_type": section_type,
-                "section_title": section_title,
-                "text": text,
-            }
-        )
-        section_pages.setdefault(section_type, []).append(book_page)
-        section_texts.setdefault(section_type, []).append(text)
+        if not text:
+            continue
+
+        blocks, active_section = split_text_into_section_blocks(text, active_section)
+        if not blocks:
+            section_type, section_title = detect_page_section(text)
+            blocks = [(section_type, text)]
+            active_section = section_type
+
+        for section_type, block_text in blocks:
+            if not block_text.strip():
+                continue
+            section_title = SECTION_LABELS.get(section_type, section_type.replace("_", " ").title())
+            pages.append(
+                {
+                    "book_page": book_page,
+                    "pdf_index": pdf_idx,
+                    "section_type": section_type,
+                    "section_title": section_title,
+                    "text": block_text,
+                }
+            )
+            section_pages.setdefault(section_type, []).append(book_page)
+            section_texts.setdefault(section_type, []).append(block_text)
 
     sections_out: List[Dict[str, Any]] = []
     for section_type, book_pages in section_pages.items():
@@ -95,7 +111,7 @@ def build_unit_sections(
                 "section_title": SECTION_LABELS.get(section_type, section_type),
                 "start_page": min(book_pages),
                 "end_page": max(book_pages),
-                "book_pages": book_pages,
+                "book_pages": sorted(set(book_pages)),
                 "text_length": len(combined),
             }
         )

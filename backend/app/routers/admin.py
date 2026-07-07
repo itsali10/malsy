@@ -764,6 +764,17 @@ def _merge_book_counts(rec: dict, manifest: Optional[dict] = None) -> dict:
     return out
 
 
+def _book_record_with_structure_counts(rec: dict) -> dict:
+    """Merge manifest-derived unit/lesson counts into a registry book record."""
+    book_id = rec.get("book_id", "")
+    manifest_path = os.path.join(book_dir(book_id), "manifest.json")
+    manifest = None
+    if os.path.isfile(manifest_path):
+        with open(manifest_path, encoding="utf-8") as f:
+            manifest = json.load(f)
+    return _merge_book_counts(dict(rec), manifest)
+
+
 def _book_to_read(rec: dict) -> BookRecordRead:
     from ..book_registry import book_processing_pipeline
 
@@ -821,58 +832,10 @@ def _run_structure_extraction_job(book_id: str) -> None:
 
 
 def _run_ingest_job(book_id: str, *, skip_structure_check: bool = False) -> None:
-    try:
-        from ..book_registry import is_structure_approved
+    """Backward-compatible wrapper — prefer book_processing_service.start_ingest_job."""
+    from ..book_processing_service import run_ingest_job
 
-        if not skip_structure_check and not is_structure_approved(book_id):
-            raise ValueError("Approve the extracted book structure before processing")
-
-        set_book_status(book_id, "processing")
-        from ..unit_detection import refresh_manifest_units_from_pdf
-        from ..canonical_plan_store import load_book_plan
-
-        refresh_manifest_units_from_pdf(book_id)
-        result = ingest_book_by_key(book_id, purge=True)
-        counts = _chroma_counts(book_id)
-        ingested_lessons = int(result.get("units_ingested") or 0)
-        manifest_path = os.path.join(book_dir(book_id), "manifest.json")
-        manifest = None
-        if os.path.isfile(manifest_path):
-            with open(manifest_path, encoding="utf-8") as f:
-                manifest = json.load(f)
-        structure = _structure_counts_from_manifest(manifest)
-        upsert_book_record(
-            book_id,
-            status="processed",
-            unit_count=structure["unit_count"] or ingested_lessons,
-            lesson_count=structure["lesson_count"] or ingested_lessons,
-            chunk_count=counts["chunk_count"] or result.get("chunks_written"),
-            error_message=None,
-        )
-
-        try:
-            from ..book_lessons_catalog import sync_lessons_catalog_from_manifest
-            from ..lesson_content_mapping import ensure_book_ready_for_students
-
-            ensure_book_ready_for_students(book_id)
-        except Exception:
-            traceback.print_exc()
-
-        rec = get_book_record(book_id) or {}
-        plan_status = rec.get("plan_status")
-        plan = load_book_plan(book_id)
-        stale_plan = False
-        if plan:
-            from ..lesson_content_mapping import plan_is_stale
-
-            stale_plan = plan_is_stale(book_id, plan)
-        if stale_plan:
-            upsert_book_record(book_id, plan_status=None, plan_error=None)
-
-        _run_plan_generation_job(book_id)
-    except Exception as exc:
-        traceback.print_exc()
-        set_book_status(book_id, "failed", error_message=str(exc))
+    run_ingest_job(book_id, skip_structure_check=skip_structure_check)
 
 
 def _run_plan_generation_job(book_id: str, *, force: bool = False) -> None:
@@ -929,7 +892,10 @@ def _run_schedule_sync_subject_job(subject_key: str) -> None:
 @router.get("/books", response_model=List[BookRecordRead])
 async def admin_list_books(_admin: User = Depends(require_admin_access)):
     sync_from_disk()
-    return [_book_to_read(b) for b in list_book_records(include_archived=True)]
+    out: List[BookRecordRead] = []
+    for rec in list_book_records(include_archived=True):
+        out.append(_book_to_read(_book_record_with_structure_counts(rec)))
+    return out
 
 
 def _subject_book_summary(rec: Optional[dict]) -> Optional[SubjectBookSummary]:
@@ -942,6 +908,7 @@ def _subject_book_summary(rec: Optional[dict]) -> Optional[SubjectBookSummary]:
         visible_to_students=bool(rec.get("visible_to_students")),
         archived=bool(rec.get("archived")),
         unit_count=rec.get("unit_count"),
+        lesson_count=rec.get("lesson_count"),
         chunk_count=rec.get("chunk_count"),
         error_message=rec.get("error_message"),
         uploaded_at=rec.get("uploaded_at"),
@@ -984,21 +951,19 @@ async def _build_subject_content_cards(db: AsyncSession) -> List[SubjectContentR
     cards: List[SubjectContentRead] = []
     for subj in list_subject_records(include_archived=True):
         key = subj["subject_key"]
-        books = books_for_subject(key, include_archived=True)
+        books = [
+            _book_record_with_structure_counts(b)
+            for b in books_for_subject(key, include_archived=True)
+        ]
         grade = int(subj.get("grade") or 6)
         primary = get_primary_book(key, grade=grade)
         if primary:
-            manifest_path = os.path.join(book_dir(primary.get("book_id", "")), "manifest.json")
-            manifest = None
-            if os.path.isfile(manifest_path):
-                with open(manifest_path, encoding="utf-8") as f:
-                    manifest = json.load(f)
-            primary = _merge_book_counts(primary, manifest)
+            primary = _book_record_with_structure_counts(primary)
         lesson_count = 0
         if primary:
-            lesson_count = int(primary.get("lesson_count") or primary.get("unit_count") or 0)
+            lesson_count = int(primary.get("lesson_count") or 0)
         elif books:
-            lesson_count = int(books[0].get("unit_count") or 0)
+            lesson_count = int(books[0].get("lesson_count") or 0)
 
         cards.append(
             SubjectContentRead(
@@ -1123,6 +1088,19 @@ async def admin_set_subject_archive(
     return _subject_record_read(subject_key)
 
 
+def _reset_replaced_book_workflow(book_id: str) -> None:
+    """Drop stale plan file so a replaced PDF does not inherit prior approval."""
+    from ..canonical_plan_store import book_plan_filename
+    from ..storage import DATA_DIR
+
+    plan_path = os.path.join(DATA_DIR, book_plan_filename(book_id))
+    if os.path.isfile(plan_path):
+        try:
+            os.remove(plan_path)
+        except OSError:
+            pass
+
+
 def _admin_save_uploaded_book(
     *,
     book_id: str,
@@ -1140,6 +1118,9 @@ def _admin_save_uploaded_book(
 
     if os.path.isdir(book_dir(book_id)) and not replace:
         replace = True
+
+    if replace and os.path.isdir(book_dir(book_id)):
+        _reset_replaced_book_workflow(book_id)
 
     dest_dir = book_dir(book_id)
     os.makedirs(dest_dir, exist_ok=True)
@@ -1173,6 +1154,13 @@ def _admin_save_uploaded_book(
         error_message=None,
         structure_status="pending",
         structure_warning=None,
+        structure_approved_at=None,
+        structure_extracted_at=None,
+        processed_at=None,
+        plan_status=None,
+        plan_generated_at=None,
+        plan_approved_at=None,
+        plan_error=None,
         book_key=book_id,
         catalog_key=book_id,
     )
@@ -1377,7 +1365,6 @@ async def admin_update_book_structure(
 @router.post("/books/{book_id}/structure/approve", response_model=BookRecordRead)
 async def admin_approve_book_structure(
     book_id: str,
-    background_tasks: BackgroundTasks,
     _admin: User = Depends(require_admin_access),
 ):
     from ..unit_detection import approve_and_prepare_manifest
@@ -1394,7 +1381,12 @@ async def admin_approve_book_structure(
         raise HTTPException(status_code=400, detail="No units to approve")
 
     approve_and_prepare_manifest(book_id, manifest)
-    background_tasks.add_task(_run_ingest_job, book_id, skip_structure_check=True)
+    from ..book_processing_service import start_ingest_job
+    from ..rag_progress_store import start_progress
+
+    start_progress(book_id)
+    if not start_ingest_job(book_id, skip_structure_check=True, reprocess=False):
+        raise HTTPException(status_code=409, detail="RAG processing is already running for this book")
     rec = set_book_status(book_id, "processing")
     return _book_to_read(rec)
 
@@ -1437,21 +1429,43 @@ async def admin_get_book(book_id: str, _admin: User = Depends(require_admin_acce
 
 
 @router.post("/books/{book_id}/process", response_model=BookRecordRead)
+@router.post("/books/{book_id}/reprocess", response_model=BookRecordRead)
 async def admin_process_book(
     book_id: str,
-    background_tasks: BackgroundTasks,
     _admin: User = Depends(require_admin_access),
 ):
+    from ..book_processing_service import is_ingest_running, start_ingest_job
+
+    print(f"[rag-process] POST process/reprocess requested for {book_id}")
     rec = get_book_record(book_id)
     if not rec:
         raise HTTPException(status_code=404, detail="Book not found")
     if not os.path.isdir(book_dir(book_id)):
         raise HTTPException(status_code=400, detail="Book files missing on disk")
 
+    if is_ingest_running(book_id):
+        raise HTTPException(status_code=409, detail="RAG processing is already running for this book")
+
     from ..book_registry import is_structure_approved
 
-    if rec.get("status") == "processed":
-        background_tasks.add_task(_run_ingest_job, book_id, True)
+    status = rec.get("status") or "uploaded"
+    previously_processed = bool(rec.get("processed_at")) or status == "processed"
+    structure_ok = is_structure_approved(book_id) or rec.get("structure_status") == "approved"
+
+    if previously_processed or status in ("processing", "failed"):
+        # Reprocess / retry / recover stale processing state.
+        from ..rag_progress_store import start_progress
+
+        upsert_book_record(
+            book_id,
+            plan_status=None,
+            plan_generated_at=None,
+            plan_approved_at=None,
+            plan_error=None,
+        )
+        start_progress(book_id)
+        if not start_ingest_job(book_id, skip_structure_check=True, reprocess=True):
+            raise HTTPException(status_code=409, detail="RAG processing is already running for this book")
     elif rec.get("structure_status") == "draft":
         raise HTTPException(
             status_code=400,
@@ -1459,16 +1473,46 @@ async def admin_process_book(
         )
     elif rec.get("structure_status") == "extracting":
         raise HTTPException(status_code=400, detail="Structure extraction is still in progress.")
-    elif not is_structure_approved(book_id):
+    elif not structure_ok:
         raise HTTPException(
             status_code=400,
             detail="Extract and approve the book structure before processing.",
         )
     else:
-        background_tasks.add_task(_run_ingest_job, book_id, True)
+        if not start_ingest_job(book_id, skip_structure_check=False, reprocess=False):
+            raise HTTPException(status_code=409, detail="RAG processing is already running for this book")
 
     rec = set_book_status(book_id, "processing")
+    print(f"[rag-process] job queued for {book_id} (status=processing)")
     return _book_to_read(rec)
+
+
+@router.get("/books/{book_id}/processing-status")
+async def admin_book_processing_status(
+    book_id: str,
+    _admin: User = Depends(require_admin_access),
+):
+    from ..book_processing_service import is_ingest_running
+    from ..rag_progress_store import get_progress, progress_to_api
+
+    rec = get_book_record(book_id)
+    if not rec:
+        raise HTTPException(status_code=404, detail="Book not found")
+    status = rec.get("status") or "uploaded"
+    job_running = is_ingest_running(book_id)
+    stale = status == "processing" and not job_running
+    rag = progress_to_api(get_progress(book_id))
+    error_message = rec.get("error_message")
+    if rag and rag.get("error_message"):
+        error_message = rag.get("error_message")
+    return {
+        "book_id": book_id,
+        "status": status,
+        "job_running": job_running,
+        "stale": stale,
+        "error_message": error_message,
+        "rag_progress": rag,
+    }
 
 
 @router.patch("/books/{book_id}/visibility", response_model=BookRecordRead)

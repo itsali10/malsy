@@ -1,6 +1,6 @@
 {
   "objectives": [
-    "Understand the basics of Science Grade 6"
+    "Teach 36 units from science_g6 in order"
   ],
   "units": [
     {
@@ -9,22 +9,22 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_01_lesson_01",
-      "module_key": null,
-      "chunk_ids": [
-        "science_g6:unit_01_lesson_01:p1:c0",
-        "science_g6:unit_01_lesson_01:p2:c0",
-        "science_g6:unit_01_lesson_01:p3:c0",
-        "science_g6:unit_01_lesson_01:p4:c0",
-        "science_g6:unit_01_lesson_01:p4:c1",
-        "science_g6:unit_01_lesson_01:p5:c0",
-        "science_g6:unit_01_lesson_01:p6:c0",
-        "science_g6:unit_01_lesson_01:p6:c1",
-        "science_g6:unit_01_lesson_01:p7:c0",
-        "science_g6:unit_01_lesson_01:p7:c1",
-        "science_g6:unit_01_lesson_01:p8:c0"
-      ],
       "start_page": 1,
-      "end_page": 8
+      "end_page": 8,
+      "module_key": "explanation",
+      "chunk_ids": [
+        "science_g6:unit_01_lesson_01:part_1:p0:c0",
+        "science_g6:unit_01_lesson_01:part_1:p1:c0",
+        "science_g6:unit_01_lesson_01:part_1:p2:c0",
+        "science_g6:unit_01_lesson_01:part_1:p3:c0",
+        "science_g6:unit_01_lesson_01:part_1:p3:c1",
+        "science_g6:unit_01_lesson_01:part_1:p4:c0",
+        "science_g6:unit_01_lesson_01:part_1:p5:c0",
+        "science_g6:unit_01_lesson_01:part_1:p5:c1",
+        "science_g6:unit_01_lesson_01:part_1:p6:c0",
+        "science_g6:unit_01_lesson_01:part_1:p6:c1",
+        "science_g6:unit_01_lesson_01:part_1:p7:c0"
+      ]
     },
     {
       "unit_id": "unit_01_lesson_02",
@@ -32,27 +32,26 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_01_lesson_02",
-      "module_key": null,
-      "chunk_ids": [
-        "science_g6:unit_01_lesson_02:p9:c0",
-        "science_g6:unit_01_lesson_02:p9:c1",
-        "science_g6:unit_01_lesson_02:p10:c0",
-        "science_g6:unit_01_lesson_02:p10:c1",
-        "science_g6:unit_01_lesson_02:p10:c2",
-        "science_g6:unit_01_lesson_02:p11:c0",
-        "science_g6:unit_01_lesson_02:p11:c1",
-        "science_g6:unit_01_lesson_02:p12:c0",
-        "science_g6:unit_01_lesson_02:p12:c1",
-        "science_g6:unit_01_lesson_02:p12:c2",
-        "science_g6:unit_01_lesson_02:p13:c0",
-        "science_g6:unit_01_lesson_02:p13:c1",
-        "science_g6:unit_01_lesson_02:p13:c2",
-        "science_g6:unit_01_lesson_02:p14:c0",
-        "science_g6:unit_01_lesson_02:p14:c1",
-        "science_g6:unit_01_lesson_02:p14:c2"
-      ],
       "start_page": 9,
-      "end_page": 14
+      "end_page": 14,
+      "module_key": "objectives",
+      "chunk_ids": [
+        "science_g6:unit_01_lesson_02:part_1:p8:c0",
+        "science_g6:unit_01_lesson_02:part_1:p8:c1",
+        "science_g6:unit_01_lesson_02:part_1:p9:c0",
+        "science_g6:unit_01_lesson_02:part_1:p9:c1",
+        "science_g6:unit_01_lesson_02:part_1:p10:c0",
+        "science_g6:unit_01_lesson_02:part_1:p10:c1",
+        "science_g6:unit_01_lesson_02:part_1:p11:c0",
+        "science_g6:unit_01_lesson_02:part_1:p11:c1",
+        "science_g6:unit_01_lesson_02:part_1:p11:c2",
+        "science_g6:unit_01_lesson_02:part_1:p12:c0",
+        "science_g6:unit_01_lesson_02:part_1:p12:c1",
+        "science_g6:unit_01_lesson_02:part_1:p12:c2",
+        "science_g6:unit_01_lesson_02:part_1:p13:c0",
+        "science_g6:unit_01_lesson_02:part_1:p13:c1",
+        "science_g6:unit_01_lesson_02:part_1:p13:c2"
+      ]
     },
     {
       "unit_id": "unit_01_lesson_03",
@@ -60,33 +59,32 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_01_lesson_03",
-      "module_key": null,
-      "chunk_ids": [
-        "science_g6:unit_01_lesson_03:p15:c0",
-        "science_g6:unit_01_lesson_03:p15:c1",
-        "science_g6:unit_01_lesson_03:p16:c0",
-        "science_g6:unit_01_lesson_03:p16:c1",
-        "science_g6:unit_01_lesson_03:p16:c2",
-        "science_g6:unit_01_lesson_03:p17:c0",
-        "science_g6:unit_01_lesson_03:p17:c1",
-        "science_g6:unit_01_lesson_03:p17:c2",
-        "science_g6:unit_01_lesson_03:p18:c0",
-        "science_g6:unit_01_lesson_03:p18:c1",
-        "science_g6:unit_01_lesson_03:p18:c2",
-        "science_g6:unit_01_lesson_03:p19:c0",
-        "science_g6:unit_01_lesson_03:p19:c1",
-        "science_g6:unit_01_lesson_03:p19:c2",
-        "science_g6:unit_01_lesson_03:p20:c0",
-        "science_g6:unit_01_lesson_03:p20:c1",
-        "science_g6:unit_01_lesson_03:p20:c2",
-        "science_g6:unit_01_lesson_03:p21:c0",
-        "science_g6:unit_01_lesson_03:p21:c1",
-        "science_g6:unit_01_lesson_03:p21:c2",
-        "science_g6:unit_01_lesson_03:p22:c0",
-        "science_g6:unit_01_lesson_03:p22:c1"
-      ],
       "start_page": 15,
-      "end_page": 22
+      "end_page": 22,
+      "module_key": "concepts",
+      "chunk_ids": [
+        "science_g6:unit_01_lesson_03:part_1:p14:c0",
+        "science_g6:unit_01_lesson_03:part_1:p14:c1",
+        "science_g6:unit_01_lesson_03:part_1:p15:c0",
+        "science_g6:unit_01_lesson_03:part_1:p15:c1",
+        "science_g6:unit_01_lesson_03:part_1:p15:c2",
+        "science_g6:unit_01_lesson_03:part_1:p16:c0",
+        "science_g6:unit_01_lesson_03:part_1:p16:c1",
+        "science_g6:unit_01_lesson_03:part_1:p16:c2",
+        "science_g6:unit_01_lesson_03:part_1:p17:c0",
+        "science_g6:unit_01_lesson_03:part_1:p17:c1",
+        "science_g6:unit_01_lesson_03:part_1:p17:c2",
+        "science_g6:unit_01_lesson_03:part_1:p18:c0",
+        "science_g6:unit_01_lesson_03:part_1:p18:c1",
+        "science_g6:unit_01_lesson_03:part_1:p18:c2",
+        "science_g6:unit_01_lesson_03:part_1:p19:c0",
+        "science_g6:unit_01_lesson_03:part_1:p19:c1",
+        "science_g6:unit_01_lesson_03:part_1:p19:c2",
+        "science_g6:unit_01_lesson_03:part_1:p20:c0",
+        "science_g6:unit_01_lesson_03:part_1:p20:c1",
+        "science_g6:unit_01_lesson_03:part_1:p21:c0",
+        "science_g6:unit_01_lesson_03:part_1:p21:c1"
+      ]
     },
     {
       "unit_id": "unit_01_lesson_04",
@@ -94,36 +92,36 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_01_lesson_04",
-      "module_key": null,
-      "chunk_ids": [
-        "science_g6:unit_01_lesson_04:p23:c0",
-        "science_g6:unit_01_lesson_04:p23:c1",
-        "science_g6:unit_01_lesson_04:p24:c0",
-        "science_g6:unit_01_lesson_04:p24:c1",
-        "science_g6:unit_01_lesson_04:p24:c2",
-        "science_g6:unit_01_lesson_04:p25:c0",
-        "science_g6:unit_01_lesson_04:p25:c1",
-        "science_g6:unit_01_lesson_04:p25:c2",
-        "science_g6:unit_01_lesson_04:p26:c0",
-        "science_g6:unit_01_lesson_04:p26:c1",
-        "science_g6:unit_01_lesson_04:p27:c0",
-        "science_g6:unit_01_lesson_04:p28:c0",
-        "science_g6:unit_01_lesson_04:p28:c1",
-        "science_g6:unit_01_lesson_04:p29:c0",
-        "science_g6:unit_01_lesson_04:p29:c1",
-        "science_g6:unit_01_lesson_04:p29:c2",
-        "science_g6:unit_01_lesson_04:p30:c0",
-        "science_g6:unit_01_lesson_04:p30:c1",
-        "science_g6:unit_01_lesson_04:p30:c2",
-        "science_g6:unit_01_lesson_04:p31:c0",
-        "science_g6:unit_01_lesson_04:p31:c1",
-        "science_g6:unit_01_lesson_04:p31:c2",
-        "science_g6:unit_01_lesson_04:p32:c0",
-        "science_g6:unit_01_lesson_04:p32:c1",
-        "science_g6:unit_01_lesson_04:p32:c2"
-      ],
       "start_page": 23,
-      "end_page": 32
+      "end_page": 32,
+      "module_key": "vocabulary",
+      "chunk_ids": [
+        "science_g6:unit_01_lesson_04:part_1:p22:c0",
+        "science_g6:unit_01_lesson_04:part_1:p22:c1",
+        "science_g6:unit_01_lesson_04:part_1:p23:c0",
+        "science_g6:unit_01_lesson_04:part_1:p23:c1",
+        "science_g6:unit_01_lesson_04:part_1:p23:c2",
+        "science_g6:unit_01_lesson_04:part_1:p24:c0",
+        "science_g6:unit_01_lesson_04:part_1:p24:c1",
+        "science_g6:unit_01_lesson_04:part_1:p24:c2",
+        "science_g6:unit_01_lesson_04:part_1:p25:c0",
+        "science_g6:unit_01_lesson_04:part_1:p25:c1",
+        "science_g6:unit_01_lesson_04:part_1:p26:c0",
+        "science_g6:unit_01_lesson_04:part_1:p27:c0",
+        "science_g6:unit_01_lesson_04:part_1:p27:c1",
+        "science_g6:unit_01_lesson_04:part_1:p28:c0",
+        "science_g6:unit_01_lesson_04:part_1:p28:c1",
+        "science_g6:unit_01_lesson_04:part_1:p28:c2",
+        "science_g6:unit_01_lesson_04:part_1:p29:c0",
+        "science_g6:unit_01_lesson_04:part_1:p29:c1",
+        "science_g6:unit_01_lesson_04:part_1:p29:c2",
+        "science_g6:unit_01_lesson_04:part_1:p30:c0",
+        "science_g6:unit_01_lesson_04:part_1:p30:c1",
+        "science_g6:unit_01_lesson_04:part_1:p30:c2",
+        "science_g6:unit_01_lesson_04:part_1:p31:c0",
+        "science_g6:unit_01_lesson_04:part_1:p31:c1",
+        "science_g6:unit_01_lesson_04:part_1:p31:c2"
+      ]
     },
     {
       "unit_id": "unit_02_lesson_05",
@@ -131,33 +129,33 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_02_lesson_05",
-      "module_key": null,
-      "chunk_ids": [
-        "science_g6:unit_02_lesson_05:p33:c0",
-        "science_g6:unit_02_lesson_05:p34:c0",
-        "science_g6:unit_02_lesson_05:p34:c1",
-        "science_g6:unit_02_lesson_05:p34:c2",
-        "science_g6:unit_02_lesson_05:p35:c0",
-        "science_g6:unit_02_lesson_05:p35:c1",
-        "science_g6:unit_02_lesson_05:p35:c2",
-        "science_g6:unit_02_lesson_05:p36:c0",
-        "science_g6:unit_02_lesson_05:p36:c1",
-        "science_g6:unit_02_lesson_05:p36:c2",
-        "science_g6:unit_02_lesson_05:p37:c0",
-        "science_g6:unit_02_lesson_05:p37:c1",
-        "science_g6:unit_02_lesson_05:p37:c2",
-        "science_g6:unit_02_lesson_05:p38:c0",
-        "science_g6:unit_02_lesson_05:p38:c1",
-        "science_g6:unit_02_lesson_05:p39:c0",
-        "science_g6:unit_02_lesson_05:p39:c1",
-        "science_g6:unit_02_lesson_05:p39:c2",
-        "science_g6:unit_02_lesson_05:p40:c0",
-        "science_g6:unit_02_lesson_05:p40:c1",
-        "science_g6:unit_02_lesson_05:p40:c2",
-        "science_g6:unit_02_lesson_05:p40:c3"
-      ],
       "start_page": 33,
-      "end_page": 40
+      "end_page": 40,
+      "module_key": "diagrams",
+      "chunk_ids": [
+        "science_g6:unit_02_lesson_05:part_1:p32:c0",
+        "science_g6:unit_02_lesson_05:part_1:p33:c0",
+        "science_g6:unit_02_lesson_05:part_1:p33:c1",
+        "science_g6:unit_02_lesson_05:part_1:p33:c2",
+        "science_g6:unit_02_lesson_05:part_1:p34:c0",
+        "science_g6:unit_02_lesson_05:part_1:p34:c1",
+        "science_g6:unit_02_lesson_05:part_1:p34:c2",
+        "science_g6:unit_02_lesson_05:part_1:p35:c0",
+        "science_g6:unit_02_lesson_05:part_1:p35:c1",
+        "science_g6:unit_02_lesson_05:part_1:p35:c2",
+        "science_g6:unit_02_lesson_05:part_1:p36:c0",
+        "science_g6:unit_02_lesson_05:part_1:p36:c1",
+        "science_g6:unit_02_lesson_05:part_1:p36:c2",
+        "science_g6:unit_02_lesson_05:part_1:p37:c0",
+        "science_g6:unit_02_lesson_05:part_1:p37:c1",
+        "science_g6:unit_02_lesson_05:part_1:p38:c0",
+        "science_g6:unit_02_lesson_05:part_1:p38:c1",
+        "science_g6:unit_02_lesson_05:part_1:p38:c2",
+        "science_g6:unit_02_lesson_05:part_1:p39:c0",
+        "science_g6:unit_02_lesson_05:part_1:p39:c1",
+        "science_g6:unit_02_lesson_05:part_1:p39:c2",
+        "science_g6:unit_02_lesson_05:part_1:p39:c3"
+      ]
     },
     {
       "unit_id": "unit_02_lesson_06",
@@ -165,24 +163,24 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_02_lesson_06",
-      "module_key": null,
-      "chunk_ids": [
-        "science_g6:unit_02_lesson_06:p41:c0",
-        "science_g6:unit_02_lesson_06:p42:c0",
-        "science_g6:unit_02_lesson_06:p43:c0",
-        "science_g6:unit_02_lesson_06:p43:c1",
-        "science_g6:unit_02_lesson_06:p43:c2",
-        "science_g6:unit_02_lesson_06:p44:c0",
-        "science_g6:unit_02_lesson_06:p44:c1",
-        "science_g6:unit_02_lesson_06:p44:c2",
-        "science_g6:unit_02_lesson_06:p45:c0",
-        "science_g6:unit_02_lesson_06:p45:c1",
-        "science_g6:unit_02_lesson_06:p46:c0",
-        "science_g6:unit_02_lesson_06:p46:c1",
-        "science_g6:unit_02_lesson_06:p46:c2"
-      ],
       "start_page": 41,
-      "end_page": 46
+      "end_page": 46,
+      "module_key": "experiments",
+      "chunk_ids": [
+        "science_g6:unit_02_lesson_06:part_1:p40:c0",
+        "science_g6:unit_02_lesson_06:part_1:p41:c0",
+        "science_g6:unit_02_lesson_06:part_1:p42:c0",
+        "science_g6:unit_02_lesson_06:part_1:p42:c1",
+        "science_g6:unit_02_lesson_06:part_1:p42:c2",
+        "science_g6:unit_02_lesson_06:part_1:p43:c0",
+        "science_g6:unit_02_lesson_06:part_1:p43:c1",
+        "science_g6:unit_02_lesson_06:part_1:p43:c2",
+        "science_g6:unit_02_lesson_06:part_1:p44:c0",
+        "science_g6:unit_02_lesson_06:part_1:p44:c1",
+        "science_g6:unit_02_lesson_06:part_1:p45:c0",
+        "science_g6:unit_02_lesson_06:part_1:p45:c1",
+        "science_g6:unit_02_lesson_06:part_1:p45:c2"
+      ]
     },
     {
       "unit_id": "unit_02_lesson_07",
@@ -190,25 +188,25 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_02_lesson_07",
-      "module_key": null,
-      "chunk_ids": [
-        "science_g6:unit_02_lesson_07:p47:c0",
-        "science_g6:unit_02_lesson_07:p48:c0",
-        "science_g6:unit_02_lesson_07:p49:c0",
-        "science_g6:unit_02_lesson_07:p50:c0",
-        "science_g6:unit_02_lesson_07:p50:c1",
-        "science_g6:unit_02_lesson_07:p51:c0",
-        "science_g6:unit_02_lesson_07:p51:c1",
-        "science_g6:unit_02_lesson_07:p52:c0",
-        "science_g6:unit_02_lesson_07:p52:c1",
-        "science_g6:unit_02_lesson_07:p53:c0",
-        "science_g6:unit_02_lesson_07:p53:c1",
-        "science_g6:unit_02_lesson_07:p54:c0",
-        "science_g6:unit_02_lesson_07:p54:c1",
-        "science_g6:unit_02_lesson_07:p54:c2"
-      ],
       "start_page": 47,
-      "end_page": 54
+      "end_page": 54,
+      "module_key": "summary",
+      "chunk_ids": [
+        "science_g6:unit_02_lesson_07:part_1:p46:c0",
+        "science_g6:unit_02_lesson_07:part_1:p47:c0",
+        "science_g6:unit_02_lesson_07:part_1:p48:c0",
+        "science_g6:unit_02_lesson_07:part_1:p49:c0",
+        "science_g6:unit_02_lesson_07:part_1:p49:c1",
+        "science_g6:unit_02_lesson_07:part_1:p50:c0",
+        "science_g6:unit_02_lesson_07:part_1:p50:c1",
+        "science_g6:unit_02_lesson_07:part_1:p51:c0",
+        "science_g6:unit_02_lesson_07:part_1:p51:c1",
+        "science_g6:unit_02_lesson_07:part_1:p52:c0",
+        "science_g6:unit_02_lesson_07:part_1:p52:c1",
+        "science_g6:unit_02_lesson_07:part_1:p53:c0",
+        "science_g6:unit_02_lesson_07:part_1:p53:c1",
+        "science_g6:unit_02_lesson_07:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_02_lesson_08",
@@ -216,10 +214,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_02_lesson_08",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 55,
-      "end_page": 62
+      "end_page": 62,
+      "module_key": "quiz",
+      "chunk_ids": [
+        "science_g6:unit_02_lesson_08:part_1:p53:c0",
+        "science_g6:unit_02_lesson_08:part_1:p53:c1",
+        "science_g6:unit_02_lesson_08:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_02_lesson_09",
@@ -227,10 +229,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_02_lesson_09",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 63,
-      "end_page": 70
+      "end_page": 70,
+      "module_key": "explanation",
+      "chunk_ids": [
+        "science_g6:unit_02_lesson_09:part_1:p53:c0",
+        "science_g6:unit_02_lesson_09:part_1:p53:c1",
+        "science_g6:unit_02_lesson_09:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_02_lesson_10",
@@ -238,10 +244,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_02_lesson_10",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 71,
-      "end_page": 78
+      "end_page": 78,
+      "module_key": "objectives",
+      "chunk_ids": [
+        "science_g6:unit_02_lesson_10:part_1:p53:c0",
+        "science_g6:unit_02_lesson_10:part_1:p53:c1",
+        "science_g6:unit_02_lesson_10:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_02_lesson_11",
@@ -249,10 +259,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_02_lesson_11",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 79,
-      "end_page": 84
+      "end_page": 84,
+      "module_key": "concepts",
+      "chunk_ids": [
+        "science_g6:unit_02_lesson_11:part_1:p53:c0",
+        "science_g6:unit_02_lesson_11:part_1:p53:c1",
+        "science_g6:unit_02_lesson_11:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_02_lesson_12",
@@ -260,10 +274,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_02_lesson_12",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 85,
-      "end_page": 90
+      "end_page": 90,
+      "module_key": "vocabulary",
+      "chunk_ids": [
+        "science_g6:unit_02_lesson_12:part_1:p53:c0",
+        "science_g6:unit_02_lesson_12:part_1:p53:c1",
+        "science_g6:unit_02_lesson_12:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_02_lesson_13",
@@ -271,10 +289,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_02_lesson_13",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 91,
-      "end_page": 98
+      "end_page": 98,
+      "module_key": "diagrams",
+      "chunk_ids": [
+        "science_g6:unit_02_lesson_13:part_1:p53:c0",
+        "science_g6:unit_02_lesson_13:part_1:p53:c1",
+        "science_g6:unit_02_lesson_13:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_02_lesson_14",
@@ -282,10 +304,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_02_lesson_14",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 99,
-      "end_page": 106
+      "end_page": 106,
+      "module_key": "experiments",
+      "chunk_ids": [
+        "science_g6:unit_02_lesson_14:part_1:p53:c0",
+        "science_g6:unit_02_lesson_14:part_1:p53:c1",
+        "science_g6:unit_02_lesson_14:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_02_lesson_15",
@@ -293,10 +319,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_02_lesson_15",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 107,
-      "end_page": 118
+      "end_page": 118,
+      "module_key": "summary",
+      "chunk_ids": [
+        "science_g6:unit_02_lesson_15:part_1:p53:c0",
+        "science_g6:unit_02_lesson_15:part_1:p53:c1",
+        "science_g6:unit_02_lesson_15:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_03_lesson_16",
@@ -304,10 +334,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_03_lesson_16",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 119,
-      "end_page": 122
+      "end_page": 122,
+      "module_key": "quiz",
+      "chunk_ids": [
+        "science_g6:unit_03_lesson_16:part_1:p53:c0",
+        "science_g6:unit_03_lesson_16:part_1:p53:c1",
+        "science_g6:unit_03_lesson_16:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_03_lesson_17",
@@ -315,10 +349,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_03_lesson_17",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 123,
-      "end_page": 132
+      "end_page": 132,
+      "module_key": "explanation",
+      "chunk_ids": [
+        "science_g6:unit_03_lesson_17:part_1:p53:c0",
+        "science_g6:unit_03_lesson_17:part_1:p53:c1",
+        "science_g6:unit_03_lesson_17:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_03_lesson_18",
@@ -326,10 +364,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_03_lesson_18",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 133,
-      "end_page": 140
+      "end_page": 140,
+      "module_key": "objectives",
+      "chunk_ids": [
+        "science_g6:unit_03_lesson_18:part_1:p53:c0",
+        "science_g6:unit_03_lesson_18:part_1:p53:c1",
+        "science_g6:unit_03_lesson_18:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_03_lesson_19",
@@ -337,10 +379,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_03_lesson_19",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 141,
-      "end_page": 148
+      "end_page": 148,
+      "module_key": "concepts",
+      "chunk_ids": [
+        "science_g6:unit_03_lesson_19:part_1:p53:c0",
+        "science_g6:unit_03_lesson_19:part_1:p53:c1",
+        "science_g6:unit_03_lesson_19:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_03_lesson_20",
@@ -348,10 +394,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_03_lesson_20",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 149,
-      "end_page": 158
+      "end_page": 158,
+      "module_key": "vocabulary",
+      "chunk_ids": [
+        "science_g6:unit_03_lesson_20:part_1:p53:c0",
+        "science_g6:unit_03_lesson_20:part_1:p53:c1",
+        "science_g6:unit_03_lesson_20:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_03_lesson_21",
@@ -359,10 +409,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_03_lesson_21",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 159,
-      "end_page": 166
+      "end_page": 166,
+      "module_key": "diagrams",
+      "chunk_ids": [
+        "science_g6:unit_03_lesson_21:part_1:p53:c0",
+        "science_g6:unit_03_lesson_21:part_1:p53:c1",
+        "science_g6:unit_03_lesson_21:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_03_lesson_22",
@@ -370,10 +424,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_03_lesson_22",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 167,
-      "end_page": 174
+      "end_page": 174,
+      "module_key": "experiments",
+      "chunk_ids": [
+        "science_g6:unit_03_lesson_22:part_1:p53:c0",
+        "science_g6:unit_03_lesson_22:part_1:p53:c1",
+        "science_g6:unit_03_lesson_22:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_03_lesson_23",
@@ -381,10 +439,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_03_lesson_23",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 175,
-      "end_page": 180
+      "end_page": 180,
+      "module_key": "summary",
+      "chunk_ids": [
+        "science_g6:unit_03_lesson_23:part_1:p53:c0",
+        "science_g6:unit_03_lesson_23:part_1:p53:c1",
+        "science_g6:unit_03_lesson_23:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_03_lesson_24",
@@ -392,10 +454,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_03_lesson_24",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 181,
-      "end_page": 186
+      "end_page": 186,
+      "module_key": "quiz",
+      "chunk_ids": [
+        "science_g6:unit_03_lesson_24:part_1:p53:c0",
+        "science_g6:unit_03_lesson_24:part_1:p53:c1",
+        "science_g6:unit_03_lesson_24:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_03_lesson_25",
@@ -403,10 +469,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_03_lesson_25",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 187,
-      "end_page": 200
+      "end_page": 200,
+      "module_key": "explanation",
+      "chunk_ids": [
+        "science_g6:unit_03_lesson_25:part_1:p53:c0",
+        "science_g6:unit_03_lesson_25:part_1:p53:c1",
+        "science_g6:unit_03_lesson_25:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_04_lesson_26",
@@ -414,10 +484,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_04_lesson_26",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 201,
-      "end_page": 210
+      "end_page": 210,
+      "module_key": "objectives",
+      "chunk_ids": [
+        "science_g6:unit_04_lesson_26:part_1:p53:c0",
+        "science_g6:unit_04_lesson_26:part_1:p53:c1",
+        "science_g6:unit_04_lesson_26:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_04_lesson_27",
@@ -425,10 +499,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_04_lesson_27",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 211,
-      "end_page": 216
+      "end_page": 216,
+      "module_key": "concepts",
+      "chunk_ids": [
+        "science_g6:unit_04_lesson_27:part_1:p53:c0",
+        "science_g6:unit_04_lesson_27:part_1:p53:c1",
+        "science_g6:unit_04_lesson_27:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_04_lesson_28",
@@ -436,10 +514,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_04_lesson_28",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 217,
-      "end_page": 224
+      "end_page": 224,
+      "module_key": "vocabulary",
+      "chunk_ids": [
+        "science_g6:unit_04_lesson_28:part_1:p53:c0",
+        "science_g6:unit_04_lesson_28:part_1:p53:c1",
+        "science_g6:unit_04_lesson_28:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_04_lesson_29",
@@ -447,10 +529,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_04_lesson_29",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 225,
-      "end_page": 232
+      "end_page": 232,
+      "module_key": "diagrams",
+      "chunk_ids": [
+        "science_g6:unit_04_lesson_29:part_1:p53:c0",
+        "science_g6:unit_04_lesson_29:part_1:p53:c1",
+        "science_g6:unit_04_lesson_29:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_04_lesson_30",
@@ -458,10 +544,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_04_lesson_30",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 233,
-      "end_page": 240
+      "end_page": 240,
+      "module_key": "experiments",
+      "chunk_ids": [
+        "science_g6:unit_04_lesson_30:part_1:p53:c0",
+        "science_g6:unit_04_lesson_30:part_1:p53:c1",
+        "science_g6:unit_04_lesson_30:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_04_lesson_31",
@@ -469,10 +559,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_04_lesson_31",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 241,
-      "end_page": 248
+      "end_page": 248,
+      "module_key": "summary",
+      "chunk_ids": [
+        "science_g6:unit_04_lesson_31:part_1:p53:c0",
+        "science_g6:unit_04_lesson_31:part_1:p53:c1",
+        "science_g6:unit_04_lesson_31:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_04_lesson_32",
@@ -480,10 +574,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_04_lesson_32",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 249,
-      "end_page": 256
+      "end_page": 256,
+      "module_key": "quiz",
+      "chunk_ids": [
+        "science_g6:unit_04_lesson_32:part_1:p53:c0",
+        "science_g6:unit_04_lesson_32:part_1:p53:c1",
+        "science_g6:unit_04_lesson_32:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_04_lesson_33",
@@ -491,10 +589,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_04_lesson_33",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 257,
-      "end_page": 264
+      "end_page": 264,
+      "module_key": "explanation",
+      "chunk_ids": [
+        "science_g6:unit_04_lesson_33:part_1:p53:c0",
+        "science_g6:unit_04_lesson_33:part_1:p53:c1",
+        "science_g6:unit_04_lesson_33:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_04_lesson_34",
@@ -502,10 +604,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_04_lesson_34",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 265,
-      "end_page": 272
+      "end_page": 272,
+      "module_key": "objectives",
+      "chunk_ids": [
+        "science_g6:unit_04_lesson_34:part_1:p53:c0",
+        "science_g6:unit_04_lesson_34:part_1:p53:c1",
+        "science_g6:unit_04_lesson_34:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_04_lesson_35",
@@ -513,10 +619,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_04_lesson_35",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 273,
-      "end_page": 286
+      "end_page": 286,
+      "module_key": "concepts",
+      "chunk_ids": [
+        "science_g6:unit_04_lesson_35:part_1:p53:c0",
+        "science_g6:unit_04_lesson_35:part_1:p53:c1",
+        "science_g6:unit_04_lesson_35:part_1:p53:c2"
+      ]
     },
     {
       "unit_id": "unit_04_lesson_36",
@@ -524,10 +634,14 @@
       "keywords": [],
       "minutes": 90,
       "real_unit_id": "science_g6:unit_04_lesson_36",
-      "module_key": null,
-      "chunk_ids": [],
       "start_page": 287,
-      "end_page": 291
+      "end_page": 291,
+      "module_key": "vocabulary",
+      "chunk_ids": [
+        "science_g6:unit_04_lesson_36:part_1:p53:c0",
+        "science_g6:unit_04_lesson_36:part_1:p53:c1",
+        "science_g6:unit_04_lesson_36:part_1:p53:c2"
+      ]
     }
   ],
   "modules": [
@@ -565,8 +679,9 @@
     }
   ],
   "subject_key": "science",
-  "plan_status": "draft",
-  "generated_at": "2026-07-04T17:40:27.867329Z",
+  "plan_status": "approved",
+  "generated_at": "2026-07-06T01:55:43.927987Z",
   "book_id": "science_g6",
-  "book_title": "Science Grade 6"
+  "book_title": "Science Grade 6",
+  "approved_at": "2026-07-06T01:58:35.085732Z"
 }

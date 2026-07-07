@@ -1,0 +1,115 @@
+{
+  "unit_title": "The Secret of Vesuvius",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Get Ready",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "overview"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Word Study",
+      "must_cover": true,
+      "keywords": [
+        "vocabulary",
+        "pronunciation",
+        "word usage",
+        "categorization"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing Study",
+      "must_cover": true,
+      "keywords": [
+        "punctuation",
+        "quotation marks",
+        "writing practice"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Before You Read",
+      "must_cover": true,
+      "keywords": [
+        "prediction",
+        "comprehension",
+        "short story"
+      ]
+    },
+    {
+      "id": "reading_2",
+      "type": "reading",
+      "title": "The Secret of Vesuvius",
+      "must_cover": true,
+      "keywords": [
+        "historical fiction",
+        "Mount Vesuvius eruption",
+        "Pliny",
+        "characters"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar in Use",
+      "must_cover": true,
+      "keywords": [
+        "past perfect tense",
+        "sentence structure",
+        "chart creation"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening",
+      "must_cover": true,
+      "keywords": [
+        "volcanoes",
+        "volcanic eruption process",
+        "listening matching"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking",
+      "must_cover": true,
+      "keywords": [
+        "offering suggestions",
+        "presentation planning",
+        "speech organization"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "words with ie and ee",
+        "Big Question chart completion"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Units 3 and 4 Writing",
+      "must_cover": true,
+      "keywords": [
+        "fossils",
+        "writing a speech",
+        "visuals in presentations"
+      ]
+    }
+  ]
+}

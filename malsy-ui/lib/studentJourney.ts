@@ -4,9 +4,12 @@ import {
   type ScheduleSession,
   getTodayName,
   subjectRouteKey,
+  learnHrefForSession,
 } from './studentSchedule';
 
 export type JourneyStatus = 'upcoming' | 'current' | 'completed' | 'locked';
+
+export type JourneyActionStatus = 'Start' | 'Continue' | 'Completed' | 'Locked';
 
 export interface JourneyItem {
   id: string;
@@ -16,10 +19,14 @@ export interface JourneyItem {
   sectionTitle: string;
   timeLabel: string;
   status: JourneyStatus;
+  actionStatus: JourneyActionStatus;
   orderIndex: number;
   lessonId: string;
   actionHref: string | null;
   actionLabel: string | null;
+  encouragement: string | null;
+  progressPercent: number;
+  lockReason?: string | null;
 }
 
 export interface EnrollmentSlot {
@@ -68,7 +75,42 @@ function journeyStatus(
   return 'upcoming';
 }
 
-function statusLabel(status: JourneyStatus): string {
+function actionStatusFor(
+  session: ScheduleSession,
+  journey: JourneyStatus,
+): JourneyActionStatus {
+  if (journey === 'completed' || session.status === 'completed') return 'Completed';
+  if (journey === 'locked' || session.status === 'locked') return 'Locked';
+  const label = (session.action_label || '').toLowerCase();
+  if (session.continue_available || label.includes('continue')) return 'Continue';
+  return 'Start';
+}
+
+function encouragementFor(actionStatus: JourneyActionStatus): string | null {
+  switch (actionStatus) {
+    case 'Completed':
+      return 'Great job, completed!';
+    case 'Start':
+      return 'Start with this lesson';
+    case 'Continue':
+      return 'Pick up where you left off';
+    default:
+      return null;
+  }
+}
+
+function sectionTitleFor(
+  session: ScheduleSession,
+  resume?: ContinueLearningSubjectRead,
+): string {
+  if (resume?.chapter_id === session.lesson_id && resume.section_title) {
+    return resume.section_title;
+  }
+  if (session.status === 'completed') return 'Lesson complete';
+  return 'Reading';
+}
+
+export function journeyStatusLabel(status: JourneyStatus): string {
   switch (status) {
     case 'completed':
       return 'Completed';
@@ -81,14 +123,14 @@ function statusLabel(status: JourneyStatus): string {
   }
 }
 
-export { statusLabel as journeyStatusLabel };
+export function journeyStatusDisplay(item: JourneyItem): string {
+  return item.actionStatus;
+}
 
 export function buildTodaysJourneyItems(
   sessions: ScheduleSession[],
   resumeByKey: Record<string, ContinueLearningSubjectRead>,
   timeBySubject: Map<string, string>,
-  buildHref: (resume: ContinueLearningSubjectRead) => string | null,
-  actionLabelFor: (resume: ContinueLearningSubjectRead) => string,
   primaryChapterId?: string | null,
 ): JourneyItem[] {
   const sorted = [...sessions].sort((a, b) => a.order_index - b.order_index);
@@ -97,25 +139,39 @@ export function buildTodaysJourneyItems(
     const subjectKey = session.subject_key || subjectRouteKey(session.subject);
     const resume = resumeByKey[subjectKey];
     const status = journeyStatus(session, index, sorted, primaryChapterId);
-    const canAct =
-      (status === 'current' || status === 'upcoming') &&
-      session.status === 'available' &&
-      resume &&
-      !resume.locked &&
-      resume.continue_available;
+    const learnHref = learnHrefForSession(session);
+    const canAct = session.status === 'available' && Boolean(learnHref);
+    const actionStatus = actionStatusFor(session, status);
+    const actionLabel =
+      actionStatus === 'Start'
+        ? 'Start'
+        : actionStatus === 'Continue'
+          ? 'Continue'
+          : null;
+
+    const progressPercent =
+      resume?.chapter_id === session.lesson_id
+        ? resume.progress_percent ?? 0
+        : session.status === 'completed'
+          ? 100
+          : 0;
 
     return {
       id: session.id,
       subject: session.subject,
       subjectKey,
       lessonTitle: session.title,
-      sectionTitle: resume?.section_title || 'Reading',
+      sectionTitle: sectionTitleFor(session, resume),
       timeLabel: timeBySubject.get(subjectKey) || `Session ${index + 1}`,
       status,
+      actionStatus,
       orderIndex: session.order_index,
       lessonId: session.lesson_id,
-      actionHref: canAct && resume ? buildHref(resume) : null,
-      actionLabel: canAct && resume ? actionLabelFor(resume) : null,
+      actionHref: canAct ? learnHref : null,
+      actionLabel: canAct ? actionLabel : null,
+      encouragement: encouragementFor(actionStatus),
+      progressPercent,
+      lockReason: session.lock_reason,
     };
   });
 }

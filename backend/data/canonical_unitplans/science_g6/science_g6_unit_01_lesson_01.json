@@ -1,0 +1,36 @@
+{
+  "unit_title": "Science and the Scientific Method",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "Science",
+        "Scientific method"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "vocab",
+      "title": "Scientific Vocabulary",
+      "must_cover": true,
+      "keywords": [
+        "Classiﬁcation",
+        "Ecosystems",
+        "Global climate change"
+      ]
+    },
+    {
+      "id": "8",
+      "type": "exercises",
+      "title": "Quiz or Review Questions",
+      "must_cover": true,
+      "keywords": [
+        "Human nutrition",
+        "Human body structures and systems"
+      ]
+    }
+  ]
+}

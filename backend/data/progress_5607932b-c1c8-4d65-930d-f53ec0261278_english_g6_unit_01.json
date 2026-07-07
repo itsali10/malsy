@@ -1,0 +1,58 @@
+{
+  "student_id": "5607932b-c1c8-4d65-930d-f53ec0261278",
+  "chapter_id": "english_g6:unit_01",
+  "current_item_index": 2,
+  "done_items": [],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [],
+  "lesson_questions": [
+    {
+      "question": "What is the main purpose of the author in the story 'The Earthworm and the Spider'?",
+      "options": [
+        "To entertain us with a magical tale",
+        "To persuade us to build bridges",
+        "To inform us about spider webs",
+        "To teach us about farming techniques"
+      ],
+      "correct_answer": "To entertain us with a magical tale",
+      "expected_points": [
+        "The author's purpose was to entertain readers with a magical story set in an imaginary place."
+      ],
+      "section_skill": "reading",
+      "correct_index": 0
+    },
+    {
+      "question": "Why did the grandfather in the story fear for his people?",
+      "options": [
+        "There were too many enemies nearby",
+        "They were isolated and cut off from the outside world",
+        "The village was too crowded",
+        "The river was too shallow"
+      ],
+      "correct_answer": "They were isolated and cut off from the outside world",
+      "expected_points": [
+        "The grandfather feared that the isolation of the village would lead to its decline."
+      ],
+      "section_skill": "reading",
+      "correct_index": 1
+    },
+    {
+      "question": "What does the act of building bridges and tunnels symbolize in the story?",
+      "options": [
+        "Isolating the villagers further",
+        "Creating more obstacles",
+        "Breaking barriers and making connections",
+        "Destroying the village's resources"
+      ],
+      "correct_answer": "Breaking barriers and making connections",
+      "expected_points": [
+        "Building bridges and tunnels symbolizes overcoming obstacles, making connections, and fostering relationships."
+      ],
+      "section_skill": "reading",
+      "correct_index": 2
+    }
+  ],
+  "lesson_question_index": 0,
+  "lesson_questions_item_id": "reading_1"
+}

@@ -38,9 +38,18 @@ def part_page_range(start_page: int, end_page: int, unit_part: int) -> tuple[int
 
 
 def chunk_pdf_page(chunk: Dict[str, Any]) -> Optional[int]:
-    """Resolve a chunk's book/PDF page from metadata or chunk id (e.g. …:p7:c0)."""
+    """Resolve a chunk's 1-based book page from metadata or chunk id (e.g. …:p7:c0)."""
     meta = chunk.get("meta") or {}
-    page = meta.get("pdf_page") or meta.get("book_page")
+    # book_page is canonical (1-based); pdf_page may be 0-based in some ingests.
+    page = meta.get("book_page")
+    if page is not None:
+        try:
+            book = int(page)
+            if book > 0:
+                return book
+        except (TypeError, ValueError):
+            pass
+    page = meta.get("pdf_page")
     if page is not None and int(page) > 0:
         return int(page)
     cid = str(meta.get("chunk_id") or "")
@@ -113,31 +122,11 @@ def item_index_for_section(items: List[Dict[str, Any]], section_index: int) -> i
 def filter_chunks_for_section(chunks: List[Dict[str, Any]], section_type: str) -> List[Dict[str, Any]]:
     """Keep chunks belonging to a textbook section (reading, grammar, …)."""
     if not chunks or not section_type:
-        return chunks
+        return []
 
-    st = section_type.lower()
-    matched: List[Dict[str, Any]] = []
-    for chunk in chunks:
-        meta = chunk.get("meta") or {}
-        ctype = str(meta.get("section_type") or "").lower()
-        cid = str(meta.get("chunk_id") or "").lower()
-        if ctype == st or f"section_{st}" in cid:
-            matched.append(chunk)
+    from .english_section_segmentation import chunks_for_teaching_section
 
-    if matched:
-        return matched
-
-    # Soft fallback: vocab chunks often sit with reading
-    if st == "reading":
-        for chunk in chunks:
-            meta = chunk.get("meta") or {}
-            ctype = str(meta.get("section_type") or "").lower()
-            if ctype in {"reading", "vocab", "word_study", ""}:
-                matched.append(chunk)
-        if matched:
-            return matched
-
-    return chunks
+    return chunks_for_teaching_section(chunks, section_type.lower())
 
 
 def section_statuses(unit_part: int, max_unlocked: int) -> List[Dict[str, Any]]:

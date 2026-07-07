@@ -1,0 +1,71 @@
+{
+  "unit_title": "The Digestive System",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "digestive system",
+        "functions",
+        "organs"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "digestion process",
+        "nutrient absorption"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "vocab",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "enzymes",
+        "peristalsis"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": [
+        "enzymatic action illustration"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "food digestion simulation",
+        "enzyme activity investigation"
+      ]
+    },
+    {
+      "id": "6",
+      "type": "wrap_up",
+      "title": "Summary",
+      "must_cover": true,
+      "keywords": [
+        "importance of digestion"
+      ]
+    },
+    {
+      "id": "7",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": []
+    }
+  ]
+}

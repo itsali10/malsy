@@ -1,0 +1,64 @@
+{
+  "unit_title": "Ecology and the Environment",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "ecology",
+        "environment"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "4",
+      "type": "vocab",
+      "title": "Scientific Vocabulary",
+      "must_cover": true,
+      "keywords": [
+        "ecosystem",
+        "biodiversity",
+        "sustainability"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "6",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "7",
+      "type": "wrap_up",
+      "title": "Summary/Wrap-up",
+      "must_cover": true,
+      "keywords": [
+        "key points covered",
+        "importance of ecological balance"
+      ]
+    },
+    {
+      "id": "8",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": []
+    }
+  ]
+}

@@ -82,23 +82,50 @@ Return JSON ONLY:
 }
 """
 
+MCQ_QUIZ_BANK_PROMPT = """
+Write exactly 3 multiple-choice quiz questions for a Grade 6 history lesson.
+
+You will receive LESSON TOPIC, TEXTBOOK CONTENT (ground truth), and a teacher lesson summary.
+Every question MUST test the LESSON TOPIC only.
+Use ONLY facts explicitly stated in the TEXTBOOK CONTENT.
+Do NOT invent names, dates, places, or events not in the textbook.
+
+Rules for EACH question:
+- 4 options: exactly 1 correct + 3 plausible wrong distractors from the same topic.
+- Keep language simple (age 10-12).
+- "correct_answer" MUST be copied WORD-FOR-WORD from one entry in "options".
+- "options" MUST contain exactly 4 items.
+- Questions must test DIFFERENT facts or angles — do not repeat the same question.
+
+Return JSON ONLY:
+{
+  "questions": [
+    {
+      "question": "...",
+      "options": ["option A", "option B", "option C", "option D"],
+      "correct_answer": "exact copy of the correct option from options",
+      "expected_points": ["short supporting fact from the textbook"],
+      "source_quote": "exact short phrase from textbook that proves the correct answer"
+    }
+  ]
+}
+"""
+
 SPEAKING_TASK_PROMPT = """
 You are an English teacher creating a pronunciation exercise for Grade 6.
 
-Generate 1 sentence from the PRONUNCIATION section lesson content for the student to read aloud.
-The sentence must:
-- Come directly from or be closely based on the Pronunciation section content provided.
-- Use vocabulary, phrases, or sentences practiced in this section only.
-- Be 8-15 words long.
-- Naturally practice the vocabulary or expressions from this section.
-- Sound clear and natural when spoken.
+Pick 1 single word from the PRONUNCIATION section lesson content for the student to say aloud.
+The word must:
+- Come directly from the Pronunciation section content provided (a real vocabulary word practiced in this section).
+- Be a single word only — no phrases or sentences.
+- Be worth practicing: not trivially short/common (avoid words like "a", "the", "is").
 - Do NOT use content from Reading, Grammar, or Listening sections unless it appears in this section.
 
 Return JSON ONLY:
 {
   "type": "speaking",
-  "sentence": "...",
-  "instructions": "Read this sentence out loud clearly."
+  "sentence": "word",
+  "instructions": "Say this word out loud clearly."
 }
 """
 
@@ -131,6 +158,43 @@ Return JSON ONLY:
   "correct_answer": "exact copy of the correct option from options",
   "expected_points": ["short explanation of why the correct answer is right"],
   "section_skill": "reading or grammar"
+}
+"""
+
+ENGLISH_MCQ_QUIZ_BANK_PROMPT = """
+Write exactly 3 multiple-choice quiz questions for a Grade 6 English lesson section.
+
+You will receive LESSON TOPIC, CURRENT SECTION (Reading / Grammar / Listening / Pronunciation),
+TEXTBOOK CONTENT (ground truth), and the TEACHER LESSON for THIS SECTION ONLY.
+
+Every question MUST test ONLY what was taught in the CURRENT SECTION:
+- Reading section → reading comprehension, main idea, vocabulary from the passage
+- Grammar section → grammar rules, sentence structure, or examples from the grammar explanation
+- Listening section → do NOT use this prompt (listening uses pre-generated listening questions)
+- Pronunciation section → do NOT use this prompt (pronunciation uses speaking tasks)
+
+Use ONLY content explicitly covered in the TEACHER LESSON and TEXTBOOK CONTENT for this section.
+Do NOT ask about content from other sections or other lessons.
+Do NOT invent facts not in the lesson.
+
+Rules for EACH question:
+- 4 options: exactly 1 correct + 3 plausible wrong distractors from the SAME section content.
+- Keep language simple and clear (age 10-12).
+- "correct_answer" MUST be copied WORD-FOR-WORD from one entry in "options".
+- "options" MUST contain exactly 4 items.
+- Questions must test DIFFERENT skills or facts — do not repeat the same question.
+
+Return JSON ONLY:
+{
+  "questions": [
+    {
+      "question": "...",
+      "options": ["option A", "option B", "option C", "option D"],
+      "correct_answer": "exact copy of the correct option from options",
+      "expected_points": ["short explanation of why the correct answer is right"],
+      "section_skill": "reading or grammar"
+    }
+  ]
 }
 """
 
@@ -331,6 +395,7 @@ Return ONLY valid JSON with this schema:
 }
 
 Rules:
+- Plan ONLY for the ONE lesson in the user message (title + page range). Never include other units, lessons, TOC, or final projects.
 - **MANDATORY: Include a "unit_opening" item** if there is an opening/introductory page at the start of the unit (title page, unit introduction, overview, etc.)
 - Include ALL sections that appear in the provided unit text (Reading/Vocabulary/Grammar/Listening/Speaking/Writing/Wrap Up).
 - **MANDATORY: Include a "discussion_questions" item** if there are any discussion questions, class activities, or "discuss with the class" sections.

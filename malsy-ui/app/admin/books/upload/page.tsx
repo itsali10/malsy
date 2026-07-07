@@ -4,7 +4,7 @@ import type { CSSProperties, FormEvent } from 'react';
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { adminApi } from '../../../lib/admin-api';
+import { adminApi } from '../../../../lib/admin-api';
 
 const SUBJECT_LABELS: Record<string, string> = {
   english: 'English',

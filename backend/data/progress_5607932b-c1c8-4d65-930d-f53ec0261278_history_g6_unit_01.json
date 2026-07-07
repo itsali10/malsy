@@ -1,0 +1,97 @@
+{
+  "student_id": "5607932b-c1c8-4d65-930d-f53ec0261278",
+  "chapter_id": "history_g6:unit_01",
+  "current_item_index": 1,
+  "done_items": [
+    "unit_opening"
+  ],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [
+    {
+      "ts": "2026-07-07T03:13:24.770602Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Where did the Ancient Egyptians primarily settle?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T03:13:33.220977Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Who united Upper Egypt and Lower Egypt around 3200 BC?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T03:13:40.046662Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Who united Upper Egypt and Lower Egypt around 3200 BC?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T03:13:50.593168Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What did the red land and black land represent in Ancient Egypt?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ],
+  "lesson_question_index": 0,
+  "lesson_questions": [
+    {
+      "question": "What was the capital city established by King Narmer for the unified Egypt?",
+      "options": [
+        "Alexandria",
+        "Luxor",
+        "Thebes",
+        "Memphis"
+      ],
+      "correct_answer": "Memphis",
+      "expected_points": [
+        "King Narmer established a new capital called Memphis, which symbolized the balance of the two lands."
+      ],
+      "source_quote": "He built a new capital called Memphis which in Greek translates to ‘Balance of the Two Lands’.",
+      "correct_index": 3
+    },
+    {
+      "question": "Which area of Egypt was known as the 'black land' and was crucial for providing food and water?",
+      "options": [
+        "Desert Land",
+        "Green Land",
+        "Red Land",
+        "Black Land"
+      ],
+      "correct_answer": "Black Land",
+      "expected_points": [
+        "The black land, close to the Nile, was important for providing food and water for the people."
+      ],
+      "source_quote": "The black land was the area close the Nile which was important for providing food and water for the people.",
+      "correct_index": 3
+    },
+    {
+      "question": "What did the River Nile provide for the Ancient Egyptians due to the region's hot deserts and little rainfall?",
+      "options": [
+        "Desalinated water",
+        "Underground caves",
+        "Transportation",
+        "Snow for cooling"
+      ],
+      "correct_answer": "Transportation",
+      "expected_points": [
+        "The River Nile provided water, food, and transportation for the Ancient Egyptians due to the region's hot deserts and little rainfall."
+      ],
+      "source_quote": "This river was vital to their existence as it provided water, food, and transportation due to Egypt's hot deserts and little rainfall.",
+      "correct_index": 2
+    }
+  ],
+  "lesson_questions_item_id": "reading_1"
+}

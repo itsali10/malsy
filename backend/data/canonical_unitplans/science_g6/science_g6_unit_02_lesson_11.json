@@ -1,0 +1,77 @@
+{
+  "unit_title": "How Plants Sense and Respond",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "Plants",
+        "Sensing",
+        "Response"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "3",
+      "type": "vocab",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "Plant hormones",
+        "Phototropism",
+        "Gravitropism",
+        "Thigmotropism"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "vocab",
+      "title": "Scientific Vocabulary",
+      "must_cover": true,
+      "keywords": [
+        "Auxins",
+        "Cytokinins",
+        "Gibberellins",
+        "Abscisic acid"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "6",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "Testing plant growth in different hormone concentrations"
+      ]
+    },
+    {
+      "id": "7",
+      "type": "wrap_up",
+      "title": "Summary/Wrap-Up",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "8",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": []
+    }
+  ]
+}

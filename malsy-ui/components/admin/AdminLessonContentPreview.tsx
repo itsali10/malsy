@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import type { AdminGeneratedPlanItem, AdminLessonContent } from '../../lib/admin-api';
 import { buildLessonPreviewSections } from '../../lib/admin-lesson-preview';
+import { dedupeList } from '../../lib/dedupe-list';
+import { isHistorySubject } from '../../lib/history-subject';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000').replace(/\/$/, '');
 
@@ -25,18 +27,20 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function PlanItemsList({ items, showTitles = false }: { items: AdminGeneratedPlanItem[]; showTitles?: boolean }) {
   if (!items.length) return null;
+  const labels = dedupeList(
+    items.map((item) => {
+      const keywords = (item.keywords ?? []).map(String).filter(Boolean);
+      return (showTitles && item.title ? item.title : keywords.join(', ') || item.title) ?? '';
+    }),
+  );
+  if (!labels.length) return null;
   return (
     <ul style={{ margin: 0, paddingLeft: 18, display: 'grid', gap: 6 }}>
-      {items.map((item, i) => {
-        const keywords = (item.keywords ?? []).map(String).filter(Boolean);
-        const label = showTitles && item.title ? item.title : keywords.join(', ') || item.title;
-        if (!label) return null;
-        return (
-          <li key={item.id ?? `${item.title}-${i}`} style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--vl)' }}>
-            {label}
-          </li>
-        );
-      })}
+      {labels.map((label) => (
+        <li key={label} style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--vl)' }}>
+          {label}
+        </li>
+      ))}
     </ul>
   );
 }
@@ -86,6 +90,12 @@ export function AdminLessonContentPreview({
 }) {
   const s = buildLessonPreviewSections(content);
   const title = titleOverride?.trim() || s.title;
+  const showLessonVideo = isHistorySubject({
+    type: null,
+    name: content.lesson_meta?.subject_title ?? content.lesson_title,
+    subjectKey: content.lesson_meta?.subject_key ?? content.subject_key,
+    chapterId: content.chapter_id,
+  });
 
   return (
     <div style={{ display: 'grid', gap: compact ? 12 : 14 }}>
@@ -134,7 +144,7 @@ export function AdminLessonContentPreview({
                 )}
                 {(sec.keywords?.length ?? 0) > 0 && (
                   <div style={{ fontSize: 12, color: 'var(--vl)', marginTop: 6 }}>
-                    {(sec.keywords ?? []).join(', ')}
+                    {dedupeList((sec.keywords ?? []).map(String)).join(', ')}
                   </div>
                 )}
               </div>
@@ -190,11 +200,11 @@ export function AdminLessonContentPreview({
         </div>
       )}
 
-      {(s.visualItems.length > 0 || s.images.length > 0 || s.videoFilename) && (
+      {(s.visualItems.length > 0 || s.images.length > 0 || (showLessonVideo && s.videoFilename)) && (
         <div>
           <SectionLabel>Images / media</SectionLabel>
           {s.visualItems.length > 0 && !s.images.length && <PlanItemsList items={s.visualItems} showTitles />}
-          {s.videoFilename && (
+          {showLessonVideo && s.videoFilename && (
             <div style={{ fontSize: 13, color: 'var(--g3)', marginBottom: s.images.length ? 10 : 0 }}>
               Video: <code>{s.videoFilename}</code>
             </div>

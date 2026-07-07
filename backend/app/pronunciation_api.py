@@ -124,14 +124,40 @@ def _parse_espeak(raw: str) -> List[str]:
     return tokens
 
 
+# Common Windows install locations, checked when the binary isn't on PATH
+# (e.g. a fresh winget install of eSpeak-NG before the shell/process PATH refreshes).
+_ESPEAK_FALLBACK_PATHS = [
+    r"C:\Program Files\eSpeak NG\espeak-ng.exe",
+    r"C:\Program Files (x86)\eSpeak NG\espeak-ng.exe",
+]
+
+
+def _espeak_binary() -> str:
+    configured = os.getenv("ESPEAK_NG_EXE")
+    if configured and os.path.isfile(configured):
+        return configured
+    from shutil import which
+
+    on_path = which("espeak-ng")
+    if on_path:
+        return on_path
+    for candidate in _ESPEAK_FALLBACK_PATHS:
+        if os.path.isfile(candidate):
+            return candidate
+    return "espeak-ng"  # let subprocess raise FileNotFoundError with a clear message
+
+
 def _ref_phonemes(word: str) -> List[str]:
     try:
         result = subprocess.run(
-            ["espeak-ng", "-q", "-v", "en-us", "-x", word],
+            [_espeak_binary(), "-q", "-v", "en-us", "-x", word],
             capture_output=True, check=True,
         )
     except FileNotFoundError:
-        raise HTTPException(status_code=503, detail="espeak-ng is not installed on this server")
+        raise HTTPException(
+            status_code=503,
+            detail="espeak-ng is not installed on this server (set ESPEAK_NG_EXE in .env if it's installed in a non-standard location)",
+        )
     except subprocess.CalledProcessError as exc:
         raise HTTPException(status_code=503, detail=f"espeak-ng failed: {exc}")
     raw = result.stdout.decode("utf-8", errors="ignore").strip()
@@ -314,3 +340,6 @@ def _score_sync(audio_b64: str, sentence: str) -> Dict[str, Any]:
             for w, ref, got, score in word_results
         ],
     }
+
+
+

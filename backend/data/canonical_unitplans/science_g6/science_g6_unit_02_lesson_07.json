@@ -1,0 +1,79 @@
+{
+  "unit_title": "Soil and Nutrients",
+  "items": [
+    {
+      "id": "lesson_explanation",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "ecology",
+        "environment",
+        "habitats",
+        "ecosystems",
+        "energy source"
+      ]
+    },
+    {
+      "id": "learning_objectives",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "living and nonliving relationships"
+      ]
+    },
+    {
+      "id": "key_scientific_concepts",
+      "type": "other",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "interrelation of living and nonliving things",
+        "ecosystem balance"
+      ]
+    },
+    {
+      "id": "scientific_vocabulary",
+      "type": "vocab",
+      "title": "Scientific Vocabulary",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "diagrams_images",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "experiments_activities",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "planting seeds experiment",
+        "observation of plant growth"
+      ]
+    },
+    {
+      "id": "summary_wrap_up",
+      "type": "wrap_up",
+      "title": "Summary/Wrap-up",
+      "must_cover": true,
+      "keywords": [
+        "living and nonliving interactions"
+      ]
+    },
+    {
+      "id": "quiz_review_questions",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": [
+        "ecological vocabulary"
+      ]
+    }
+  ]
+}

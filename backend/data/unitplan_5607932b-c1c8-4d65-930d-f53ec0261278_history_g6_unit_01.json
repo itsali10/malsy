@@ -1,0 +1,90 @@
+{
+  "unit_title": "Where and Who Were the Ancient Egyptians?",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Opening",
+      "must_cover": true,
+      "keywords": [
+        "research project",
+        "Ancient Egyptians",
+        "reading",
+        "discussion"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Where and who were the Ancient Egyptians?",
+      "must_cover": true,
+      "keywords": [
+        "ancient Egypt",
+        "civilization",
+        "River Nile",
+        "geography",
+        "population",
+        "farming",
+        "Narmer",
+        "Menes",
+        "Memphis",
+        "two lands"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "similarities",
+        "differences",
+        "ancient Egypt",
+        "modern life",
+        "River Nile",
+        "pharaohs",
+        "kingdoms"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "monuments",
+        "tombs",
+        "River Nile",
+        "Egyptian kingdoms",
+        "two lands"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "reading comprehension",
+        "discussion",
+        "key points",
+        "ancient Egypt",
+        "River Nile",
+        "pharaohs",
+        "farming",
+        "kingdoms"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Wrap Up",
+      "must_cover": true,
+      "keywords": [
+        "Ancient Egyptians",
+        "River Nile",
+        "Egyptian civilization"
+      ]
+    }
+  ]
+}

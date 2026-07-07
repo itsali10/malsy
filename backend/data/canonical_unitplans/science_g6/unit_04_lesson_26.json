@@ -1,0 +1,63 @@
+{
+  "unit_title": "Human Life",
+  "items": [
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "understanding human life processes",
+        "impact of environment on human life"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "vocab",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "cellular processes",
+        "homeostasis",
+        "reproduction"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "vocab",
+      "title": "Scientific Vocabulary",
+      "must_cover": true,
+      "keywords": [
+        "metabolism",
+        "mitosis",
+        "hormones"
+      ]
+    },
+    {
+      "id": "6",
+      "type": "exercises",
+      "title": "Experiments or Activities",
+      "must_cover": true,
+      "keywords": [
+        "hands-on cell observation activity",
+        "experiment on hormone regulation"
+      ]
+    },
+    {
+      "id": "7",
+      "type": "wrap_up",
+      "title": "Summary / Wrap-up",
+      "must_cover": true,
+      "keywords": [
+        "recap of human life processes"
+      ]
+    },
+    {
+      "id": "8",
+      "type": "exercises",
+      "title": "Quiz or Review Questions",
+      "must_cover": true,
+      "keywords": []
+    }
+  ]
+}

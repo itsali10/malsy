@@ -27,6 +27,26 @@ export function isLessonCompleted(
   return Boolean(prog?.completed_lesson_numbers?.includes(lessonNumber));
 }
 
+export function isLessonLocked(
+  prog: BookLessonProgressState | undefined,
+  lessonNumber: number,
+): boolean {
+  return !isLessonUnlocked(prog, lessonNumber);
+}
+
+export const LOCKED_LESSON_MESSAGE =
+  'Finish the previous lesson to unlock this lesson.';
+
+/** @deprecated Intentionally shows only the current lesson — prefer listing all lessons with lock state. */
+export function getVisibleLessons<T extends { id: number | string }>(
+  lessons: T[],
+  prog: BookLessonProgressState | undefined,
+): T[] {
+  const current = getCurrentLessonNumber(prog, lessons.length);
+  if (current === null) return [];
+  return lessons.filter((lesson, i) => getLessonNumber(lesson, i) === current);
+}
+
 /** First incomplete unlocked lesson; null when all lessons are done. */
 export function getCurrentLessonNumber(
   prog: BookLessonProgressState | undefined,
@@ -37,15 +57,6 @@ export function getCurrentLessonNumber(
     if (isLessonUnlocked(prog, n)) return n;
   }
   return null;
-}
-
-export function getVisibleLessons<T extends { id: number | string }>(
-  lessons: T[],
-  prog: BookLessonProgressState | undefined,
-): T[] {
-  const current = getCurrentLessonNumber(prog, lessons.length);
-  if (current === null) return [];
-  return lessons.filter((lesson, i) => getLessonNumber(lesson, i) === current);
 }
 
 /** Build book-style progress from evaluation records (English grammar/comprehension). */

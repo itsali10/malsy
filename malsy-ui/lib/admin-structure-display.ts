@@ -108,3 +108,15 @@ export function pageRangeLabel(start?: number, end?: number): string {
   if (start == null && end == null) return '';
   return `Pages ${start ?? '?'}–${end ?? '?'}`;
 }
+
+/** Unit/lesson totals matching the grouped Book structure tree (admin summary cards). */
+export function structureDisplayCounts(
+  units: BookStructureUnit[],
+  bookId: string,
+): { unitCount: number; lessonCount: number } {
+  const displayUnits = groupStructureForDisplay(units, bookId);
+  return {
+    unitCount: displayUnits.length,
+    lessonCount: displayUnits.reduce((total, unit) => total + unit.lessons.length, 0),
+  };
+}

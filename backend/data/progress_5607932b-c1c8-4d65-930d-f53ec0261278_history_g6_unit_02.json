@@ -1,0 +1,58 @@
+{
+  "student_id": "5607932b-c1c8-4d65-930d-f53ec0261278",
+  "chapter_id": "history_g6:unit_02",
+  "current_item_index": 0,
+  "done_items": [],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [],
+  "lesson_questions": [
+    {
+      "question": "Which Egyptian god was known as the King of the Gods and gained more power when combined with Ra?",
+      "options": [
+        "Amun with the head of a ram",
+        "Bastet with the head of a cat",
+        "Geb with the head of a goose",
+        "Anubis with the head of a jackal"
+      ],
+      "correct_answer": "Amun with the head of a ram",
+      "expected_points": [
+        "Amun was known as the King of the Gods and gained more power when combined with Ra."
+      ],
+      "source_quote": "Amun, King of the Gods. When Amun was combined with Ra he was even more powerful.",
+      "correct_index": 0
+    },
+    {
+      "question": "Which Egyptian goddess was associated with protection and household entertainment and depicted with the head of a cat?",
+      "options": [
+        "Anubis with the head of a jackal",
+        "Bastet with the head of a cat",
+        "Amun with the head of a ram",
+        "Geb with the head of a goose"
+      ],
+      "correct_answer": "Bastet with the head of a cat",
+      "expected_points": [
+        "Bastet was associated with protection and household entertainment and depicted with the head of a cat."
+      ],
+      "source_quote": "Bastet, Protection and the household entertainment. Daughter of Ra. Head of a cat",
+      "correct_index": 1
+    },
+    {
+      "question": "Which Egyptian god was symbolized with the head of a crocodile and associated with fertility and protection?",
+      "options": [
+        "Sobek with the head of a crocodile",
+        "Thoth with the head of a bird",
+        "Hathor with the head of a cow",
+        "Sekhmet with the head of a lioness"
+      ],
+      "correct_answer": "Sobek with the head of a crocodile",
+      "expected_points": [
+        "Sobek was symbolized with the head of a crocodile and associated with fertility and protection."
+      ],
+      "source_quote": "Sobek, God of the Nile. Head of a crocodile",
+      "correct_index": 0
+    }
+  ],
+  "lesson_question_index": 0,
+  "lesson_questions_item_id": "unit_opening"
+}

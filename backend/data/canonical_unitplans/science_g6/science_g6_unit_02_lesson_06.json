@@ -1,0 +1,63 @@
+{
+  "unit_title": "The Seedling",
+  "items": [
+    {
+      "id": "learning_objectives",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "Differentiates between different types of simple organisms",
+        "Provides specific examples to support statements"
+      ]
+    },
+    {
+      "id": "key_scientific_concepts",
+      "type": "other",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "Ecology",
+        "Ecosystems",
+        "Habitat",
+        "Interrelatedness of organisms and environment"
+      ]
+    },
+    {
+      "id": "scientific_vocabulary",
+      "type": "vocab",
+      "title": "Scientific Vocabulary",
+      "must_cover": true,
+      "keywords": [
+        "Range"
+      ]
+    },
+    {
+      "id": "diagrams_images",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": [
+        "A fish in its environment"
+      ]
+    },
+    {
+      "id": "experiments_activities",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "Video Production",
+        "Nature Drawing",
+        "Research Endangered Species"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Summary / Wrap-up",
+      "must_cover": true,
+      "keywords": []
+    }
+  ]
+}

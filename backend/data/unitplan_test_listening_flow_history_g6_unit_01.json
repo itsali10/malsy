@@ -1,0 +1,83 @@
+{
+  "unit_title": "Ancient Egyptians",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Ancient Egyptians",
+      "must_cover": true,
+      "keywords": [
+        "research project",
+        "Ancient Egyptians",
+        "reading",
+        "sections",
+        "life"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Where and who were the Ancient Egyptians?",
+      "must_cover": true,
+      "keywords": [
+        "Egypt",
+        "civilisation",
+        "Pharaohs",
+        "River Nile",
+        "Sudan",
+        "settlement",
+        "population",
+        "farming",
+        "Nile valley",
+        "water",
+        "food",
+        "transportation",
+        "flood",
+        "land",
+        "kingdoms",
+        "pharaoh",
+        "Menes",
+        "Memphis",
+        "Two Lands"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "similarities",
+        "differences",
+        "Ancient Egyptian life",
+        "life today"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "monuments",
+        "tombs",
+        "River Nile",
+        "maps",
+        "illustrations"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Reading Comprehension Exercises",
+      "must_cover": true,
+      "keywords": [
+        "reading aloud",
+        "key points",
+        "extended reading",
+        "family discussion",
+        "comprehension"
+      ]
+    }
+  ]
+}

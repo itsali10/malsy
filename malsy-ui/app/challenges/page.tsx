@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import { auth } from '../../lib/auth';
 
 // ── Game stats storage ───────────────────────────────────────────
@@ -444,112 +444,9 @@ function SpellingBeeModal({ onClose }: { onClose: (score: number) => void }) {
   );
 }
 
-// ── Leaderboard ──────────────────────────────────────────────────
-
-const LB_FILTERS = ['This Week', 'This Month', 'All Time'];
-
-const LB_ROWS = [
-  { rank: 4, me: false, initials: 'SA', bg: 'var(--v)',  name: 'Sara Ahmed',      badge: '🧬 Bio Master',   lessons: 12, quiz: '94%', streak: '🔥18', xp: '1,240' },
-  { rank: 4, me: true,  initials: 'SA', bg: 'var(--v)',  name: 'Sara Ahmed',      badge: '🧬 Bio Master',   lessons: 12, quiz: '94%', streak: '🔥18', xp: '1,240' },
-  { rank: 5, me: false, initials: 'NA', bg: '#00B87E',   name: 'Nada Amin',       badge: '⚡ Fast Learner', lessons: 10, quiz: '88%', streak: '🔥9',  xp: '990'   },
-  { rank: 6, me: false, initials: 'OT', bg: '#FF6B6B',   name: 'Omar Tarek',      badge: '🎯 Quiz Pro',     lessons: 9,  quiz: '82%', streak: '🔥6',  xp: '870'   },
-];
-
-function Leaderboard() {
-  const [active, setActive] = useState(0);
-  return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <div>
-          <div className="card-title" style={{ fontSize: 18 }}>Class Leaderboard</div>
-          <div style={{ fontSize: 12, color: 'var(--g3)', marginTop: 3 }}>Class 9-A · Week of June 2</div>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          {LB_FILTERS.map((f, i) => (
-            <button key={f} className="btn btn-o btn-sm"
-              style={i === active ? { background: 'rgba(91,33,245,.15)', color: 'var(--vl)' } : {}}
-              onClick={() => setActive(i)}>{f}</button>
-          ))}
-        </div>
-      </div>
-
-      <div className="lb-podium">
-        <div className="podium-card podium-2" style={{ height: 180 }}>
-          <div className="podium-avatar" style={{ background: '#3BBFFF', color: 'white', fontSize: 14 }}>MH</div>
-          <div className="podium-name">Mohamed Hassan</div>
-          <div className="podium-score" style={{ color: 'var(--sky)' }}>1,180</div>
-          <div className="podium-xplbl">XP · 🥈 2nd</div>
-        </div>
-        <div className="podium-card podium-1" style={{ height: 210 }}>
-          <div className="podium-crown">👑</div>
-          <div className="podium-avatar" style={{ background: 'linear-gradient(135deg,#FFB830,#E8A020)', color: 'var(--navy)', fontSize: 14 }}>KA</div>
-          <div className="podium-name">Karim Ali</div>
-          <div className="podium-score" style={{ color: 'var(--amber)' }}>1,420</div>
-          <div className="podium-xplbl">XP · 🥇 1st</div>
-        </div>
-        <div className="podium-card podium-3" style={{ height: 160 }}>
-          <div className="podium-avatar" style={{ background: '#FF6B6B', color: 'white', fontSize: 14 }}>LM</div>
-          <div className="podium-name">Layla Mostafa</div>
-          <div className="podium-score" style={{ color: 'var(--coral)' }}>1,020</div>
-          <div className="podium-xplbl">XP · 🥉 3rd</div>
-        </div>
-      </div>
-
-      <div className="lb-row" style={{ background: 'rgba(255,255,255,.04)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--g5)', cursor: 'default' }}>
-        <div style={{ textAlign: 'center' }}>Rank</div>
-        <div>Student</div>
-        <div style={{ textAlign: 'center' }}>Lessons</div>
-        <div style={{ textAlign: 'center' }}>Quiz Avg</div>
-        <div style={{ textAlign: 'center' }}>Streak</div>
-        <div style={{ textAlign: 'right' }}>XP</div>
-      </div>
-
-      {LB_ROWS.map((r, i) => (
-        <div key={i} className={`lb-row${r.me ? ' me' : ''}`}>
-          <div className="lb-num" style={r.me ? { color: 'var(--vl)' } : {}}>{r.rank}</div>
-          <div className="lb-user">
-            <div className="lb-av" style={{ background: r.bg, border: r.me ? '2px solid var(--mint)' : undefined }}>{r.initials}</div>
-            <div>
-              <div className="lb-uname" style={r.me ? { color: 'var(--mint)' } : {}}>
-                {r.name}{r.me && <span style={{ fontSize: 9 }}> (You)</span>}
-              </div>
-              <div className="lb-usub">{r.badge}</div>
-            </div>
-          </div>
-          <div className="lb-num-val" style={{ color: r.me ? 'var(--mint)' : undefined }}>{r.lessons}</div>
-          <div className="lb-num-val" style={{ color: r.me ? 'var(--mint)' : undefined }}>{r.quiz}</div>
-          <div className="lb-num-val" style={{ color: 'var(--amber)' }}>{r.streak}</div>
-          <div className="lb-xp">{r.xp}</div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ── Arcade game grid ─────────────────────────────────────────────
-
-const ARCADE_GAMES: Array<{
-  thumb: string;
-  thumbBg: string;
-  name: string;
-  desc: string;
-  game?: GameKey;
-  locked?: boolean;
-}> = [
-  { thumb: '🎯', thumbBg: 'linear-gradient(135deg,#0d2d1a,#1a4f2e)', name: 'Hangman',      desc: 'Guess the vocabulary word before running out of lives', game: 'hangman' },
-  { thumb: '🐝', thumbBg: 'linear-gradient(135deg,#2d1f00,#4a3500)', name: 'Spelling Bee', desc: 'Type the correct spelling of words you hear',            game: 'spelling' },
-  { thumb: '🚀', thumbBg: 'linear-gradient(135deg,#0a1a3d,#0e2a5c)', name: 'Space Blaster', desc: 'Answer questions to power your ship through space missions', locked: true },
-  { thumb: '⚡', thumbBg: 'linear-gradient(135deg,#2d0d1a,#4a1028)', name: 'Flash Cards',   desc: 'Flip and match terms with definitions against the clock',   locked: true },
-  { thumb: '🧩', thumbBg: 'linear-gradient(135deg,#0d2d2a,#0a3d38)', name: 'Word Builder',  desc: 'Arrange jumbled letters to form the correct science terms',  locked: true },
-  { thumb: '🗣️', thumbBg: 'rgba(255,255,255,.04)',                    name: 'Debate Arena',  desc: 'Coming soon — AI-powered debate practice mode',              locked: true },
-];
-
 // ── Page ─────────────────────────────────────────────────────────
 
-type Tab = 'challenges' | 'leaderboard';
-
-export default function ChallengesPage() {
-  const [tab, setTab] = useState<Tab>('challenges');
+function ChallengesPageInner() {
   const [activeGame, setActiveGame] = useState<GameKey | null>(null);
   const [stats, setStats] = useState<AllStats>({ hangman: defaultStat(), spelling: defaultStat() });
   const [userId, setUserId] = useState('');
@@ -612,155 +509,93 @@ export default function ChallengesPage() {
 
   return (
     <div className="page-enter">
-
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-        {(['challenges', 'leaderboard'] as Tab[]).map(t => (
-          <button key={t} className="btn btn-o btn-sm"
-            style={tab === t ? { background: 'rgba(91,33,245,.15)', color: 'var(--vl)', borderColor: 'rgba(91,33,245,.3)' } : {}}
-            onClick={() => setTab(t)}>
-            {t === 'challenges' ? '⚡ Challenges' : '🏆 Leaderboard'}
-          </button>
-        ))}
+      {/* Banner cards */}
+      <div className="g2" style={{ marginBottom: 24 }}>
+        <div className="card" style={{ background: 'linear-gradient(135deg,rgba(255,184,48,.12),rgba(255,184,48,.04))', borderColor: 'rgba(255,184,48,.2)' }}>
+          <div style={{ fontSize: 28, marginBottom: 8 }}>⚡</div>
+          <div className="card-title" style={{ fontSize: 16 }}>Daily Challenge</div>
+          <div style={{ fontSize: 13, color: 'var(--g3)', margin: '6px 0 10px' }}>
+            Play Hangman or Spelling Bee and beat your best score today
+          </div>
+          {renderGameMeta('hangman')}
+          <div style={{ marginTop: 12 }}>
+            <button
+              className="btn btn-sm"
+              style={{ background: 'var(--amber)', color: 'var(--navy)', border: 'none', borderRadius: 999, padding: '7px 14px', fontFamily: 'var(--fd)', fontSize: 11, fontWeight: 700, cursor: playsLeft(stats.hangman) === 0 ? 'not-allowed' : 'pointer', opacity: playsLeft(stats.hangman) === 0 ? 0.5 : 1 }}
+              disabled={playsLeft(stats.hangman) === 0}
+              onClick={() => openGame('hangman')}
+            >
+              {playsLeft(stats.hangman) === 0 ? 'Done for today' : 'Start Hangman'}
+            </button>
+          </div>
+        </div>
+        <div className="card" style={{ background: 'linear-gradient(135deg,rgba(91,33,245,.15),rgba(91,33,245,.04))', borderColor: 'rgba(91,33,245,.2)' }}>
+          <div style={{ fontSize: 28, marginBottom: 8 }}>🐝</div>
+          <div className="card-title" style={{ fontSize: 16 }}>Spelling Bee</div>
+          <div style={{ fontSize: 13, color: 'var(--g3)', margin: '6px 0 10px' }}>
+            10 progressive words — difficulty climbs as you get them right
+          </div>
+          {renderGameMeta('spelling')}
+          <div style={{ marginTop: 12 }}>
+            <button className="btn btn-v"
+              disabled={playsLeft(stats.spelling) === 0}
+              style={{ opacity: playsLeft(stats.spelling) === 0 ? 0.5 : 1, cursor: playsLeft(stats.spelling) === 0 ? 'not-allowed' : 'pointer' }}
+              onClick={() => openGame('spelling')}>
+              {playsLeft(stats.spelling) === 0 ? 'Done for today' : 'Play Now'}
+            </button>
+          </div>
+        </div>
       </div>
 
-      {tab === 'leaderboard' ? <Leaderboard /> : (
-        <>
-          {/* Banner cards */}
-          <div className="g2" style={{ marginBottom: 24 }}>
-            <div className="card" style={{ background: 'linear-gradient(135deg,rgba(255,184,48,.12),rgba(255,184,48,.04))', borderColor: 'rgba(255,184,48,.2)' }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>⚡</div>
-              <div className="card-title" style={{ fontSize: 16 }}>Daily Challenge</div>
-              <div style={{ fontSize: 13, color: 'var(--g3)', margin: '6px 0 10px' }}>
-                Play Hangman or Spelling Bee and beat your best score today
-              </div>
-              {renderGameMeta('hangman')}
-              <div style={{ marginTop: 12 }}>
-                <button
-                  className="btn btn-sm"
-                  style={{ background: 'var(--amber)', color: 'var(--navy)', border: 'none', borderRadius: 999, padding: '7px 14px', fontFamily: 'var(--fd)', fontSize: 11, fontWeight: 700, cursor: playsLeft(stats.hangman) === 0 ? 'not-allowed' : 'pointer', opacity: playsLeft(stats.hangman) === 0 ? 0.5 : 1 }}
-                  disabled={playsLeft(stats.hangman) === 0}
-                  onClick={() => openGame('hangman')}
-                >
-                  {playsLeft(stats.hangman) === 0 ? 'Done for today' : 'Start Hangman'}
-                </button>
-              </div>
-            </div>
-            <div className="card" style={{ background: 'linear-gradient(135deg,rgba(91,33,245,.15),rgba(91,33,245,.04))', borderColor: 'rgba(91,33,245,.2)' }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>🐝</div>
-              <div className="card-title" style={{ fontSize: 16 }}>Spelling Bee</div>
-              <div style={{ fontSize: 13, color: 'var(--g3)', margin: '6px 0 10px' }}>
-                10 progressive words — difficulty climbs as you get them right
-              </div>
-              {renderGameMeta('spelling')}
-              <div style={{ marginTop: 12 }}>
-                <button className="btn btn-v"
-                  disabled={playsLeft(stats.spelling) === 0}
-                  style={{ opacity: playsLeft(stats.spelling) === 0 ? 0.5 : 1, cursor: playsLeft(stats.spelling) === 0 ? 'not-allowed' : 'pointer' }}
-                  onClick={() => openGame('spelling')}>
-                  {playsLeft(stats.spelling) === 0 ? 'Done for today' : 'Play Now'}
-                </button>
-              </div>
-            </div>
-          </div>
+      {/* Active Challenges */}
+      <div className="card-title" style={{ marginBottom: 16 }}>Active Challenges</div>
 
-          {/* Active Challenges */}
-          <div className="card-title" style={{ marginBottom: 16 }}>Active Challenges</div>
-
-          {([
-            {
-              id: 'hangman' as GameKey,
-              icon: '🔤', iconBg: 'linear-gradient(135deg,rgba(59,191,255,.18),rgba(59,191,255,.05))',
-              name: 'Hangman', desc: 'Guess the hidden word letter by letter before the figure is complete',
-              tip: 'Press A–Z on your keyboard to guess letters instantly',
-              diff: 'Medium', diffStyle: { background: 'rgba(255,184,48,.12)', color: 'var(--amber)' },
-              xp: '+10–15 pts',
-            },
-            {
-              id: 'spelling' as GameKey,
-              icon: '🐝', iconBg: 'linear-gradient(135deg,rgba(255,184,48,.2),rgba(255,184,48,.05))',
-              name: 'Spelling Bee', desc: 'See the partial word, hear it spoken, then spell it out completely',
-              tip: 'Skip the hint for +5 bonus pts — difficulty rises every 3 correct answers',
-              diff: 'Easy → Hard', diffStyle: { background: 'rgba(0,229,160,.1)', color: 'var(--mint)' },
-              xp: '+10–25 pts',
-            },
-          ]).map((ch, i) => (
-            <div key={ch.id} className="challenge-item" style={{ marginBottom: 10 }}>
-              <div className="ch-rank" style={{ color: i === 0 ? 'var(--amber)' : 'var(--g3)' }}>{i + 1}</div>
-              <div className="ch-icon" style={{ background: ch.iconBg }}>{ch.icon}</div>
-              <div className="ch-body">
-                <div className="ch-name">{ch.name}</div>
-                <div className="ch-desc">{ch.desc}</div>
-                <div style={{ fontSize: 10, color: 'var(--g5)', marginTop: 4 }}>💡 {ch.tip}</div>
-                {renderGameMeta(ch.id)}
-              </div>
-              <div className="ch-right">
-                <div className="ch-xp">{ch.xp}</div>
-                <div className="ch-xpl">per word</div>
-                <div className="ch-diff" style={ch.diffStyle}>{ch.diff}</div>
-              </div>
-              {renderPlayBtn(ch.id)}
-            </div>
-          ))}
-
-          {/* Games grid */}
-          <div style={{ marginTop: 32, marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="card-title">🎮 Games</div>
-            <div style={{ display: 'flex', gap: 24 }}>
-              {([
-                ['Total XP', (stats.hangman.totalScore + stats.spelling.totalScore).toLocaleString(), 'var(--amber)'],
-                ['Hangman Streak', stats.hangman.streak > 0 ? `🔥${stats.hangman.streak}d` : '—', 'var(--coral)'],
-                ['Spelling Streak', stats.spelling.streak > 0 ? `🔥${stats.spelling.streak}d` : '—', 'var(--mint)'],
-              ] as const).map(([l, v, c]) => (
-                <div key={l} style={{ textAlign: 'center' }}>
-                  <div style={{ fontFamily: 'var(--fd)', fontSize: 16, fontWeight: 800, color: c }}>{v}</div>
-                  <div style={{ fontSize: 10, color: 'var(--g3)' }}>{l}</div>
-                </div>
-              ))}
-            </div>
+      {([
+        {
+          id: 'hangman' as GameKey,
+          icon: '🔤', iconBg: 'linear-gradient(135deg,rgba(59,191,255,.18),rgba(59,191,255,.05))',
+          name: 'Hangman', desc: 'Guess the hidden word letter by letter before the figure is complete',
+          tip: 'Press A–Z on your keyboard to guess letters instantly',
+          diff: 'Medium', diffStyle: { background: 'rgba(255,184,48,.12)', color: 'var(--amber)' },
+          xp: '+10–15 pts',
+        },
+        {
+          id: 'spelling' as GameKey,
+          icon: '🐝', iconBg: 'linear-gradient(135deg,rgba(255,184,48,.2),rgba(255,184,48,.05))',
+          name: 'Spelling Bee', desc: 'See the partial word, hear it spoken, then spell it out completely',
+          tip: 'Skip the hint for +5 bonus pts — difficulty rises every 3 correct answers',
+          diff: 'Easy → Hard', diffStyle: { background: 'rgba(0,229,160,.1)', color: 'var(--mint)' },
+          xp: '+10–25 pts',
+        },
+      ]).map((ch, i) => (
+        <div key={ch.id} className="challenge-item" style={{ marginBottom: 10 }}>
+          <div className="ch-rank" style={{ color: i === 0 ? 'var(--amber)' : 'var(--g3)' }}>{i + 1}</div>
+          <div className="ch-icon" style={{ background: ch.iconBg }}>{ch.icon}</div>
+          <div className="ch-body">
+            <div className="ch-name">{ch.name}</div>
+            <div className="ch-desc">{ch.desc}</div>
+            <div style={{ fontSize: 10, color: 'var(--g5)', marginTop: 4 }}>💡 {ch.tip}</div>
+            {renderGameMeta(ch.id)}
           </div>
-          <div style={{ fontSize: 12, color: 'var(--g3)', marginBottom: 16 }}>
-            {MAX_PLAYS_PER_DAY} plays per game per day · streaks grow each day you play
+          <div className="ch-right">
+            <div className="ch-xp">{ch.xp}</div>
+            <div className="ch-xpl">per word</div>
+            <div className="ch-diff" style={ch.diffStyle}>{ch.diff}</div>
           </div>
-
-          <div className="game-grid">
-            {ARCADE_GAMES.map(g => {
-              const left = g.game ? playsLeft(stats[g.game]) : 0;
-              const stat = g.game ? stats[g.game] : null;
-              return (
-                <div key={g.name} className="game-card" style={g.locked || left === 0 ? { opacity: g.locked ? .55 : .7 } : {}}>
-                  <div className="gc-thumb" style={{ background: g.thumbBg }}>{g.thumb}</div>
-                  <div className="gc-body">
-                    <div className="gc-name">{g.name}</div>
-                    <div className="gc-desc">{g.desc}</div>
-                    {stat && (
-                      <div style={{ fontSize: 10, color: 'var(--g3)', marginTop: 4 }}>
-                        Best: <span style={{ color: 'var(--amber)' }}>{stat.bestScore > 0 ? `${stat.bestScore} pts` : '—'}</span>
-                        {stat.streak > 0 && <span style={{ marginLeft: 8, color: 'var(--coral)' }}>🔥{stat.streak}d</span>}
-                      </div>
-                    )}
-                    <div className="gc-bottom">
-                      <div className="gc-hi">
-                        {g.locked ? 'Coming soon' : left === 0 ? 'No plays left today' : `${left} play${left !== 1 ? 's' : ''} left`}
-                      </div>
-                      <button
-                        className="btn btn-v btn-sm"
-                        disabled={g.locked || left === 0}
-                        onClick={() => g.game && openGame(g.game)}
-                      >
-                        {g.locked ? 'Soon' : left === 0 ? '✓' : 'Play'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
-      )}
+          {renderPlayBtn(ch.id)}
+        </div>
+      ))}
 
       {activeGame === 'hangman'  && <HangmanModal    onClose={score => closeGame('hangman', score)} />}
       {activeGame === 'spelling' && <SpellingBeeModal onClose={score => closeGame('spelling', score)} />}
     </div>
+  );
+}
+
+export default function ChallengesPage() {
+  return (
+    <Suspense fallback={<div className="page-enter card-sub">Loading challenges…</div>}>
+      <ChallengesPageInner />
+    </Suspense>
   );
 }

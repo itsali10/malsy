@@ -1,0 +1,154 @@
+{
+  "student_id": "5607932b-c1c8-4d65-930d-f53ec0261278",
+  "updated_at": "2026-07-07T22:28:36.242674Z",
+  "totals": {
+    "attempts": 7,
+    "correct": 6,
+    "accuracy": 85.71
+  },
+  "recent_attempts": [
+    {
+      "ts": "2026-07-07T03:13:24.777132Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Where did the Ancient Egyptians primarily settle?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T03:13:34.173874Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Who united Upper Egypt and Lower Egypt around 3200 BC?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T03:13:40.053691Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "Who united Upper Egypt and Lower Egypt around 3200 BC?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T03:13:51.788074Z",
+      "unit_id": "history_g6:unit_01",
+      "item_id": "unit_opening",
+      "quiz_question": "What did the red land and black land represent in Ancient Egypt?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T22:27:25.432714Z",
+      "unit_id": "science_g6:unit_01_lesson_01",
+      "item_id": "1",
+      "quiz_question": "What is the purpose of the scientific method in science?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T22:27:50.392353Z",
+      "unit_id": "science_g6:unit_01_lesson_01",
+      "item_id": "1",
+      "quiz_question": "How can the scientific method help us learn about what plants need to grow?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T22:28:36.242674Z",
+      "unit_id": "science_g6:unit_01_lesson_01",
+      "item_id": "1",
+      "quiz_question": "Which of the following is NOT a step in the scientific method?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ],
+  "by_unit": {
+    "history_g6:unit_01": {
+      "attempts": 4,
+      "correct": 3,
+      "accuracy": 75.0
+    },
+    "science_g6:unit_01_lesson_01": {
+      "attempts": 3,
+      "correct": 3,
+      "accuracy": 100.0
+    }
+  },
+  "by_item": {
+    "history_g6:unit_01:unit_opening": {
+      "attempts": 4,
+      "incorrect": 1,
+      "remediation_used": 0
+    },
+    "science_g6:unit_01_lesson_01:1": {
+      "attempts": 3,
+      "incorrect": 0,
+      "remediation_used": 0
+    }
+  },
+  "tutor_quality_events": [
+    {
+      "ts": "2026-07-07T22:27:25.432714Z",
+      "unit_id": "science_g6:unit_01_lesson_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of other steps in the scientific method",
+          "Examples of experiments using the scientific method",
+          "Explanation of how to test a hypothesis",
+          "Connection to the specific book context"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 630,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T22:27:50.392353Z",
+      "unit_id": "science_g6:unit_01_lesson_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of other steps in the scientific method",
+          "Examples of experiments or studies using the scientific method",
+          "Explanation of how the scientific method is applied in different scientific fields"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 630,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T22:28:36.242674Z",
+      "unit_id": "science_g6:unit_01_lesson_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of other steps in the scientific method",
+          "Examples of experiments using the scientific method",
+          "Explanation of how to test a hypothesis",
+          "Explanation of analyzing and interpreting data"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 630,
+        "mentions_page_ranges": false
+      }
+    }
+  ]
+}

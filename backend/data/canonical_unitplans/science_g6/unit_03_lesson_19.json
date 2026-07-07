@@ -1,0 +1,72 @@
+{
+  "unit_title": "Vertebrates",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "overview",
+        "vertebrates"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "understand classification",
+        "recognize characteristics"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "vocab",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "4",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": [
+        "vertebrate classification chart",
+        "vertebrate anatomy diagram"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "vertebrate classification activity",
+        "anatomy observation experiment"
+      ]
+    },
+    {
+      "id": "6",
+      "type": "wrap_up",
+      "title": "Summary",
+      "must_cover": true,
+      "keywords": [
+        "review classification"
+      ]
+    },
+    {
+      "id": "7",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": [
+        "vertebrate characteristics quiz",
+        "classification review questions"
+      ]
+    }
+  ]
+}

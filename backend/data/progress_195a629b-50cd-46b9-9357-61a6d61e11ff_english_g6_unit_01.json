@@ -1,0 +1,240 @@
+{
+  "student_id": "195a629b-50cd-46b9-9357-61a6d61e11ff",
+  "chapter_id": "english_g6:unit_01",
+  "current_item_index": 2,
+  "done_items": [],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [
+    {
+      "ts": "2026-07-07T13:55:43.925139Z",
+      "item_id": "reading_1",
+      "quiz_question": "What is the author’s purpose in the story 'The Earthworm and the Spider'?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T14:00:45.033988Z",
+      "item_id": "reading_1",
+      "quiz_question": "What is the author’s purpose in the story 'The Earthworm and the Spider'?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T14:01:00.282013Z",
+      "item_id": "reading_1",
+      "quiz_question": "What is the author’s purpose in the story 'The Earthworm and the Spider'?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T14:01:12.163187Z",
+      "item_id": "reading_1",
+      "quiz_question": "What is the author’s purpose in the story 'The Earthworm and the Spider'?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T14:01:22.792975Z",
+      "item_id": "reading_1",
+      "quiz_question": "Why did the grandfather decide to build a bridge and a tunnel in the story?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:22:19.887695Z",
+      "item_id": "reading_1",
+      "quiz_question": "Why were some villagers afraid of building the bridge and tunnel in the story?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:22:32.150708Z",
+      "item_id": "reading_1",
+      "quiz_question": "Why were some villagers afraid of building the bridge and tunnel in the story?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:23:47.184452Z",
+      "item_id": "reading_1",
+      "quiz_question": "Why were some villagers afraid of building the bridge and tunnel in the story?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:24:04.803125Z",
+      "item_id": "reading_1",
+      "quiz_question": "Why were some villagers afraid of building the bridge and tunnel in the story?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:25:22.412632Z",
+      "item_id": "grammar",
+      "quiz_question": "Which sentence correctly uses the future continuous form?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:25:41.014873Z",
+      "item_id": "grammar",
+      "quiz_question": "Which sentence correctly uses the future continuous form?",
+      "correct": false,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": true
+    },
+    {
+      "ts": "2026-07-07T21:25:53.575523Z",
+      "item_id": "grammar",
+      "quiz_question": "Which sentence correctly uses the future continuous form?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:26:09.350888Z",
+      "item_id": "grammar",
+      "quiz_question": "What does the sentence 'Next spring, I’m going to be walking through the mountain' indicate?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:27:23.634801Z",
+      "item_id": "listening",
+      "quiz_question": "Does the first speaker use a bridge or a tunnel to get home?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:27:29.731206Z",
+      "item_id": "listening",
+      "quiz_question": "Does the first speaker use a bridge or a tunnel to get home?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:27:44.297142Z",
+      "item_id": "listening",
+      "quiz_question": "How are bridges and tunnels important in your daily life?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:27:49.081109Z",
+      "item_id": "listening",
+      "quiz_question": "Does the second speaker use bridges or tunnels to get around in the summer?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:27:53.595783Z",
+      "item_id": "listening",
+      "quiz_question": "Does the third speaker take a bus through a tunnel or over a bridge?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:28:05.393340Z",
+      "item_id": "listening",
+      "quiz_question": "Does the third speaker take a bus through a tunnel or over a bridge?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:28:12.249460Z",
+      "item_id": "listening",
+      "quiz_question": "What do all three speakers use?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ],
+  "listening_question_index": 0,
+  "lesson_questions": [
+    {
+      "question": "What is the author's purpose in the story 'The Earthworm and the Spider'?",
+      "options": [
+        "To describe the appearance of the characters",
+        "To explain how to build a bridge",
+        "To list the names of different villages",
+        "To show the importance of connections and taking risks for the greater good"
+      ],
+      "correct_answer": "To show the importance of connections and taking risks for the greater good",
+      "expected_points": [
+        "The author's purpose is to make readers think about the significance of connections and taking risks for the benefit of the community, as seen in the actions of the characters in the story."
+      ],
+      "section_skill": "reading",
+      "correct_index": 3
+    },
+    {
+      "question": "What is one of the author's purposes in writing 'The Earthworm and the Spider'?",
+      "options": [
+        "To explain the process of building a tunnel",
+        "To show the value of overcoming obstacles to build connections with others",
+        "To describe the weather in the village",
+        "To teach readers how to fish"
+      ],
+      "correct_answer": "To show the value of overcoming obstacles to build connections with others",
+      "expected_points": [
+        "One of the author's purposes is to demonstrate the importance of overcoming challenges to create relationships with others, as demonstrated by the characters in the story."
+      ],
+      "section_skill": "reading",
+      "correct_index": 1
+    },
+    {
+      "question": "What did the villagers in Koi do to connect with other villages?",
+      "options": [
+        "Dug a trench around the village",
+        "Sailed across the river",
+        "Built a bridge and a tunnel",
+        "Flew over the mountain"
+      ],
+      "correct_answer": "Built a bridge and a tunnel",
+      "expected_points": [
+        "The villagers in Koi built a bridge and a tunnel to reach out to other villages for trading, sharing stories, and making friendships, as suggested by the grandfather in the story."
+      ],
+      "section_skill": "reading",
+      "correct_index": 2
+    }
+  ],
+  "lesson_question_index": 0,
+  "lesson_questions_item_id": "reading_1"
+}

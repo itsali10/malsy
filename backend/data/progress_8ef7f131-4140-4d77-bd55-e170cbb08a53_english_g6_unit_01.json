@@ -1,0 +1,21 @@
+{
+  "student_id": "8ef7f131-4140-4d77-bd55-e170cbb08a53",
+  "chapter_id": "english_g6:unit_01",
+  "current_item_index": 4,
+  "done_items": [
+    "reading_1"
+  ],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [
+    {
+      "ts": "2026-07-05T03:17:33.220232Z",
+      "item_id": "reading_1",
+      "quiz_question": "What are the main reasons authors write stories according to the lesson?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ]
+}

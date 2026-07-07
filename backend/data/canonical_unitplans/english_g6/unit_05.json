@@ -1,0 +1,102 @@
+{
+  "unit_title": "Why do we wear masks?",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Get Ready",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "preparation"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Word Study",
+      "must_cover": true,
+      "keywords": [
+        "words",
+        "synonyms",
+        "sentences",
+        "suffixes"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing Study",
+      "must_cover": true,
+      "keywords": [
+        "title selection",
+        "story writing",
+        "comparison"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Before You Read",
+      "must_cover": true,
+      "keywords": [
+        "mask importance",
+        "discussion"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar in Use",
+      "must_cover": true,
+      "keywords": [
+        "past perfect",
+        "continuous tense",
+        "questions"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening",
+      "must_cover": true,
+      "keywords": [
+        "acting with masks",
+        "instructions",
+        "comprehension"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking",
+      "must_cover": true,
+      "keywords": [
+        "describing objects",
+        "conversation practice"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "vocabulary practice",
+        "grammar practice",
+        "listening practice",
+        "speaking practice"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Big Question",
+      "must_cover": true,
+      "keywords": [
+        "mask purpose",
+        "theater experience"
+      ]
+    }
+  ]
+}

@@ -455,6 +455,8 @@ class StudentSessionRead(BaseModel):
     chapter_id: Optional[str] = None
     schedule_id: Optional[str] = None
     attendance_id: Optional[str] = None
+    progress_percent: Optional[int] = None
+    last_activity_at: Optional[str] = None
 
 
 class StudentOverviewRead(BaseModel):
@@ -649,6 +651,7 @@ class SubjectBookSummary(BaseModel):
     visible_to_students: bool = False
     archived: bool = False
     unit_count: Optional[int] = None
+    lesson_count: Optional[int] = None
     chunk_count: Optional[int] = None
     error_message: Optional[str] = None
     uploaded_at: Optional[str] = None
@@ -738,7 +741,7 @@ class StudentLessonScheduleItemRead(BaseModel):
 
 
 class LessonScheduleSessionRead(BaseModel):
-    """Day-based lesson session (no fixed clock time)."""
+    """Day-based lesson session (optional clock time from personal timetable)."""
     schedule_item_id: uuid.UUID
     lesson_id: str
     lesson_title: str
@@ -748,6 +751,12 @@ class LessonScheduleSessionRead(BaseModel):
     order_index: int
     status: str
     day_of_week: str
+    lock_reason: Optional[str] = None
+    action_label: Optional[str] = None
+    unit_part: int = 0
+    continue_available: bool = False
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
 
 
 class WeekDayLessonScheduleRead(BaseModel):

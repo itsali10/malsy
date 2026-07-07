@@ -1,0 +1,68 @@
+{
+  "unit_title": "The Skeletal System",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "skeletal system",
+        "bones",
+        "human body"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "explain the importance of bone health"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "vocab",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "bone structure",
+        "bone marrow"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "5",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "hands-on bone model activity",
+        "bone density experiment"
+      ]
+    },
+    {
+      "id": "6",
+      "type": "wrap_up",
+      "title": "Summary",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "7",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": [
+        "explain the role of calcium in bone health"
+      ]
+    }
+  ]
+}

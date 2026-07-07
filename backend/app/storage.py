@@ -12,8 +12,12 @@ def load_json(name: str, default: Any) -> Any:
     p = _path(name)
     if not os.path.exists(p):
         return default
-    with open(p, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, UnicodeDecodeError, OSError) as exc:
+        print(f"[storage] corrupt or unreadable JSON file {name}: {exc}; using default")
+        return default
 
 def save_json(name: str, obj: Any) -> None:
     p = _path(name)

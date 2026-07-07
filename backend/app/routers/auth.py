@@ -7,9 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import create_access_token, get_current_user, hash_password, verify_password
 from ..database import get_db
-from ..default_schedule import enroll_user_in_default_schedules
+from ..default_schedule import create_random_schedule_for_student
 from ..lesson_schedule_service import generate_lesson_schedule_for_student
-from ..timetable_service import ensure_student_timetable_enrollment
 from ..models import User
 from ..schemas import LoginRequest, Token, UserCreate, UserRead
 
@@ -52,15 +51,12 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
     await db.commit()
     await db.refresh(user)
 
-    logger.info("Enroll in default schedules user_id=%s", user.user_id)
-    await enroll_user_in_default_schedules(db, user.user_id)
-
-    logger.info("Ensure real timetable enrollment user_id=%s", user.user_id)
-    await ensure_student_timetable_enrollment(user.user_id, db)
+    logger.info("Create randomized personal timetable user_id=%s", user.user_id)
+    await create_random_schedule_for_student(db, user.user_id)
     await db.commit()
 
     logger.info("Generate lesson schedule user_id=%s", user.user_id)
-    await generate_lesson_schedule_for_student(db, user.user_id, force=False, append_missing=False)
+    await generate_lesson_schedule_for_student(db, user.user_id, force=True, append_missing=False)
     await db.commit()
 
     logger.info("END Register user_id=%s email=%s", user.user_id, user.email)

@@ -1,0 +1,79 @@
+{
+  "unit_title": "Where and Who Were the Ancient Egyptians?",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Ancient Egyptians Research Project",
+      "must_cover": true,
+      "keywords": [
+        "research project",
+        "Ancient Egyptians"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Where and Who were the Ancient Egyptians?",
+      "must_cover": true,
+      "keywords": [
+        "ancient Egypt",
+        "civilization",
+        "River Nile",
+        "geography",
+        "pharaohs",
+        "Narmer",
+        "Menes",
+        "Memphis",
+        "two lands"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions on Ancient Egyptians",
+      "must_cover": true,
+      "keywords": [
+        "compare",
+        "life today",
+        "River Nile importance",
+        "pharaohs",
+        "kingdoms",
+        "two lands"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements of Ancient Egypt",
+      "must_cover": true,
+      "keywords": [
+        "monuments",
+        "tombs",
+        "River Nile map",
+        "Egyptian kingdoms map"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Ancient Egyptians Practice Tasks",
+      "must_cover": true,
+      "keywords": [
+        "reading comprehension",
+        "geography quiz",
+        "historical figures matching"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Lesson Wrap-Up",
+      "must_cover": true,
+      "keywords": [
+        "Ancient Egyptians summary",
+        "key learnings"
+      ]
+    }
+  ]
+}

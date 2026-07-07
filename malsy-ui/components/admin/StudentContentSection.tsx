@@ -172,7 +172,7 @@ function SubjectSummaryCard({
 }) {
   const book = card.book;
   const unitCount = book?.unit_count ?? '—';
-  const lessonCount = book?.lesson_count ?? book?.unit_count ?? '—';
+  const lessonCount = book?.lesson_count ?? '—';
 
   return (
     <button
@@ -250,12 +250,16 @@ function SubjectSummaryCard({
   );
 }
 
-export default function StudentContentSection() {
+export default function StudentContentSection({
+  initialSubjectKey = null,
+}: {
+  initialSubjectKey?: string | null;
+}) {
   const [cards, setCards] = useState<SubjectCardModel[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [showAddSubject, setShowAddSubject] = useState(false);
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [selectedKey, setSelectedKey] = useState<string | null>(initialSubjectKey);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -291,6 +295,11 @@ export default function StudentContentSection() {
       setLoading(false);
     });
   }, [load]);
+
+  useEffect(() => {
+    if (!initialSubjectKey) return;
+    setSelectedKey(initialSubjectKey);
+  }, [initialSubjectKey]);
 
   const selectedCard = selectedKey ? cards.find((c) => c.subject_key === selectedKey) ?? null : null;
 

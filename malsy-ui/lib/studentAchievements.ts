@@ -30,7 +30,7 @@ const DEFS = {
     id: 'grammar_star',
     icon: '✏️',
     label: 'Grammar Star',
-    description: 'Strong grammar score or section completed.',
+    description: 'Completed a Grammar section.',
     bg: 'linear-gradient(135deg,#D4A017,#FFB830)',
     color: 'var(--amber)',
   },
@@ -60,24 +60,50 @@ const DEFS = {
   },
 } as const;
 
-function sectionDone(resumes: ContinueLearningSubjectRead[], key: string): boolean {
-  return resumes.some((r) =>
-    (r.section_statuses ?? []).some(
-      (s) => s.key === key && s.completed,
-    ),
+/** Language section order: Reading → Grammar → Listening → Pronunciation */
+const SECTION_INDEX: Record<string, number> = {
+  reading: 0,
+  grammar: 1,
+  listening: 2,
+  pronunciation: 3,
+};
+
+/** Language lessons expose reading/grammar/listening/pronunciation section keys. */
+function languageResumes(resumes: ContinueLearningSubjectRead[]): ContinueLearningSubjectRead[] {
+  return resumes.filter((r) =>
+    (r.section_statuses ?? []).some((s) => s.key === 'reading'),
   );
+}
+
+/**
+ * A section is earned only after the student moves past it (unit_part > section index).
+ * Unlocked-but-not-finished sections must not count. Non-language subjects are ignored.
+ */
+function sectionPassed(resumes: ContinueLearningSubjectRead[], sectionKey: string): boolean {
+  const index = SECTION_INDEX[sectionKey];
+  if (index === undefined) return false;
+  return languageResumes(resumes).some((r) => r.continue_available && r.unit_part > index);
 }
 
 function hasCompletedLesson(evals: LessonEvaluationRead[]): boolean {
   return evals.some((e) => e.lesson_completed);
 }
 
-function grammarEarned(evals: LessonEvaluationRead[], resumes: ContinueLearningSubjectRead[]): boolean {
-  if (sectionDone(resumes, 'grammar')) return true;
-  return evals.some((e) => (e.grammar_score ?? 0) >= 80);
+function grammarEarned(_evals: LessonEvaluationRead[], resumes: ContinueLearningSubjectRead[]): boolean {
+  return sectionPassed(resumes, 'grammar');
 }
 
-/** Derive earned badges from evaluations, resume progress, and streak — no mock data. */
+function pronunciationEarned(
+  evals: LessonEvaluationRead[],
+  resumes: ContinueLearningSubjectRead[],
+): boolean {
+  if (sectionPassed(resumes, 'pronunciation')) return true;
+  return evals.some(
+    (e) => e.lesson_completed && e.pronunciation_score != null,
+  );
+}
+
+/** Derive earned badges from this student's evaluations, resume progress, and streak only. */
 export function computeEarnedAchievements(
   evals: LessonEvaluationRead[],
   resumeSubjects: ContinueLearningSubjectRead[],
@@ -88,19 +114,16 @@ export function computeEarnedAchievements(
   if (hasCompletedLesson(evals)) {
     earned.push({ ...DEFS.first_lesson });
   }
-  if (sectionDone(resumeSubjects, 'reading')) {
+  if (sectionPassed(resumeSubjects, 'reading')) {
     earned.push({ ...DEFS.great_reader });
   }
   if (grammarEarned(evals, resumeSubjects)) {
     earned.push({ ...DEFS.grammar_star });
   }
-  if (sectionDone(resumeSubjects, 'listening')) {
+  if (sectionPassed(resumeSubjects, 'listening')) {
     earned.push({ ...DEFS.listening_hero });
   }
-  if (
-    sectionDone(resumeSubjects, 'pronunciation') ||
-    evals.some((e) => (e.pronunciation_score ?? 0) >= 80)
-  ) {
+  if (pronunciationEarned(evals, resumeSubjects)) {
     earned.push({ ...DEFS.pronunciation_star });
   }
   if (streak >= 3) {

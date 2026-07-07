@@ -1,0 +1,159 @@
+{
+  "unit_title": "Unit 1: Bridges and Tunnels",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Opening",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "overview"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Vocabulary Section",
+      "must_cover": true,
+      "keywords": [
+        "new words",
+        "word study",
+        "vocabulary",
+        "verbs",
+        "adjectives",
+        "opposites",
+        "listening",
+        "activities",
+        "circle the correct answer",
+        "match words",
+        "words in context"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Reading Section - Sam and David at Black Water River",
+      "must_cover": true,
+      "keywords": [
+        "author's purpose",
+        "short story",
+        "comprehension questions",
+        "words in context",
+        "fantasy story"
+      ]
+    },
+    {
+      "id": "reading_2",
+      "type": "reading",
+      "title": "Reading Section - The Earthworm and the Spider",
+      "must_cover": true,
+      "keywords": [
+        "comprehension questions",
+        "trust",
+        "stranger",
+        "villagers",
+        "bridge and tunnel",
+        "words in context"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar Section",
+      "must_cover": true,
+      "keywords": [
+        "future continuous forms",
+        "circle the correct answer",
+        "talk about actions in progress",
+        "future times",
+        "correcting someone",
+        "prefixes bi- and tri-"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening Section",
+      "must_cover": true,
+      "keywords": [
+        "listening activities",
+        "comprehension questions",
+        "key words",
+        "speaking",
+        "correcting someone"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking Section",
+      "must_cover": true,
+      "keywords": [
+        "correcting someone",
+        "polite expressions",
+        "key words"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing Section",
+      "must_cover": true,
+      "keywords": [
+        "prefixes bi- and tri-",
+        "sentence writing",
+        "paragraph breaks",
+        "organizing writing",
+        "topics for paragraphs"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Unit Wrap-Up",
+      "must_cover": true,
+      "keywords": [
+        "review",
+        "summary",
+        "conclusion"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "big question",
+        "building bridges and tunnels",
+        "importance in daily life"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "illustrations",
+        "diagrams",
+        "charts",
+        "pictures"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "fill-in-the-blank",
+        "listening and reading comprehension",
+        "circle the correct answer",
+        "sentence completion",
+        "sentence writing"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "student_id": "195a629b-50cd-46b9-9357-61a6d61e11ff",
+  "chapter_id": "english_g6",
+  "unit_index": 0,
+  "unit_part": 0,
+  "max_unlocked_part": 3,
+  "lesson_chapter_id": "english_g6:unit_01",
+  "lesson_title": "Why do we build bridges and tunnels?",
+  "section_statuses": [
+    {
+      "index": 0,
+      "key": "reading",
+      "title": "Reading",
+      "completed": true,
+      "active": false
+    },
+    {
+      "index": 1,
+      "key": "grammar",
+      "title": "Grammar",
+      "completed": true,
+      "active": false
+    },
+    {
+      "index": 2,
+      "key": "listening",
+      "title": "Listening",
+      "completed": true,
+      "active": false
+    },
+    {
+      "index": 3,
+      "key": "pronunciation",
+      "title": "Pronunciation",
+      "completed": false,
+      "active": false
+    }
+  ],
+  "updated_at": "2026-07-07T22:21:12.774439Z"
+}

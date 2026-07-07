@@ -163,6 +163,12 @@ export interface LessonScheduleSessionRead {
   order_index: number;
   status: 'locked' | 'available' | 'completed' | 'missed';
   day_of_week: string;
+  lock_reason?: string | null;
+  action_label?: string | null;
+  unit_part?: number;
+  continue_available?: boolean;
+  start_time?: string | null;
+  end_time?: string | null;
 }
 
 export interface WeekDayRead {
@@ -214,8 +220,12 @@ export interface Quiz {
   expected_points?: string[];
   listening_question_index?: number;
   listening_question_total?: number;
+  lesson_question_index?: number;
+  lesson_question_total?: number;
   explanation?: string;
   skill?: string;
+  sentence?: string;
+  instructions?: string;
 }
 
 export interface ListeningQuestion {
@@ -240,6 +250,8 @@ export interface HistoryLessonCard {
   unit_id: string;
   title: string;
   shortDescription: string;
+  start_page?: number;
+  end_page?: number;
   videoFilename?: string | null;
   videoType?: string | null;
   videoUrl?: string | null;
@@ -251,8 +263,10 @@ export interface HistoryLessonsResponse {
   subject: string;
   grade: number;
   unit: string;
+  title?: string;
   lessons: HistoryLessonCard[];
-  validation: { valid: boolean; errors: string[] };
+  partCount?: number;
+  validation?: { valid: boolean; errors: string[] };
 }
 
 export interface BookLessonProgress {
@@ -427,7 +441,10 @@ export const api = {
 
   dashboard: {
     subjects: () => request<MySubjectRead[]>('/dashboard/my-subjects'),
-    week: () => request<WeekDayRead[]>('/dashboard/my-week'),
+    week: (selectedDay?: string) => {
+      const q = selectedDay ? `?selected_day=${encodeURIComponent(selectedDay)}` : '';
+      return request<WeekDayRead[]>(`/dashboard/my-week${q}`);
+    },
     nextSession: () => request<ScheduleSessionRead | null>('/dashboard/next-session'),
     continueLearning: () => request<ContinueLearningRead>('/dashboard/continue-learning'),
   },

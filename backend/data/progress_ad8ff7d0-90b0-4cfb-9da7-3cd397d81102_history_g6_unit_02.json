@@ -1,0 +1,58 @@
+{
+  "student_id": "ad8ff7d0-90b0-4cfb-9da7-3cd397d81102",
+  "chapter_id": "history_g6:unit_02",
+  "current_item_index": 0,
+  "done_items": [],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [],
+  "lesson_questions": [
+    {
+      "question": "Which Egyptian god was known as the King of the Gods and was even more powerful when combined with Ra?",
+      "options": [
+        "Sobek - God of the Nile",
+        "Anubis - God of mummification",
+        "Amun - King of the Gods",
+        "Hathor - Goddess of love and joy"
+      ],
+      "correct_answer": "Amun - King of the Gods",
+      "expected_points": [
+        "Amun was worshipped for his power, especially when combined with Ra."
+      ],
+      "source_quote": "When Amun was combined with Ra he was even more powerful.",
+      "correct_index": 2
+    },
+    {
+      "question": "Which goddess was associated with protection and household entertainment, depicted with the head of a cat?",
+      "options": [
+        "Bastet - Protection and the household entertainment",
+        "Anubis - God of mummification",
+        "Amun - King of the Gods",
+        "Geb - The earth God"
+      ],
+      "correct_answer": "Bastet - Protection and the household entertainment",
+      "expected_points": [
+        "Bastet was associated with protection and household entertainment."
+      ],
+      "source_quote": "Bastet Protection and the household entertainment. Daughter of Ra.",
+      "correct_index": 0
+    },
+    {
+      "question": "Which god was believed to cause earthquakes with his laughter and was symbolized with the head of a goose?",
+      "options": [
+        "Geb - The earth God",
+        "Sekmet - Goddess of war and battle",
+        "Horus - God of the sky",
+        "Hathor - Goddess of love and joy"
+      ],
+      "correct_answer": "Geb - The earth God",
+      "expected_points": [
+        "Geb was believed to cause earthquakes with his laughter."
+      ],
+      "source_quote": "Geb The earth God. Egyptians believed earthquakes were his laughter.",
+      "correct_index": 0
+    }
+  ],
+  "lesson_question_index": 0,
+  "lesson_questions_item_id": "unit_opening"
+}

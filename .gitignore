@@ -28,3 +28,9 @@ frontend/GradGame/videos/
 
 # Node modules
 **/node_modules/
+
+# Next.js build output
+**/.next/
+
+# Vendored third-party SDK binaries (re-download separately if working on test2/)
+test2/Oculus/

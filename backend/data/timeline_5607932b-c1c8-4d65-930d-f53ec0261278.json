@@ -1,0 +1,11 @@
+{
+  "student_id": "5607932b-c1c8-4d65-930d-f53ec0261278",
+  "student_start_at": "2026-07-06T21:14:20.011752Z",
+  "taught_units": [
+    {
+      "unit_id": "history_g6:unit_01",
+      "taught_at": "2026-07-07T03:13:51.816108Z",
+      "completed_parts": 2
+    }
+  ]
+}

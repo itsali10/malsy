@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import func, select
@@ -31,10 +31,155 @@ def _eval_for_lesson(evals: Dict[str, LessonEvaluation], lesson_id: str) -> Opti
         return None
     if lesson_id in evals:
         return evals[lesson_id]
+    short = lesson_id.split(":")[-1] if ":" in lesson_id else lesson_id
     for cid, ev in evals.items():
-        if cid == lesson_id or cid.startswith(f"{lesson_id}_") or lesson_id.startswith(f"{cid}_"):
+        if cid == lesson_id or cid.endswith(f":{short}") or lesson_id.endswith(f":{cid.split(':')[-1]}"):
+            return ev
+        if cid.startswith(f"{lesson_id}_") or lesson_id.startswith(f"{cid}_"):
             return ev
     return None
+
+
+def _scheduled_date(week_start: date, day_of_week: Optional[str]) -> Optional[date]:
+    if not day_of_week:
+        return None
+    day_rank = {day: idx for idx, day in enumerate(DAY_ORDER)}
+    idx = day_rank.get(day_of_week)
+    if idx is None:
+        return None
+    return week_start + timedelta(days=idx)
+
+
+def _parse_iso_dt(value: Optional[str]) -> Optional[datetime]:
+    if not value:
+        return None
+    try:
+        text = str(value).replace("Z", "+00:00")
+        dt = datetime.fromisoformat(text)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
+    except (TypeError, ValueError):
+        return None
+
+
+def _lesson_index_for_id(lessons: List[Dict[str, Any]], lesson_id: str) -> Optional[int]:
+    norm = (lesson_id or "").strip()
+    if not norm:
+        return None
+    short = norm.split(":")[-1] if ":" in norm else norm
+    for i, les in enumerate(lessons):
+        cid = str(les.get("chapter_id") or les.get("id") or "")
+        if cid == norm:
+            return i
+        uid = str(les.get("unit_id") or "")
+        if uid and uid == short:
+            return i
+    return None
+
+
+def _progress_percent_for_lesson(
+    student_id: str,
+    lesson_id: str,
+    session: Dict[str, Any],
+    ev: Optional[LessonEvaluation],
+) -> int:
+    if ev and ev.lesson_completed:
+        return 100
+    if str(session.get("status") or "") == "completed":
+        return 100
+
+    from .language_lesson_sections import last_part_index
+    from .lesson_catalog_service import list_book_lessons, parse_chapter_id
+    from .session_engine import load_book_lesson_progress, load_progress, progress_matches_book
+
+    book_id, _ = parse_chapter_id(lesson_id)
+    lessons = list_book_lessons(book_id)
+    lesson_idx = _lesson_index_for_id(lessons, lesson_id)
+    if lesson_idx is None:
+        return 0
+
+    lesson = lessons[lesson_idx]
+    lesson_num = int(lesson.get("lesson_number") or (lesson_idx + 1))
+    book_prog = load_book_lesson_progress(student_id, book_id)
+    completed_numbers = {int(x) for x in (book_prog.get("completed_lesson_numbers") or [])}
+    if lesson_num in completed_numbers:
+        return 100
+
+    part_count = max(1, last_part_index(book_id) + 1)
+    prog = load_progress(student_id)
+    on_lesson = (
+        progress_matches_book(prog.get("chapter_id"), book_id)
+        and int(prog.get("unit_index", -1)) == lesson_idx
+    )
+    if on_lesson:
+        unit_part = int(prog.get("unit_part", 0))
+        max_unlocked = int(prog.get("max_unlocked_part", 0))
+        done_parts = max(unit_part, max_unlocked, int(session.get("unit_part") or 0))
+        if done_parts >= part_count:
+            return 99
+        return max(5, min(99, int(round((done_parts / part_count) * 100))))
+
+    if session.get("continue_available"):
+        unit_part = int(session.get("unit_part") or 0)
+        return max(5, min(99, int(round(((unit_part + 1) / part_count) * 100))))
+
+    return 0
+
+
+def _admin_schedule_status(
+    session: Dict[str, Any],
+    ev: Optional[LessonEvaluation],
+    scheduled_date: Optional[date],
+    today: date,
+) -> str:
+    raw = str(session.get("status") or "locked")
+    if (ev and ev.lesson_completed) or raw == "completed":
+        return "completed"
+    if raw == "locked":
+        return "locked"
+    if scheduled_date and scheduled_date < today:
+        return "missed"
+    if session.get("continue_available"):
+        return "in_progress"
+    return "not_started"
+
+
+def _last_activity_at(
+    student_id: str,
+    lesson_id: str,
+    ev: Optional[LessonEvaluation],
+    schedule_item: Optional[StudentLessonScheduleItem],
+) -> Optional[str]:
+    from .lesson_catalog_service import list_book_lessons, parse_chapter_id
+    from .session_engine import load_progress, progress_matches_book
+
+    candidates: List[datetime] = []
+    if ev:
+        if ev.completion_date:
+            candidates.append(ev.completion_date)
+        if ev.created_at:
+            candidates.append(ev.created_at)
+    if schedule_item:
+        if schedule_item.completed_at:
+            candidates.append(schedule_item.completed_at)
+        if schedule_item.updated_at:
+            candidates.append(schedule_item.updated_at)
+
+    book_id, _ = parse_chapter_id(lesson_id)
+    lessons = list_book_lessons(book_id)
+    lesson_idx = _lesson_index_for_id(lessons, lesson_id)
+    prog = load_progress(student_id)
+    if lesson_idx is not None and progress_matches_book(prog.get("chapter_id"), book_id):
+        if int(prog.get("unit_index", -1)) == lesson_idx:
+            parsed = _parse_iso_dt(prog.get("updated_at"))
+            if parsed:
+                candidates.append(parsed)
+
+    if not candidates:
+        return None
+    latest = max(candidates, key=lambda dt: dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc))
+    return latest.isoformat()
 
 
 def _attendance_label(status: str, lesson_completed: bool = False) -> str:
@@ -210,25 +355,46 @@ async def student_activity_stats_batch(
 
 async def build_student_schedule(db: AsyncSession, user_id: uuid.UUID) -> List[Dict[str, Any]]:
     """
-    Weekly lesson schedule for admin — same saved plan the student dashboard reads
-    via GET /dashboard/my-week (fetch_student_weekly_schedule).
+    Weekly lesson schedule for admin — merges saved schedule, live session progress,
+    evaluations, and book unlock state for the requested student only.
     """
     from .lesson_schedule_service import fetch_student_weekly_schedule
 
+    student_id = str(user_id)
     evals = await _eval_map(db, user_id)
+    week_start = sunday_of_week()
+    today = date.today()
+
+    item_result = await db.execute(
+        select(StudentLessonScheduleItem).where(
+            StudentLessonScheduleItem.user_id == user_id,
+            StudentLessonScheduleItem.week_start_date == week_start,
+        )
+    )
+    items_by_lesson = {str(row.lesson_id): row for row in item_result.scalars().all()}
+
     week_data = await fetch_student_weekly_schedule(user_id, db, auto_generate=True)
 
     rows: List[Dict[str, Any]] = []
     for day_block in week_data:
         day = day_block.get("day_of_week")
+        scheduled_date = _scheduled_date(week_start, day)
         for session in day_block.get("sessions") or []:
             lesson_id = str(session.get("lesson_id") or "")
             ev = _eval_for_lesson(evals, lesson_id)
-            status = str(session.get("status") or "locked")
+            schedule_item = items_by_lesson.get(lesson_id)
+            status = _admin_schedule_status(session, ev, scheduled_date, today)
+            progress_percent = _progress_percent_for_lesson(student_id, lesson_id, session, ev)
+            last_activity = _last_activity_at(student_id, lesson_id, ev, schedule_item)
+            completion_time = None
+            if ev and ev.completion_date:
+                completion_time = ev.completion_date.isoformat()
+            elif schedule_item and schedule_item.completed_at:
+                completion_time = schedule_item.completed_at.isoformat()
 
             rows.append(
                 {
-                    "session_date": None,
+                    "session_date": scheduled_date.isoformat() if scheduled_date else None,
                     "day_of_week": day,
                     "subject": session.get("subject_name") or "",
                     "module": session.get("lesson_title") or lesson_id,
@@ -236,10 +402,12 @@ async def build_student_schedule(db: AsyncSession, user_id: uuid.UUID) -> List[D
                     "scheduled_end": None,
                     "location": None,
                     "status": status,
-                    "completion_time": ev.completion_date.isoformat() if ev and ev.completion_date else None,
+                    "completion_time": completion_time,
                     "quiz_score": ev.overall_score if ev else None,
                     "chapter_id": lesson_id or None,
                     "schedule_id": str(session.get("schedule_item_id")) if session.get("schedule_item_id") else None,
+                    "progress_percent": progress_percent,
+                    "last_activity_at": last_activity,
                 }
             )
 
@@ -290,6 +458,15 @@ async def build_student_attendance_sessions(db: AsyncSession, user_id: uuid.UUID
         status = _attendance_label(att.attendance_status, bool(matched_eval and matched_eval.lesson_completed))
         completion_time = matched_eval.completion_date if matched_eval else att.check_out_time or att.check_in_time
         quiz_score = matched_eval.overall_score if matched_eval else None
+        chapter = chapter_id or (matched_eval.content_id if matched_eval else None)
+        progress_percent = 100 if status == "completed" else (0 if not matched_eval else None)
+        if matched_eval and not matched_eval.lesson_completed and chapter:
+            progress_percent = 50
+        last_activity = None
+        if completion_time:
+            last_activity = completion_time.isoformat() if hasattr(completion_time, "isoformat") else str(completion_time)
+        elif matched_eval and matched_eval.created_at:
+            last_activity = matched_eval.created_at.isoformat()
 
         key = (str(att.session_date), str(sch.schedule_id))
         seen_keys.add(key)
@@ -303,11 +480,13 @@ async def build_student_attendance_sessions(db: AsyncSession, user_id: uuid.UUID
                 "scheduled_end": _time_str(sch.end_time),
                 "attendance_status": att.attendance_status,
                 "status": status,
-                "completion_time": completion_time.isoformat() if completion_time else None,
+                "completion_time": completion_time.isoformat() if completion_time and hasattr(completion_time, "isoformat") else (str(completion_time) if completion_time else None),
                 "quiz_score": quiz_score,
-                "chapter_id": chapter_id or (matched_eval.content_id if matched_eval else None),
+                "chapter_id": chapter,
                 "schedule_id": str(sch.schedule_id),
                 "attendance_id": str(att.attendance_id),
+                "progress_percent": progress_percent,
+                "last_activity_at": last_activity,
             }
         )
 
@@ -334,6 +513,8 @@ async def build_student_attendance_sessions(db: AsyncSession, user_id: uuid.UUID
                 "chapter_id": cid,
                 "schedule_id": None,
                 "attendance_id": None,
+                "progress_percent": 100,
+                "last_activity_at": ev.completion_date.isoformat() if ev.completion_date else (ev.created_at.isoformat() if ev.created_at else None),
             }
         )
 

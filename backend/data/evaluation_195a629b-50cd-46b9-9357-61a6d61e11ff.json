@@ -1,0 +1,412 @@
+{
+  "student_id": "195a629b-50cd-46b9-9357-61a6d61e11ff",
+  "updated_at": "2026-07-07T21:28:13.165049Z",
+  "totals": {
+    "attempts": 20,
+    "correct": 11,
+    "accuracy": 55.0
+  },
+  "recent_attempts": [
+    {
+      "ts": "2026-07-07T13:55:44.843565Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "What is the author’s purpose in the story 'The Earthworm and the Spider'?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T14:00:46.187056Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "What is the author’s purpose in the story 'The Earthworm and the Spider'?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T14:01:01.082403Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "What is the author’s purpose in the story 'The Earthworm and the Spider'?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T14:01:12.169861Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "What is the author’s purpose in the story 'The Earthworm and the Spider'?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T14:01:22.800545Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Why did the grandfather decide to build a bridge and a tunnel in the story?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:22:20.613843Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Why were some villagers afraid of building the bridge and tunnel in the story?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:22:32.826596Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Why were some villagers afraid of building the bridge and tunnel in the story?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:23:47.854961Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Why were some villagers afraid of building the bridge and tunnel in the story?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:24:04.808346Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "reading_1",
+      "quiz_question": "Why were some villagers afraid of building the bridge and tunnel in the story?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:25:23.621229Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "grammar",
+      "quiz_question": "Which sentence correctly uses the future continuous form?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:25:43.704331Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "grammar",
+      "quiz_question": "Which sentence correctly uses the future continuous form?",
+      "correct": false,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": true
+    },
+    {
+      "ts": "2026-07-07T21:25:53.607321Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "grammar",
+      "quiz_question": "Which sentence correctly uses the future continuous form?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:26:10.211303Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "grammar",
+      "quiz_question": "What does the sentence 'Next spring, I’m going to be walking through the mountain' indicate?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:27:24.682651Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "listening",
+      "quiz_question": "Does the first speaker use a bridge or a tunnel to get home?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:27:29.738187Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "listening",
+      "quiz_question": "Does the first speaker use a bridge or a tunnel to get home?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:27:44.300518Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "listening",
+      "quiz_question": "How are bridges and tunnels important in your daily life?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:27:49.082804Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "listening",
+      "quiz_question": "Does the second speaker use bridges or tunnels to get around in the summer?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:27:54.581157Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "listening",
+      "quiz_question": "Does the third speaker take a bus through a tunnel or over a bridge?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:28:05.399971Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "listening",
+      "quiz_question": "Does the third speaker take a bus through a tunnel or over a bridge?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T21:28:13.165049Z",
+      "unit_id": "english_g6:unit_01",
+      "item_id": "listening",
+      "quiz_question": "What do all three speakers use?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ],
+  "by_unit": {
+    "english_g6:unit_01": {
+      "attempts": 20,
+      "correct": 11,
+      "accuracy": 55.0
+    }
+  },
+  "by_item": {
+    "english_g6:unit_01:reading_1": {
+      "attempts": 9,
+      "incorrect": 5,
+      "remediation_used": 0
+    },
+    "english_g6:unit_01:grammar": {
+      "attempts": 4,
+      "incorrect": 2,
+      "remediation_used": 1
+    },
+    "english_g6:unit_01:listening": {
+      "attempts": 7,
+      "incorrect": 2,
+      "remediation_used": 0
+    }
+  },
+  "tutor_quality_events": [
+    {
+      "ts": "2026-07-07T13:55:44.843565Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [],
+        "coverage_fix_applied": false,
+        "teacher_text_len": 1509,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T14:00:46.187056Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [],
+        "coverage_fix_applied": false,
+        "teacher_text_len": 1509,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T14:01:01.082403Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explicitly stating the author's purpose for writing 'The Earthworm and the Spider'",
+          "Connecting the author's purpose to the themes of the story",
+          "Linking the author's purpose to the characters' actions or development in the story"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 1509,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T14:01:12.169861Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [],
+        "coverage_fix_applied": false,
+        "teacher_text_len": 1509,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T14:01:22.800545Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [],
+        "coverage_fix_applied": false,
+        "teacher_text_len": 1509,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T21:22:20.613843Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of how the author's purpose is reflected in the specific text 'The Earthworm and the Spider'",
+          "Discussion on how the author informs, persuades, or entertains in 'The Earthworm and the Spider'",
+          "Analysis of how the author achieves multiple purposes in 'The Earthworm and the Spider'"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 1080,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T21:22:32.826596Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of how the author's purpose is reflected in 'The Earthworm and the Spider'",
+          "Discussion on how the author informs, persuades, or entertains in 'The Earthworm and the Spider'",
+          "Application of the concept of author's purpose to 'The Earthworm and the Spider'"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 1080,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T21:23:47.854961Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of how the concept of author's purpose applies to 'The Earthworm and the Spider'",
+          "Discussion on how the author's purpose can be inferred from the text of 'The Earthworm and the Spider'",
+          "Guidance on identifying multiple purposes the author may have had in 'The Earthworm and the Spider'"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 1080,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T21:24:04.808346Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of how the author's purpose is reflected in the specific text 'The Earthworm and the Spider'",
+          "Discussion on how the author informs, persuades, or entertains in 'The Earthworm and the Spider'"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 1080,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T21:25:23.621229Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [],
+        "coverage_fix_applied": false,
+        "teacher_text_len": 870,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T21:25:43.704331Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of how to form future continuous tense (subject + will be + present participle)",
+          "Clarification on the difference between future continuous and other future tenses",
+          "Guided practice for the student to form sentences using future continuous tense"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 870,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T21:25:53.607321Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of how to form future continuous forms",
+          "Additional examples of future continuous forms from the text",
+          "Guided practice for the student to form sentences using future continuous"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 870,
+        "mentions_page_ranges": false
+      }
+    },
+    {
+      "ts": "2026-07-07T21:26:10.211303Z",
+      "unit_id": "english_g6:unit_01",
+      "signals": {
+        "coverage_guard_called": true,
+        "coverage_missing": [
+          "Explanation of how to form future continuous forms",
+          "Guidance on when to use future continuous forms",
+          "Examples of future continuous forms other than those directly from the text",
+          "Interactive practice where students form their own sentences using future continuous"
+        ],
+        "coverage_fix_applied": true,
+        "teacher_text_len": 870,
+        "mentions_page_ranges": false
+      }
+    }
+  ]
+}

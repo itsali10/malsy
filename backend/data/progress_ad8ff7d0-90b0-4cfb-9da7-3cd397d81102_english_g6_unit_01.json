@@ -1,0 +1,58 @@
+{
+  "student_id": "ad8ff7d0-90b0-4cfb-9da7-3cd397d81102",
+  "chapter_id": "english_g6:unit_01",
+  "current_item_index": 2,
+  "done_items": [],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [],
+  "lesson_questions": [
+    {
+      "question": "What is the main reason the villagers in the story 'The Earthworm and the Spider' decided to build a bridge and a tunnel?",
+      "options": [
+        "To reach out to other villages, trade, exchange stories, and make friendships",
+        "To explore the mountain and river",
+        "To keep enemies away from their village",
+        "To isolate themselves further from the outside world"
+      ],
+      "correct_answer": "To reach out to other villages, trade, exchange stories, and make friendships",
+      "expected_points": [
+        "The text mentions that the villagers wanted to connect with other villages and make friendships by building the bridge and tunnel."
+      ],
+      "section_skill": "reading",
+      "correct_index": 0
+    },
+    {
+      "question": "What did the author aim to achieve by writing 'The Earthworm and the Spider'?",
+      "options": [
+        "To describe the life of earthworms and spiders",
+        "To persuade readers to stay isolated",
+        "To inform readers about the importance of connecting with others",
+        "To entertain readers with a fantasy story"
+      ],
+      "correct_answer": "To inform readers about the importance of connecting with others",
+      "expected_points": [
+        "The author's purpose was to show how building bridges and tunnels can help connect isolated places and foster relationships with others."
+      ],
+      "section_skill": "reading",
+      "correct_index": 2
+    },
+    {
+      "question": "What was the grandfather's main concern that led to the decision of building a bridge and a tunnel in the story?",
+      "options": [
+        "To keep the fire flowers hidden from strangers",
+        "To avoid meeting strangers from other villages",
+        "To explore the mountain and river",
+        "To prevent the village from fading away due to isolation"
+      ],
+      "correct_answer": "To prevent the village from fading away due to isolation",
+      "expected_points": [
+        "The grandfather feared that if they stayed isolated, the village of Koi would fade away, prompting him to find a way to connect with other villages."
+      ],
+      "section_skill": "reading",
+      "correct_index": 3
+    }
+  ],
+  "lesson_question_index": 0,
+  "lesson_questions_item_id": "reading_1"
+}

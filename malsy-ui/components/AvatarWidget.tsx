@@ -157,12 +157,12 @@ export default function AvatarWidget({ variant }: { variant?: 'lesson' | 'dashbo
     const isDashboard = variant === 'dashboard';
     const camera = new THREE.PerspectiveCamera(isDashboard ? 28 : 35, W / H, 0.01, 100);
     if (isDashboard) {
-      // Head + both shoulders, minimal upper chest; wide aspect shows shoulder width
-      camera.position.set(0, 1.65, 0.90);
-      camera.lookAt(new THREE.Vector3(0, 1.53, 0));
+      // Head-and-shoulders framing for the welcome banner card, full face + hair included
+      camera.position.set(0, 1.78, 1.16);
+      camera.lookAt(new THREE.Vector3(0, 1.70, 0));
     } else {
-      camera.position.set(0, 1.60, 0.90);
-      camera.lookAt(new THREE.Vector3(0, 1.55, 0));
+      camera.position.set(0, 1.78, 1.38);
+      camera.lookAt(new THREE.Vector3(0, 1.70, 0));
     }
 
     const morphMeshes: THREE.Mesh[] = [];
@@ -209,7 +209,7 @@ export default function AvatarWidget({ variant }: { variant?: 'lesson' | 'dashbo
           }
         });
         poseArmsDown(model);
-        if (isDashboard) model.position.y = -0.05;
+        if (isDashboard) model.position.y = 0.14;
       },
       undefined,
       (err: unknown) => console.error('[AvatarWidget] GLB load error', err),

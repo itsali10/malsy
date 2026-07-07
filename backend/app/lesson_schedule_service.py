@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import uuid
+from collections import defaultdict
 from datetime import date, datetime, timezone
 from typing import Any, Dict, List, Optional, Set
 
@@ -19,6 +20,11 @@ from .schedule_sync_service import (
     registry_key_from_db_subject,
     visible_registry_subject_keys,
     _ensure_db_subject,
+)
+from .default_schedule import (
+    fetch_student_personal_schedules,
+    session_label_from_schedule,
+    student_has_personal_timetable,
 )
 from .weekly_schedule_planner import (
     DAY_ORDER,
@@ -37,6 +43,71 @@ STATUS_COMPLETED = "completed"
 STATUS_MISSED = "missed"
 
 BLOATED_SCHEDULE_THRESHOLD = 40
+
+# Timetable session label → teaching section index (language) or legacy part
+_SESSION_LABEL_UNIT_PART: Dict[str, int] = {
+    "comprehension": 0,
+    "reading": 0,
+    "grammar": 1,
+    "listening": 2,
+    "pronunciation": 3,
+    "theoretical": 0,
+    "practical": 1,
+    "videos": 0,
+}
+
+
+def encode_schedule_lesson_id(chapter_id: str, session_label: str, *, duplicate_index: int = 0) -> str:
+    """Unique per-slot lesson_id (DB constraint) while preserving chapter + session type."""
+    slug = (session_label or "lesson").lower().replace(" ", "_")
+    if duplicate_index > 0:
+        return f"{chapter_id}::{slug}#{duplicate_index}"
+    return f"{chapter_id}::{slug}"
+
+
+def decode_schedule_lesson_id(lesson_id: str) -> tuple[str, str, int]:
+    """Return (chapter_id, session_label_slug, duplicate_index)."""
+    raw = (lesson_id or "").strip()
+    if "::" not in raw:
+        return raw, "", 0
+    base, tag = raw.split("::", 1)
+    if "#" in tag:
+        label, idx_s = tag.rsplit("#", 1)
+        try:
+            return base, label, int(idx_s)
+        except ValueError:
+            return base, tag, 0
+    return base, tag, 0
+
+
+def _is_legacy_slot_lesson_id(lesson_id: str) -> bool:
+    """Old placeholder ids like ``english:grammar`` (not a real chapter)."""
+    raw = (lesson_id or "").strip()
+    if not raw or "::" in raw:
+        return False
+    if "unit_" in raw:
+        return False
+    parts = raw.split(":")
+    return len(parts) == 2 and parts[0] in {"english", "science", "history"}
+
+
+def unit_part_for_session_label(registry_key: str, session_label: str, book_id: str) -> int:
+    from .language_lesson_sections import uses_language_sections
+
+    label = (session_label or "").strip().lower()
+    if registry_key == "english" or uses_language_sections(book_id):
+        return _SESSION_LABEL_UNIT_PART.get(label, 0)
+    if registry_key == "science":
+        return 1 if label == "practical" else 0
+    return _SESSION_LABEL_UNIT_PART.get(label, 0)
+
+
+def _format_time(t: Optional[Any]) -> Optional[str]:
+    if t is None:
+        return None
+    if hasattr(t, "strftime"):
+        return t.strftime("%H:%M")
+    return str(t)[:5]
 
 
 def _utcnow() -> datetime:
@@ -133,10 +204,20 @@ def build_interleaved_queue(
     return queue
 
 
+def _sequences_for_student_grade(grade: int) -> Dict[str, List[Dict[str, Any]]]:
+    """Lesson sequences for a grade, falling back to grade 6 when none are published."""
+    sequences = collect_subject_sequences(grade)
+    if sequences:
+        return sequences
+    if grade != 6:
+        return collect_subject_sequences(6)
+    return sequences
+
+
 def collect_lessons_for_grade(grade: int) -> List[Dict[str, Any]]:
     """Flat list of all lessons (legacy helper — prefer subject sequences)."""
     out: List[Dict[str, Any]] = []
-    for lessons in collect_subject_sequences(grade).values():
+    for lessons in _sequences_for_student_grade(grade).values():
         out.extend(lessons)
     return out
 
@@ -267,18 +348,108 @@ async def _delete_week_schedule(
     await db.flush()
 
 
+async def _create_week_schedule_from_timetable(
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    week_start: date,
+) -> List[StudentLessonScheduleItem]:
+    """Build the weekly lesson view from the student's personal randomized timetable."""
+    schedules = await fetch_student_personal_schedules(db, user_id)
+    if not schedules:
+        return []
+
+    user = await db.get(User, user_id)
+    grade = int(user.grade_level or 6) if user else 6
+    sequences = _sequences_for_student_grade(grade)
+    completed_ids = await _completed_lesson_ids(db, user_id)
+
+    result = await db.execute(
+        select(func.max(StudentLessonScheduleItem.order_index)).where(
+            StudentLessonScheduleItem.user_id == user_id,
+        )
+    )
+    next_order = int(result.scalar_one() or 0)
+
+    new_items: List[StudentLessonScheduleItem] = []
+    label_counts: Dict[str, int] = defaultdict(int)
+
+    for schedule in schedules:
+        subject = schedule.subject
+        if not subject:
+            continue
+        db_name = subject.subject_name or ""
+        registry_key = registry_key_from_db_subject(db_name)
+        session_label = session_label_from_schedule(schedule)
+
+        lesson = _next_lesson_for_subject(
+            sequences,
+            completed_ids,
+            registry_key,
+            skip_ids=set(),
+        )
+        if lesson:
+            base_lid = _normalize_lesson_id(lesson["lesson_id"])
+            dup_idx = label_counts[session_label]
+            label_counts[session_label] += 1
+            lid = encode_schedule_lesson_id(base_lid, session_label, duplicate_index=dup_idx)
+        else:
+            lid = f"{registry_key}:{session_label.lower().replace(' ', '_')}"
+
+        next_order += 1
+        item = StudentLessonScheduleItem(
+            user_id=user_id,
+            subject_id=subject.subject_id,
+            lesson_id=lid,
+            lesson_title=session_label,
+            day_of_week=schedule.day_of_week,
+            week_start_date=week_start,
+            order_index=next_order,
+            status=STATUS_LOCKED,
+        )
+        db.add(item)
+        new_items.append(item)
+
+    if not new_items:
+        return []
+
+    existing_completed = await db.execute(
+        select(StudentLessonScheduleItem).where(
+            StudentLessonScheduleItem.user_id == user_id,
+            StudentLessonScheduleItem.week_start_date == week_start,
+            StudentLessonScheduleItem.status == STATUS_COMPLETED,
+        )
+    )
+    all_items = list(existing_completed.scalars().all()) + new_items
+    _recompute_unlock_chain(all_items, _utcnow())
+    await db.flush()
+
+    by_day = {d: sum(1 for i in new_items if i.day_of_week == d) for d in DAY_ORDER}
+    logger.info(
+        "[lesson-schedule] created week from personal timetable user=%s week=%s sessions=%s by_day=%s",
+        user_id,
+        week_start,
+        len(new_items),
+        by_day,
+    )
+    return new_items
+
+
 async def _create_week_schedule(
     db: AsyncSession,
     user_id: uuid.UUID,
     week_start: date,
 ) -> List[StudentLessonScheduleItem]:
     """Generate and persist one realistic weekly layout for a single student."""
+    from_timetable = await _create_week_schedule_from_timetable(db, user_id, week_start)
+    if from_timetable:
+        return from_timetable
+
     user = await db.get(User, user_id)
     if not user:
         return []
 
     grade = int(user.grade_level or 6)
-    sequences = collect_subject_sequences(grade)
+    sequences = _sequences_for_student_grade(grade)
     if not sequences:
         return []
 
@@ -438,7 +609,8 @@ async def generate_lesson_schedule_for_student(
         return {"user_id": str(user_id), "skipped": True, "reason": "not an active student"}
 
     grade = int(user.grade_level or 6)
-    if not collect_subject_sequences(grade):
+    has_personal = await student_has_personal_timetable(db, user_id)
+    if not _sequences_for_student_grade(grade) and not has_personal:
         return {"user_id": str(user_id), "skipped": True, "reason": "no published lessons for grade"}
 
     week_start = sunday_of_week()
@@ -636,15 +808,28 @@ async def fetch_student_weekly_schedule(
     db: AsyncSession,
     *,
     auto_generate: bool = True,
+    selected_day: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """Return the student's day-based weekly lesson schedule for the current week."""
     from sqlalchemy.orm import selectinload
 
+    from .schedule_availability_service import evaluate_schedule_session
+
     week_start = sunday_of_week()
+    today = datetime.now().strftime("%A")
+    unlock_day = (selected_day or today).strip()
 
     if auto_generate:
         await ensure_current_week_schedule(db, user_id, force=False)
         await db.flush()
+
+    user = await db.get(User, user_id)
+    grade = int(user.grade_level or 6) if user else 6
+    sequences = _sequences_for_student_grade(grade)
+    completed_ids = await _completed_lesson_ids(db, user_id)
+
+    personal_slots = await fetch_student_personal_schedules(db, user_id)
+    time_lookup = _build_timetable_time_lookup(personal_slots)
 
     result = await db.execute(
         select(StudentLessonScheduleItem)
@@ -658,22 +843,73 @@ async def fetch_student_weekly_schedule(
     items = list(result.scalars().all())
 
     by_day: Dict[str, List[Dict[str, Any]]] = {day: [] for day in DAY_ORDER}
+    student_id_str = str(user_id)
+    label_seen_on_day: Dict[tuple[str, str, str], int] = defaultdict(int)
+    unlock_day_slot_opened = False
+
     for item in items:
         day = item.day_of_week or DAY_ORDER[0]
         subject: Optional[Subject] = item.subject
         db_name = subject.subject_name if subject else ""
         registry_key = registry_key_from_db_subject(db_name) if subject else ""
+        session_label = (item.lesson_title or "").strip()
+
+        chapter_id, label_slug, dup_idx = decode_schedule_lesson_id(item.lesson_id)
+        if _is_legacy_slot_lesson_id(item.lesson_id) or not chapter_id or "unit_" not in chapter_id:
+            lesson = _next_lesson_for_subject(sequences, completed_ids, registry_key, skip_ids=set())
+            if lesson:
+                chapter_id = _normalize_lesson_id(lesson["lesson_id"])
+            else:
+                chapter_id = item.lesson_id
+
+        book_id = chapter_id.split(":")[0] if ":" in chapter_id else registry_key
+        unit_part = unit_part_for_session_label(
+            registry_key,
+            session_label or label_slug.replace("_", " ").title(),
+            book_id,
+        )
+
+        availability = evaluate_schedule_session(
+            student_id_str,
+            chapter_id,
+            session_label,
+        )
+        effective_status = availability["status"]
+
+        if day == unlock_day and effective_status != STATUS_COMPLETED and not unlock_day_slot_opened:
+            effective_status = STATUS_AVAILABLE
+            availability["lock_reason"] = None
+            availability["action_label"] = (
+                "Continue Lesson" if availability.get("continue_available") else "Start Lesson"
+            )
+            availability["continue_available"] = True
+            availability["unit_part"] = unit_part
+            unlock_day_slot_opened = True
+        elif effective_status == STATUS_AVAILABLE:
+            availability["unit_part"] = unit_part
+
+        slot_key = (str(item.subject_id), day, session_label.lower())
+        dup_n = label_seen_on_day[slot_key]
+        label_seen_on_day[slot_key] += 1
+        start_t, end_t = _match_slot_time(time_lookup, item.subject_id, day, session_label, dup_n)
+
         by_day.setdefault(day, []).append(
             {
                 "schedule_item_id": item.schedule_item_id,
-                "lesson_id": item.lesson_id,
-                "lesson_title": item.lesson_title or item.lesson_id,
+                "lesson_id": chapter_id,
+                "lesson_title": session_label or item.lesson_id,
                 "subject_id": item.subject_id,
                 "subject_name": display_subject_name(registry_key, db_name) if registry_key else db_name,
                 "subject_key": registry_key,
                 "order_index": item.order_index,
-                "status": item.status,
+                "status": effective_status,
                 "day_of_week": day,
+                "lock_reason": availability.get("lock_reason"),
+                "action_label": availability.get("action_label"),
+                "unit_part": int(availability.get("unit_part", unit_part) or 0),
+                "continue_available": bool(availability.get("continue_available")),
+                "start_time": _format_time(start_t),
+                "end_time": _format_time(end_t),
             }
         )
 
@@ -681,9 +917,39 @@ async def fetch_student_weekly_schedule(
     total = sum(len(d["sessions"]) for d in week)
     by_day_counts = {day: len(by_day.get(day, [])) for day in DAY_ORDER}
     logger.info(
-        "[lesson-schedule] weekly schedule user=%s total=%s by_day=%s",
+        "[lesson-schedule] weekly schedule user=%s total=%s by_day=%s unlock_day=%s",
         user_id,
         total,
         by_day_counts,
+        unlock_day,
     )
     return week
+
+
+def _build_timetable_time_lookup(
+    schedules: List[Any],
+) -> Dict[tuple[Any, str, str], List[Dict[str, Any]]]:
+    """Group personal timetable rows by (subject_id, day, label) with sorted times."""
+    buckets: Dict[tuple[Any, str, str], List[Dict[str, Any]]] = defaultdict(list)
+    for row in schedules:
+        label = session_label_from_schedule(row).lower()
+        buckets[(row.subject_id, row.day_of_week, label)].append(
+            {"start": row.start_time, "end": row.end_time}
+        )
+    for key in buckets:
+        buckets[key].sort(key=lambda x: x["start"])
+    return buckets
+
+
+def _match_slot_time(
+    lookup: Dict[tuple[Any, str, str], List[Dict[str, Any]]],
+    subject_id: Any,
+    day: str,
+    session_label: str,
+    duplicate_index: int,
+) -> tuple[Any, Any]:
+    slots = lookup.get((subject_id, day, (session_label or "").lower()), [])
+    if duplicate_index < len(slots):
+        hit = slots[duplicate_index]
+        return hit["start"], hit["end"]
+    return None, None

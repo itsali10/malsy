@@ -1,0 +1,91 @@
+{
+  "unit_title": "Religion and Gods of Ancient Egypt",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Religion and Gods of Ancient Egypt",
+      "must_cover": true,
+      "keywords": [
+        "Ancient Egyptians",
+        "religion",
+        "gods",
+        "goddesses"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Overview of Egyptian Gods and Goddesses",
+      "must_cover": true,
+      "keywords": [
+        "Ra",
+        "Ancient Egypt",
+        "Gods",
+        "goddesses",
+        "animal symbolism",
+        "Ra the God of the sun",
+        "Barque of Millions of Years",
+        "underworld",
+        "Egyptian gods table"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Representation of Egyptian Gods",
+      "must_cover": true,
+      "keywords": [
+        "images",
+        "Egyptian gods",
+        "goddesses",
+        "human body",
+        "bird head",
+        "animal head",
+        "Ra with falcon head",
+        "sun disc",
+        "sacred cobra",
+        "Barque of Millions of Years",
+        "Egyptian gods table"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions on Egyptian Gods",
+      "must_cover": true,
+      "keywords": [
+        "worship",
+        "reasons for worship",
+        "animal symbolism",
+        "importance of Ra",
+        "beliefs about Ra's nightly voyage",
+        "Egyptian gods table"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Practice on Egyptian Gods and Goddesses",
+      "must_cover": true,
+      "keywords": [
+        "identify gods",
+        "match gods with reasons for worship",
+        "match gods with animals",
+        "understand significance of animal symbolism"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Wrapping Up Ancient Egyptian Gods",
+      "must_cover": true,
+      "keywords": [
+        "summary",
+        "key gods",
+        "symbolism",
+        "importance of Ra"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "stage": "completed",
+  "stage_label": "Completed",
+  "current": 412,
+  "total": 412,
+  "batch_current": 17,
+  "batch_total": 17,
+  "detail": "Completed",
+  "error_message": null,
+  "started_at": "2026-07-07T19:04:20.748157Z",
+  "book_id": "english_g6",
+  "updated_at": "2026-07-07T19:07:10.128926Z"
+}

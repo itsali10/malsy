@@ -10,6 +10,7 @@ import {
   AdminListeningQuestion,
   AdminLessonPart,
 } from '../../../../lib/admin-api';
+import { isHistorySubject } from '../../../../lib/history-subject';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000').replace(/\/$/, '');
 
@@ -252,6 +253,12 @@ export default function AdminLessonContentPage() {
   const hasSummary = summaryItems.length > 0;
   const hasQuiz = Boolean(view?.quiz) || quizPlanItems.length > 0;
   const hasImages = images.length > 0 || visualItems.length > 0;
+  const showLessonVideo = isHistorySubject({
+    type: null,
+    name: meta?.subject_title,
+    subjectKey: meta?.subject_key ?? data?.subject_key,
+    chapterId: chapterId,
+  });
 
   return (
     <div className="page-enter" style={{ padding: 28, maxWidth: 960 }}>
@@ -434,7 +441,7 @@ export default function AdminLessonContentPage() {
             </ContentBlock>
           )}
 
-          {media?.video_filename && (
+          {showLessonVideo && media?.video_filename && (
             <ContentBlock title="Media">
               <div style={{ fontSize: 13, color: 'var(--vl)' }}>
                 Lesson video: <code>{media.video_filename}</code>

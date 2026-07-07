@@ -10,6 +10,7 @@ import HistoryInteractiveImages from '../HistoryInteractiveImages';
 import AvatarWidget from '../AvatarWidget';
 import LessonSectionNav from '../LessonSectionNav';
 import { unitVideoFilename } from '../../lib/unit-video';
+import { isHistorySubject } from '../../lib/history-subject';
 import { useLessonAudioPlayer } from '../../hooks/useLessonAudioPlayer';
 import {
   clampPartIndex,
@@ -51,7 +52,12 @@ function AdminLessonPreviewInner() {
   const [errorMsg, setErrorMsg] = useState('');
   const sessionLoadIdRef = useRef(0);
 
-  const isHistory = chapter.toLowerCase().includes('history');
+  const isHistory = isHistorySubject({
+    type: null,
+    name: subjectLabel,
+    subjectKey: chapter.split(':')[0],
+    chapterId: chapter,
+  });
   const isLanguageLesson = usesLanguageSections(chapter);
   const videoFilename = isHistory ? unitVideoFilename(chapter) : null;
   const currentSection = isLanguageLesson ? sectionDef(unitPart) : null;
@@ -157,7 +163,8 @@ function AdminLessonPreviewInner() {
     if (isLanguageLesson && currentSection) {
       if (currentSection.key === 'grammar') return 'Grammar Time';
       if (currentSection.key === 'reading') return 'Reading Time';
-      if (currentSection.key === 'speaking') return 'Pronunciation Time';
+      if (currentSection.key === 'pronunciation') return 'Pronunciation Time';
+      if (currentSection.key === 'listening') return 'Listening Time';
     }
     return 'Learning Time';
   })();

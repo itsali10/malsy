@@ -1,0 +1,100 @@
+{
+  "book_id": "history_g6",
+  "lessons": {
+    "history_g6:unit_01": {
+      "lesson_id": "history_g6:unit_01",
+      "unit_id": "unit_01",
+      "title": "Where and Who Were the Ancient Egyptians?",
+      "unit": "Unit 1",
+      "start_page": 4,
+      "end_page": 4,
+      "chunk_ids": [
+        "history_g6:unit_01:part_1:p3:c0",
+        "history_g6:unit_01:part_1:p3:c1",
+        "history_g6:unit_01:part_1:p3:c2"
+      ],
+      "chunk_count": 3,
+      "source": "chromadb_sync",
+      "updated_at": "2026-07-06T17:09:33.269757+00:00"
+    },
+    "history_g6:unit_02": {
+      "lesson_id": "history_g6:unit_02",
+      "unit_id": "unit_02",
+      "title": "Religion and Gods of Ancient Egypt",
+      "unit": "Unit 2",
+      "start_page": 5,
+      "end_page": 5,
+      "chunk_ids": [
+        "history_g6:unit_02:part_1:p4:c0",
+        "history_g6:unit_02:part_1:p4:c1"
+      ],
+      "chunk_count": 2,
+      "source": "chromadb_sync",
+      "updated_at": "2026-07-06T17:09:33.310966+00:00"
+    },
+    "history_g6:unit_03": {
+      "lesson_id": "history_g6:unit_03",
+      "unit_id": "unit_03",
+      "title": "Egyptian Society and the Pharaohs",
+      "unit": "Unit 3",
+      "start_page": 6,
+      "end_page": 6,
+      "chunk_ids": [
+        "history_g6:unit_03:part_1:p5:c0",
+        "history_g6:unit_03:part_1:p5:c1"
+      ],
+      "chunk_count": 2,
+      "source": "chromadb_sync",
+      "updated_at": "2026-07-06T17:09:33.351212+00:00"
+    },
+    "history_g6:unit_04": {
+      "lesson_id": "history_g6:unit_04",
+      "unit_id": "unit_04",
+      "title": "Mummification and the Afterlife",
+      "unit": "Unit 4",
+      "start_page": 7,
+      "end_page": 7,
+      "chunk_ids": [
+        "history_g6:unit_04:part_1:p6:c0",
+        "history_g6:unit_04:part_1:p6:c1"
+      ],
+      "chunk_count": 2,
+      "source": "chromadb_sync",
+      "updated_at": "2026-07-06T17:09:33.404000+00:00"
+    },
+    "history_g6:unit_05": {
+      "lesson_id": "history_g6:unit_05",
+      "unit_id": "unit_05",
+      "title": "Fashion and Daily Life in Ancient Egypt",
+      "unit": "Unit 5",
+      "start_page": 8,
+      "end_page": 8,
+      "chunk_ids": [
+        "history_g6:unit_05:part_1:p7:c0",
+        "history_g6:unit_05:part_1:p7:c1",
+        "history_g6:unit_05:part_1:p7:c2"
+      ],
+      "chunk_count": 3,
+      "source": "chromadb_sync",
+      "updated_at": "2026-07-06T17:09:33.448724+00:00"
+    },
+    "history_g6:unit_06": {
+      "lesson_id": "history_g6:unit_06",
+      "unit_id": "unit_06",
+      "title": "Hieroglyphics and Ancient Writing",
+      "unit": "Unit 6",
+      "start_page": 9,
+      "end_page": 9,
+      "chunk_ids": [
+        "history_g6:unit_06:part_1:p8:c0",
+        "history_g6:unit_06:part_1:p8:c1",
+        "history_g6:unit_06:part_1:p8:c2"
+      ],
+      "chunk_count": 3,
+      "source": "chromadb_sync",
+      "updated_at": "2026-07-06T17:09:33.489127+00:00"
+    }
+  },
+  "synced_at": "2026-07-06T17:09:33.489127+00:00",
+  "updated_at": "2026-07-06T17:09:33.489127+00:00"
+}

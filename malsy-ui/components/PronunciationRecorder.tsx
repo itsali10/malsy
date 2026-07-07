@@ -67,7 +67,7 @@ export default function PronunciationRecorder({
 
   return (
     <div className="lesson-pronunciation">
-      <p className="lesson-pronunciation__prompt">Say this aloud:</p>
+      <p className="lesson-pronunciation__prompt">Say this word aloud:</p>
       <p className="lesson-pronunciation__sentence">{sentence}</p>
       <button
         type="button"

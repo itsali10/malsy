@@ -1,0 +1,68 @@
+{
+  "unit_title": "The Senses",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "senses",
+        "perception"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "3",
+      "type": "vocab",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "sensory organs",
+        "stimuli"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": [
+        "diagram of the eye",
+        "diagram of the ear"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "taste test experiment"
+      ]
+    },
+    {
+      "id": "6",
+      "type": "wrap_up",
+      "title": "Summary/Wrap-up",
+      "must_cover": true,
+      "keywords": [
+        "importance of each sense"
+      ]
+    },
+    {
+      "id": "7",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": []
+    }
+  ]
+}

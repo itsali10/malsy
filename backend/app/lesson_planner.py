@@ -69,6 +69,8 @@ def build_chapter_plan(chapter_id: str, lesson_title: str = "", lesson_descripti
             "keywords": [],
             "minutes": SESSION_UNIT_MINUTES,
             "real_unit_id": full_id,
+            "start_page": int(u.get("start_page") or 0),
+            "end_page": int(u.get("end_page") or u.get("start_page") or 0),
         })
     
     return {

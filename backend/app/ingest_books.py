@@ -186,6 +186,12 @@ def _add_chunk(
         embeddings=[vec],
         metadatas=[sanitize_chroma_metadata(meta)],
     )
+    try:
+        from .rag_progress_store import report_chunk_saved
+
+        report_chunk_saved()
+    except Exception:
+        pass
 
 
 def _lessons_path(book_dir: str) -> str:
@@ -514,10 +520,13 @@ def ingest_book(book_dir: str, chroma_path: str = "chroma_db", *, purge: bool = 
     if not os.path.exists(pdf_file):
         raise FileNotFoundError(f"Missing PDF: {pdf_file}")
 
+    print(f"[ingest] Creating chunks for {book_id}...")
     client = get_chroma_client(chroma_path)
     units_col = client.get_or_create_collection("units")
     chunks_col = get_collection(client, "pdf_chunks")
     embedder = get_embedder(device="cpu")
+    print(f"[ingest] Generating embeddings for {book_id}...")
+    print(f"[ingest] Saving vector database for {book_id}...")
 
     purged = purge_book_vectors(chunks_col, book_id, units_col=units_col) if purge else 0
 
@@ -550,6 +559,85 @@ def ingest_book(book_dir: str, chroma_path: str = "chroma_db", *, purge: bool = 
         print(f"[ingest] lesson mapping sync failed for {book_id}: {exc}")
 
     return result
+
+
+def estimate_ingest_chunk_count(book_dir: str) -> int:
+    """Count chunks that ingest would create (progress estimation only)."""
+    manifest_path = os.path.join(book_dir, "manifest.json")
+    if not os.path.exists(manifest_path):
+        return 0
+    manifest = load_manifest(book_dir)
+    book_id = manifest["book_id"]
+    pdf_offset = int(manifest.get("page_map", {}).get("pdf_page_offset", 0))
+
+    if os.path.exists(_lessons_path(book_dir)):
+        with open(_lessons_path(book_dir), "r", encoding="utf-8") as f:
+            catalog = json.load(f)
+        lessons: List[Dict[str, Any]] = catalog.get("lessons") or []
+        reader = PdfReader(pdf_path(book_dir, manifest))
+        total_pages = len(reader.pages)
+        count = 0
+        seen: set = set()
+        for lesson in lessons:
+            start_book = int(lesson.get("start_page", 0))
+            end_book = int(lesson.get("end_page", start_book))
+            start_pdf = max(0, min(book_page_to_pdf_index(start_book, pdf_offset), total_pages - 1))
+            end_pdf = max(start_pdf, min(book_page_to_pdf_index(end_book, pdf_offset), total_pages - 1))
+            for pdf_page in range(start_pdf, end_pdf + 1):
+                page_text = (reader.pages[pdf_page].extract_text() or "").strip()
+                book_page = pdf_page - pdf_offset + 1
+                for item in _create_history_embedding_chunks(
+                    lesson,
+                    page_text,
+                    book_id=book_id,
+                    pdf_page=pdf_page,
+                    book_page=book_page,
+                ):
+                    chunk = item["text"]
+                    meta = item["meta"]
+                    text_key = re.sub(r"\s+", " ", chunk.lower().strip())[:200]
+                    owner = f"{meta['lesson_id']}:{text_key}"
+                    if owner in seen:
+                        continue
+                    seen.add(owner)
+                    count += 1
+        return count
+
+    reader = PdfReader(pdf_path(book_dir, manifest))
+    total_pages = len(reader.pages)
+    ranges = compute_ranges(manifest["units"], pdf_offset, total_pages)
+    from .unit_detection import full_unit_id, normalize_manifest_unit_id
+
+    count = 0
+    for r in ranges:
+        short_uid = normalize_manifest_unit_id(r["unit_id"], book_id)
+        unit_id = full_unit_id(book_id, short_uid)
+        start_book = int(r["start_book_page"])
+        end_book = int(r.get("end_book_page") or r["end_pdf"] - pdf_offset + 1)
+        unit_data = build_unit_sections(reader, start_book, end_book, pdf_offset)
+        seen: set = set()
+        for page in unit_data["pages"]:
+            book_page = page["book_page"]
+            page_text = page["text"]
+            if not page_text:
+                continue
+            for chunk in simple_chunk(page_text):
+                text_key = re.sub(r"\s+", " ", chunk.lower().strip())[:200]
+                owner = f"{unit_id}:{book_page}:{text_key}"
+                if owner in seen:
+                    continue
+                seen.add(owner)
+                count += 1
+        for section in unit_data["sections"]:
+            section_type = section["section_type"]
+            if section_type not in ANCHOR_SECTION_TYPES:
+                continue
+            combined = "\n\n".join(
+                p["text"] for p in unit_data["pages"] if p["section_type"] == section_type and p["text"]
+            ).strip()
+            if len(combined) >= 40:
+                count += 1
+    return count
 
 
 def ingest_book_by_key(

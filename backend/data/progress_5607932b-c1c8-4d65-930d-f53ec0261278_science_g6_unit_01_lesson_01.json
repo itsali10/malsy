@@ -1,0 +1,40 @@
+{
+  "student_id": "5607932b-c1c8-4d65-930d-f53ec0261278",
+  "chapter_id": "science_g6:unit_01_lesson_01",
+  "current_item_index": 1,
+  "done_items": [
+    "1"
+  ],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [
+    {
+      "ts": "2026-07-07T22:27:25.427966Z",
+      "item_id": "1",
+      "quiz_question": "What is the purpose of the scientific method in science?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T22:27:50.391222Z",
+      "item_id": "1",
+      "quiz_question": "How can the scientific method help us learn about what plants need to grow?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-07T22:28:35.523697Z",
+      "item_id": "1",
+      "quiz_question": "Which of the following is NOT a step in the scientific method?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ],
+  "lesson_question_index": 0
+}

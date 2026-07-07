@@ -25,10 +25,27 @@ logger = logging.getLogger(__name__)
 
 MALSY_SYNC_PREFIX = "MALSY:"
 
+from .default_schedule import (
+    is_student_personal_slot,
+    session_label_from_schedule,
+    student_has_personal_timetable,
+    student_slot_belongs_to,
+)
+
 
 def is_sync_spread_slot(schedule: Schedule) -> bool:
     """True for auto-generated one-subject-per-day placeholder slots."""
-    return (schedule.location or "").startswith(MALSY_SYNC_PREFIX)
+    loc = schedule.location or ""
+    if loc.startswith("MALSY:STUDENT:"):
+        return False
+    return loc.startswith(MALSY_SYNC_PREFIX)
+
+
+def _day_sort_key(day: str) -> int:
+    try:
+        return DAY_ORDER.index(day)
+    except ValueError:
+        return 99
 
 
 async def ensure_student_timetable_enrollment(
@@ -42,6 +59,13 @@ async def ensure_student_timetable_enrollment(
     user = await db.get(User, user_id)
     if not user or user.role != "student":
         return {"skipped": True, "reason": "not a student"}
+
+    if await student_has_personal_timetable(db, user_id):
+        return {
+            "skipped": True,
+            "reason": "student has personal randomized timetable",
+            "user_id": str(user_id),
+        }
 
     grade = int(user.grade_level or 6)
     visible_keys = visible_registry_subject_keys()
@@ -62,6 +86,9 @@ async def ensure_student_timetable_enrollment(
         subject = schedule.subject
         db_name = subject.subject_name if subject else ""
         registry_key = registry_key_from_db_subject(db_name) if subject else ""
+
+        if is_student_personal_slot(schedule):
+            continue
 
         if is_sync_spread_slot(schedule):
             examined.append(
@@ -187,6 +214,22 @@ async def fetch_student_timetable_sessions(
         subject = schedule.subject
         db_name = subject.subject_name if subject else ""
         registry_key = registry_key_from_db_subject(db_name) if subject else ""
+
+        if is_student_personal_slot(schedule):
+            if student_slot_belongs_to(schedule, user_id):
+                included.append(schedule)
+                audit.append(
+                    {
+                        "schedule_id": str(schedule.schedule_id),
+                        "day": schedule.day_of_week,
+                        "time": str(schedule.start_time),
+                        "subject": db_name,
+                        "session_type": session_label_from_schedule(schedule),
+                        "included": True,
+                        "reason": "personal randomized slot",
+                    }
+                )
+            continue
 
         if is_sync_spread_slot(schedule):
             audit.append(

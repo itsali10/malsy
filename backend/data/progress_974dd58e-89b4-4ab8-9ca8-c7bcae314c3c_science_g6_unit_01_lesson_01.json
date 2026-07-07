@@ -1,0 +1,21 @@
+{
+  "student_id": "974dd58e-89b4-4ab8-9ca8-c7bcae314c3c",
+  "chapter_id": "science_g6:unit_01_lesson_01",
+  "current_item_index": 1,
+  "done_items": [
+    "unit_opening"
+  ],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [
+    {
+      "ts": "2026-07-05T04:05:24.960133Z",
+      "item_id": "unit_opening",
+      "quiz_question": "What is the purpose of the scientific method in science?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ]
+}

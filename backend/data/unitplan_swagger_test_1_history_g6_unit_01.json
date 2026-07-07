@@ -1,0 +1,81 @@
+{
+  "unit_title": "Where and Who Were the Ancient Egyptians?",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Ancient Egyptians Research Project",
+      "must_cover": true,
+      "keywords": [
+        "research project",
+        "Ancient Egyptians"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Where and who were the Ancient Egyptians?",
+      "must_cover": true,
+      "keywords": [
+        "Ancient Egypt",
+        "civilisation",
+        "River Nile",
+        "Egyptian life",
+        "Pharaohs",
+        "Nile valley",
+        "Upper Egypt",
+        "Lower Egypt",
+        "King Narmer",
+        "Menes",
+        "Memphis",
+        "Two Lands"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions on Ancient Egyptians",
+      "must_cover": true,
+      "keywords": [
+        "similarities",
+        "differences",
+        "Ancient Egyptian life",
+        "life today"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements of Ancient Egyptian Life",
+      "must_cover": true,
+      "keywords": [
+        "monuments",
+        "tombs",
+        "River Nile map",
+        "Egyptian kingdoms"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises on Ancient Egyptian Life",
+      "must_cover": true,
+      "keywords": [
+        "reading comprehension",
+        "Ancient Egypt quiz",
+        "Egyptian kingdoms matching"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Wrapping Up Ancient Egyptian Study",
+      "must_cover": true,
+      "keywords": [
+        "Ancient Egyptian civilization",
+        "key points",
+        "Nile importance"
+      ]
+    }
+  ]
+}

@@ -9,6 +9,24 @@
       "archived": true,
       "builtin": false,
       "created_at": "2026-07-02T12:04:57.612622Z"
+    },
+    "science": {
+      "subject_name": "Science",
+      "icon": "🔬",
+      "grade": 6,
+      "builtin": true,
+      "subject_key": "science",
+      "visible_to_students": true,
+      "archived": false
+    },
+    "english": {
+      "subject_name": "English",
+      "icon": "📖",
+      "grade": 6,
+      "builtin": true,
+      "subject_key": "english",
+      "visible_to_students": true,
+      "archived": false
     }
   }
 }

@@ -4,6 +4,7 @@ uvicorn
 # Pronunciation scoring
 torch
 transformers
+phonemizer
 soundfile
 scipy
 python-dotenv

@@ -1,9 +1,0 @@
-{
-  "/lessons/page": "app/lessons/page.js",
-  "/login/page": "app/login/page.js",
-  "/page": "app/page.js",
-  "/lessons/subject/[subject]/page": "app/lessons/subject/[subject]/page.js",
-  "/lessons/learn/page": "app/lessons/learn/page.js",
-  "/api/interactive-images/route": "app/api/interactive-images/route.js",
-  "/api/lesson-video-check/route": "app/api/lesson-video-check/route.js"
-}

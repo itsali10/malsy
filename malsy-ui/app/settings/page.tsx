@@ -18,16 +18,16 @@ const THEMES: { id: Theme; label: string; desc: string; bg: string; dot1: string
   {
     id: 'dark',
     label: 'Dark',
-    desc: 'Deep navy — easy on the eyes',
-    bg: '#0D0B2E',
-    dot1: '#5B21F5', dot2: '#00E5A0', dot3: '#1A1650',
+    desc: 'Soft navy — easy on the eyes',
+    bg: '#1E2235',
+    dot1: '#AFA8FF', dot2: '#B8F2D8', dot3: '#2D3348',
   },
   {
     id: 'light',
     label: 'Light',
-    desc: 'Pale violet — bright & clean',
-    bg: '#F0EEFF',
-    dot1: '#5B21F5', dot2: '#00B87E', dot3: '#E4DFFF',
+    desc: 'Pale violet — bright and clean',
+    bg: '#F7F8FF',
+    dot1: '#8F86F5', dot2: '#3D9B6E', dot3: '#DCD7FF',
   },
 ];
 
@@ -42,14 +42,15 @@ export default function SettingsPage() {
         {/* Left nav */}
         <div className="settings-nav">
           {tabs.map((t, i) => (
-            <div
+            <button
               key={t.label}
+              type="button"
               className={`settings-nav-item${activeTab === i ? ' active' : ''}`}
               onClick={() => setActiveTab(i)}
             >
               <span className="sni">{t.icon}</span>
               {t.label}
-            </div>
+            </button>
           ))}
         </div>
 

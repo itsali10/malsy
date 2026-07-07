@@ -304,6 +304,25 @@ class AvatarLipSyncQARunReq(BaseModel):
     out_of_order_chance: float = 0.0
 
 
+_SCHEDULE_SESSION_LABELS = frozenset({
+    "comprehension", "grammar", "listening", "pronunciation",
+    "theoretical", "practical", "videos",
+})
+
+
+def _is_schedule_session_label(title: str) -> bool:
+    return (title or "").strip().lower() in _SCHEDULE_SESSION_LABELS
+
+
+def _teacher_text_is_insufficient(text: str) -> bool:
+    t = (text or "").strip().lower()
+    return (
+        "need more textbook content" in t
+        or "lesson extraction failed" in t
+        or "reprocess the book" in t
+    )
+
+
 def _ensure_session_in_memory() -> Dict[str, Any] | None:
     global ACTIVE_SESSION
     if ACTIVE_SESSION is not None:
@@ -594,18 +613,19 @@ def start_session(req: StartSessionReq):
     disk = load_active_session()
     if disk and disk.get("student_id") == req.student_id:
         disk_book = disk.get("book_id") or progress_book_id(disk.get("chapter_id", ""))
-        if disk_book != req_book:
+        if disk_book != req_book or disk.get("chapter_id") != req.chapter_id:
             clear_active_session()
             ACTIVE_SESSION = None
     elif ACTIVE_SESSION and ACTIVE_SESSION.get("student_id") == req.student_id:
         mem_book = ACTIVE_SESSION.get("book_id") or progress_book_id(ACTIVE_SESSION.get("chapter_id", ""))
-        if mem_book != req_book:
+        if mem_book != req_book or ACTIVE_SESSION.get("chapter_id") != req.chapter_id:
             clear_active_session()
             ACTIVE_SESSION = None
     ensure_student_start(req.student_id)
 
     # Step A: try to start requested chapter
     def _start_chapter(chapter_id: str):
+        global ACTIVE_SESSION
         book_id = progress_book_id(chapter_id)
         from .book_registry import get_book_record, is_book_visible_to_students
 
@@ -677,6 +697,8 @@ def start_session(req: StartSessionReq):
         # Resolve lesson → textbook mapping (stored chunk ids + page range).
         from .lesson_content_mapping import build_unit_for_teaching, ensure_lesson_mapping, session_unit_from_mapping
 
+        if req.lesson_title and not _is_schedule_session_label(req.lesson_title):
+            unit = {**unit, "title": req.lesson_title}
         mapped_unit = session_unit_from_mapping(chapter_id, book_id=book_id, plan_unit=unit)
         lesson_mapping = mapped_unit.get("lesson_mapping") or ensure_lesson_mapping(
             chapter_id, book_id=book_id, plan_unit=unit
@@ -686,7 +708,7 @@ def start_session(req: StartSessionReq):
         )
         real_unit_id = str(lesson_mapping.get("lesson_id") or mapped_unit.get("real_unit_id"))
 
-        # Create single active session
+        # Create single active session (fresh part cache per lesson)
         ACTIVE_SESSION = {
             "student_id": req.student_id,
             "chapter_id": chapter_id,
@@ -695,6 +717,7 @@ def start_session(req: StartSessionReq):
             "session_units": [mapped_unit],
             "current_pos": 0,
             "unit_part": unit_part,
+            "part_cache": {},
         }
         save_active_session(ACTIVE_SESSION)
 
@@ -706,6 +729,15 @@ def start_session(req: StartSessionReq):
                 "student_answer": "",
                 "provided_quiz": None,
             })
+            if _teacher_text_is_insufficient(str(out.get("teacher_text") or "")):
+                print("[session/start] insufficient teacher text — retrying lesson generation once")
+                out = lesson_graph.invoke({
+                    "student_id": req.student_id,
+                    "chapter_id": graph_chapter_id,
+                    "current_unit": unit_for_teaching,
+                    "student_answer": "",
+                    "provided_quiz": None,
+                })
             # Debug: Print final state to see what we got
             print(f"[DEBUG] Graph completed. teacher_text length: {len(out.get('teacher_text', ''))}, quiz: {out.get('quiz', {})}")
             print(f"[DEBUG] Graph done flag: {out.get('done', False)}")
@@ -716,6 +748,16 @@ def start_session(req: StartSessionReq):
 
         # store last quiz so /answer grades the SAME quiz
         _apply_graph_output_to_session(ACTIVE_SESSION, out)
+        if _teacher_text_is_insufficient(str(ACTIVE_SESSION.get("last_teacher_text") or "")):
+            clear_active_session()
+            ACTIVE_SESSION = None
+            return {
+                "error": (
+                    "Lesson content could not be loaded from the textbook. "
+                    "Please try again — if this persists, the book may need to be re-ingested."
+                ),
+                "need_restart": True,
+            }
         _cache_part(
             ACTIVE_SESSION,
             unit_part,
@@ -961,6 +1003,25 @@ def answer(req: AnswerReq):
                 "evaluation_summary": evaluation_summary,
                 **pron_extra,
             }
+
+    # Correct answer — more lesson MCQ questions remain
+    if out.get("lesson_more_questions"):
+        sess["last_quiz"] = _prepare_stored_quiz(out.get("quiz"))
+        save_active_session(sess)
+        timeline = load_timeline(req.student_id)
+        course_week, course_month = course_week_month(timeline)
+        return {
+            "correct": True,
+            "evaluation": evaluation,
+            "advance_text": out.get("advance_text") or evaluation.get("feedback"),
+            "quiz": _quiz_for_client(sess.get("last_quiz")),
+            "next_action": "lesson_next_question",
+            "course_week": course_week,
+            "course_month": course_month,
+            **pron_extra,
+            "recommendations": recommendations,
+            "evaluation_summary": evaluation_summary,
+        }
 
     # Correct answer
     if out.get("listening_more_questions"):
@@ -1232,6 +1293,11 @@ def _teach_unit_part(
             lesson_chapter_id=chapter_id,
         )
         return _part_response(sess, student_id, target_part, max_unlocked)
+
+    # Do not reuse another part/lesson's cached teaching text.
+    sess.pop("last_teacher_text", None)
+    sess.pop("last_quiz", None)
+    sess.pop("listening", None)
 
     from .lesson_content_mapping import build_unit_for_teaching
 

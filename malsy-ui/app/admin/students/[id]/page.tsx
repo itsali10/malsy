@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import {
@@ -9,36 +9,14 @@ import {
   StudentParentInfo,
   StudentSession,
 } from '../../../../lib/admin-api';
+import {
+  adminStatusColor,
+  enrichStudentSessions,
+  formatAdminSessionStatus,
+  formatLastActivity,
+} from '../../../../lib/admin-student-schedule';
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000').replace(/\/$/, '');
-
-function statusColor(status: string): string {
-  switch (status) {
-    case 'attended':
-    case 'completed':
-      return 'var(--mint)';
-    case 'available':
-      return 'var(--sky)';
-    case 'missed':
-      return 'var(--coral)';
-    case 'locked':
-    case 'not_started':
-    default:
-      return 'var(--g3)';
-  }
-}
-
-function statusLabel(status: string): string {
-  switch (status) {
-    case 'attended': return 'Attended';
-    case 'missed': return 'Missed';
-    case 'completed': return 'Completed';
-    case 'available': return 'Available';
-    case 'locked': return 'Locked';
-    case 'not_started': return 'Not started';
-    default: return status;
-  }
-}
+const REFRESH_MS = 30_000;
 
 function scheduleSummaryLabel(data: StudentOverview): string {
   if (data.scheduled_lessons_count > 0) {
@@ -82,6 +60,10 @@ function SessionTable({
     );
   }
 
+  const gridCols = showDate
+    ? 'minmax(88px,1fr) minmax(72px,1fr) minmax(96px,1fr) minmax(100px,1fr) minmax(72px,1fr) minmax(88px,1fr) minmax(56px,1fr) minmax(110px,1fr) auto'
+    : 'minmax(72px,1fr) minmax(96px,1fr) minmax(100px,1fr) minmax(72px,1fr) minmax(88px,1fr) minmax(56px,1fr) minmax(110px,1fr) auto';
+
   return (
     <section style={{ marginBottom: 28 }}>
       <h2 style={{ fontFamily: 'var(--fd)', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>{title}</h2>
@@ -89,9 +71,7 @@ function SessionTable({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: showDate
-              ? 'minmax(90px,1fr) minmax(80px,1fr) minmax(100px,1fr) minmax(90px,1fr) minmax(80px,1fr) minmax(90px,1fr) minmax(70px,1fr) auto'
-              : 'minmax(80px,1fr) minmax(100px,1fr) minmax(90px,1fr) minmax(80px,1fr) minmax(90px,1fr) minmax(70px,1fr) auto',
+            gridTemplateColumns: gridCols,
             gap: 8,
             padding: '12px 16px',
             fontSize: 10,
@@ -108,7 +88,8 @@ function SessionTable({
           <span>Lesson</span>
           <span>Time</span>
           <span>Status</span>
-          <span>Score</span>
+          <span>Progress</span>
+          <span>Last activity</span>
           <span />
         </div>
         {sessions.map((row, idx) => (
@@ -116,9 +97,7 @@ function SessionTable({
             key={`${row.session_date}-${row.schedule_id}-${row.module}-${idx}`}
             style={{
               display: 'grid',
-              gridTemplateColumns: showDate
-                ? 'minmax(90px,1fr) minmax(80px,1fr) minmax(100px,1fr) minmax(90px,1fr) minmax(80px,1fr) minmax(90px,1fr) minmax(70px,1fr) auto'
-                : 'minmax(80px,1fr) minmax(100px,1fr) minmax(90px,1fr) minmax(80px,1fr) minmax(90px,1fr) minmax(70px,1fr) auto',
+              gridTemplateColumns: gridCols,
               gap: 8,
               padding: '14px 16px',
               fontSize: 13,
@@ -137,8 +116,20 @@ function SessionTable({
             <span style={{ color: 'var(--g3)' }}>
               {row.scheduled_start ? `${row.scheduled_start}${row.scheduled_end ? `–${row.scheduled_end}` : ''}` : '—'}
             </span>
-            <span style={{ color: statusColor(row.status), fontWeight: 700 }}>{statusLabel(row.status)}</span>
-            <span>{row.quiz_score != null ? row.quiz_score : '—'}</span>
+            <span style={{ color: adminStatusColor(row.status), fontWeight: 700 }}>
+              {formatAdminSessionStatus(row.status)}
+            </span>
+            <span>
+              {row.progress_percent != null ? `${row.progress_percent}%` : '—'}
+              {row.quiz_score != null && (
+                <span style={{ display: 'block', fontSize: 11, color: 'var(--g3)' }}>
+                  Quiz {row.quiz_score}
+                </span>
+              )}
+            </span>
+            <span style={{ color: 'var(--g3)', fontSize: 12 }}>
+              {formatLastActivity(row.last_activity_at ?? row.completion_time)}
+            </span>
             {row.chapter_id ? (
               <Link
                 href={`/admin/lessons/${encodeURIComponent(row.chapter_id)}?student=${encodeURIComponent(studentId)}`}
@@ -171,48 +162,41 @@ export default function AdminStudentDetailPage() {
   const [parentsError, setParentsError] = useState('');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+  const overviewRef = useRef<StudentOverview | null>(null);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (opts?: { silent?: boolean }) => {
     if (!id) {
       setError('Missing student id in URL.');
       setLoading(false);
       return;
     }
 
-    setError('');
-    setScheduleError('');
-    setAttendanceError('');
-    setParentsError('');
-    setLoading(true);
+    const silent = opts?.silent ?? false;
+    if (!silent) {
+      setError('');
+      setScheduleError('');
+      setAttendanceError('');
+      setParentsError('');
+      setLoading(true);
+    } else {
+      setRefreshing(true);
+    }
 
-    const overviewUrl = `${API_BASE}/admin/students/${encodeURIComponent(id)}`;
     console.log('[admin-students] loading detail for id:', id);
-    console.log('[admin-students] overview URL:', overviewUrl);
 
     try {
       const overview = await adminApi.students.get(id);
-      console.log('[admin-students] overview response:', overview);
-      console.log('[admin-students] count source:', {
-        subjects_assigned_count: overview.subjects_assigned_count,
-        scheduled_lessons_count: overview.scheduled_lessons_count,
-        completed_lessons_count: overview.completed_lessons_count,
-        source: 'StudentLessonScheduleItem (same as GET /dashboard/my-week)',
-      });
+      overviewRef.current = overview;
       setData(overview);
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to load student details';
       console.error('[admin-students] overview error:', e);
       setError(msg);
-      setLoading(false);
+      if (!silent) setLoading(false);
+      setRefreshing(false);
       return;
     }
-
-    const parentsUrl = `${API_BASE}/admin/students/${encodeURIComponent(id)}/parents`;
-    const scheduleUrl = `${API_BASE}/admin/students/${encodeURIComponent(id)}/schedule`;
-    const attendanceUrl = `${API_BASE}/admin/students/${encodeURIComponent(id)}/attendance`;
-    console.log('[admin-students] parents URL:', parentsUrl);
-    console.log('[admin-students] schedule URL:', scheduleUrl);
-    console.log('[admin-students] attendance URL:', attendanceUrl);
 
     const [parentResult, scheduleResult, attendanceResult] = await Promise.allSettled([
       adminApi.students.parents(id),
@@ -220,39 +204,51 @@ export default function AdminStudentDetailPage() {
       adminApi.students.attendance(id),
     ]);
 
+    const progress = overviewRef.current?.progress ?? [];
+
     if (parentResult.status === 'fulfilled') {
-      console.log('[admin-students] parents response:', parentResult.value);
       setParents(parentResult.value);
-    } else {
+    } else if (!silent) {
       const msg = parentResult.reason instanceof Error ? parentResult.reason.message : 'Failed to load parent info';
-      console.error('[admin-students] parents error:', parentResult.reason);
       setParentsError(msg);
     }
 
     if (scheduleResult.status === 'fulfilled') {
-      console.log('[admin-students] schedule response:', scheduleResult.value);
-      setSchedule(scheduleResult.value);
-    } else {
+      setSchedule(enrichStudentSessions(scheduleResult.value, progress));
+    } else if (!silent) {
       const msg = scheduleResult.reason instanceof Error ? scheduleResult.reason.message : 'Failed to load schedule';
-      console.error('[admin-students] schedule error:', scheduleResult.reason);
       setScheduleError(msg);
     }
 
     if (attendanceResult.status === 'fulfilled') {
-      console.log('[admin-students] attendance response:', attendanceResult.value);
-      setAttendance(attendanceResult.value);
-    } else {
+      setAttendance(enrichStudentSessions(attendanceResult.value, progress));
+    } else if (!silent) {
       const msg = attendanceResult.reason instanceof Error ? attendanceResult.reason.message : 'Failed to load attendance';
-      console.error('[admin-students] attendance error:', attendanceResult.reason);
       setAttendanceError(msg);
     }
 
-    setLoading(false);
+    if (!silent) setLoading(false);
+    setRefreshing(false);
   }, [id]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (!id) return;
+    const timer = window.setInterval(() => {
+      load({ silent: true });
+    }, REFRESH_MS);
+    return () => window.clearInterval(timer);
+  }, [id, load]);
+
+  useEffect(() => {
+    if (!id) return;
+    const onFocus = () => load({ silent: true });
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [id, load]);
 
   async function runDeactivate() {
     if (!confirm('Deactivate this student? They will be hidden from the active student list and cannot log in. Progress records will be kept.')) {
@@ -304,9 +300,19 @@ export default function AdminStudentDetailPage() {
               </p>
             </div>
             {s.account_status === 'Active' && (
-              <button type="button" className="btn btn-o btn-sm" disabled={!!busy} onClick={runDeactivate}>
-                {busy === 'deactivate' ? 'Deactivating…' : 'Deactivate Student'}
-              </button>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="btn btn-o btn-sm"
+                  disabled={refreshing}
+                  onClick={() => load({ silent: true })}
+                >
+                  {refreshing ? 'Refreshing…' : 'Refresh'}
+                </button>
+                <button type="button" className="btn btn-o btn-sm" disabled={!!busy} onClick={runDeactivate}>
+                  {busy === 'deactivate' ? 'Deactivating…' : 'Deactivate Student'}
+                </button>
+              </div>
             )}
           </div>
 
@@ -360,7 +366,7 @@ export default function AdminStudentDetailPage() {
             </div>
           </section>
 
-          <SessionTable title="Weekly schedule" sessions={schedule} studentId={id} showDate={false} loadError={scheduleError} />
+          <SessionTable title="Weekly schedule" sessions={schedule} studentId={id} showDate loadError={scheduleError} />
           <SessionTable title="Attendance & lesson history" sessions={attendance} studentId={id} showDate loadError={attendanceError} />
 
           {data && data.progress.length > 0 && (

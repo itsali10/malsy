@@ -1,0 +1,110 @@
+{
+  "unit_title": "What is the Earth made of?",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Get Ready",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "preparation"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Word Study",
+      "must_cover": true,
+      "keywords": [
+        "homonyms",
+        "spelling",
+        "pronunciation",
+        "meaning"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing Study",
+      "must_cover": true,
+      "keywords": [
+        "parentheses",
+        "extra information",
+        "punctuation"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Before You Read",
+      "must_cover": true,
+      "keywords": [
+        "evaluation",
+        "opinions",
+        "comprehension"
+      ]
+    },
+    {
+      "id": "reading_2",
+      "type": "reading",
+      "title": "Inside Our Planet",
+      "must_cover": true,
+      "keywords": [
+        "Earth's layers",
+        "mantle",
+        "crust",
+        "plate tectonics"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar in Use",
+      "must_cover": true,
+      "keywords": [
+        "modals",
+        "ability",
+        "permission",
+        "deduction"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening",
+      "must_cover": true,
+      "keywords": [
+        "Lake Vostok",
+        "hidden lakes"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking",
+      "must_cover": true,
+      "keywords": [
+        "conducting an interview",
+        "geologist",
+        "important discovery"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "The Earth is made of",
+      "must_cover": true,
+      "keywords": [
+        "composition"
+      ]
+    }
+  ]
+}

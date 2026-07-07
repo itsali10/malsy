@@ -1,0 +1,87 @@
+{
+  "unit_title": "Populations",
+  "items": [
+    {
+      "id": "lesson_explanation",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "definition",
+        "importance of studying populations"
+      ]
+    },
+    {
+      "id": "learning_objectives",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "understanding populations",
+        "factors affecting populations",
+        "population dynamics"
+      ]
+    },
+    {
+      "id": "key_scientific_concepts",
+      "type": "other",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "population size",
+        "population density",
+        "carrying capacity"
+      ]
+    },
+    {
+      "id": "scientific_vocabulary",
+      "type": "vocab",
+      "title": "Scientific Vocabulary",
+      "must_cover": true,
+      "keywords": [
+        "population growth rate",
+        "biotic factors"
+      ]
+    },
+    {
+      "id": "diagrams_images",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": [
+        "population growth curve",
+        "population distribution map"
+      ]
+    },
+    {
+      "id": "experiments_activities",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "simulate population growth in a controlled environment",
+        "analyze factors affecting population growth"
+      ]
+    },
+    {
+      "id": "summary_wrap_up",
+      "type": "wrap_up",
+      "title": "Summary/Wrap-up",
+      "must_cover": true,
+      "keywords": [
+        "reinforce key concepts"
+      ]
+    },
+    {
+      "id": "quiz_review_questions",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": [
+        "multiple-choice questions on population characteristics",
+        "short-answer questions on factors influencing populations"
+      ]
+    }
+  ]
+}

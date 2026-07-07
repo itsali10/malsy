@@ -1,35 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '../../lib/api';
-import TimetableCard from '../../components/ui/TimetableCard';
-import SubjectIcon from '../../components/ui/SubjectIcon';
 import DashboardWidget from '../../components/ui/DashboardWidget';
-import SectionHeader from '../../components/ui/SectionHeader';
+import LockedLessonNotice from '../../components/ui/LockedLessonNotice';
+import { usePortalSubjects } from '../../lib/studentPortalSubjects';
+import { useStudentWeekSchedule } from '../../lib/useStudentWeekSchedule';
 import {
   WEEK_DAYS,
-  apiWeekToSchedule,
   getSubjectMeta,
   getTodayName,
   getWeeklySessionCount,
   getSessionsForDayFromApi,
+  learnHrefForSession,
+  displayStatusLabel,
   routeForSession,
   getLockedMessage,
+  formatSessionTimeRange,
   type DayName,
   type ScheduleSession,
 } from '../../lib/studentSchedule';
-import { usePortalSubjects } from '../../lib/studentPortalSubjects';
-
-const DAY_ABBR: Record<DayName, string> = {
-  Monday: 'Mon',
-  Tuesday: 'Tue',
-  Wednesday: 'Wed',
-  Thursday: 'Thu',
-  Friday: 'Fri',
-  Saturday: 'Sat',
-  Sunday: 'Sun',
-};
 
 function getCurrentWeekDates(): Record<DayName, Date> {
   const today = new Date();
@@ -45,124 +35,82 @@ function getCurrentWeekDates(): Record<DayName, Date> {
   return dates;
 }
 
-function statusLabel(status: ScheduleSession['status']): string {
-  switch (status) {
-    case 'available':
-      return 'Available';
-    case 'completed':
-      return 'Completed';
-    default:
-      return 'Locked';
-  }
-}
-
 export default function SchedulePage() {
   const router = useRouter();
   const todayName = getTodayName();
   const { subjects, loading: subjectsLoading } = usePortalSubjects();
-  const [selected, setSelected] = useState<DayName>(todayName);
-  const [apiWeek, setApiWeek] = useState<Partial<Record<DayName, ScheduleSession[]>>>({});
+  const subjectSignature = subjects.map((s) => s.subject_key).sort().join(',');
+  const [lockedNotice, setLockedNotice] = useState<string | null>(null);
+  const { apiWeek } = useStudentWeekSchedule(subjectSignature);
   const weekDates = getCurrentWeekDates();
 
-  useEffect(() => {
-    let cancelled = false;
-    api.dashboard.week()
-      .then((week) => {
-        if (cancelled) return;
-        if (!Array.isArray(week)) {
-          console.warn('[portal] schedule fetch returned non-array — keeping previous week');
-          return;
-        }
-        console.info('[portal] fetched lesson schedule', week.map((d) => ({
-          day: d.day_of_week,
-          sessions: d.sessions?.length ?? 0,
-        })));
-        setApiWeek((prev) => {
-          const mapped = apiWeekToSchedule(week);
-          const total = Object.values(mapped).flat().length;
-          const byDay = WEEK_DAYS.map((d) => ({ day: d, count: mapped[d]?.length ?? 0 }));
-          console.info('[portal] generated schedule by day', byDay, 'total=', total);
-          if (total === 0 && Object.keys(prev).length === 0) {
-            return mapped;
-          }
-          if (total === 0) {
-            console.warn('[portal] mapped schedule empty — keeping previous week');
-            return prev;
-          }
-          return mapped;
-        });
-      })
-      .catch((err) => {
-        console.warn('[portal] schedule fetch failed — keeping previous week', err);
-      });
-    return () => { cancelled = true; };
-  }, [subjects]);
-
-  const sessions = getSessionsForDayFromApi(selected, apiWeek);
   const sessionCount = getWeeklySessionCount(apiWeek);
 
-  const headingBase =
-    weekDates[selected]?.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-    }) ?? selected;
-  const heading = selected === todayName ? `${headingBase} · Today` : headingBase;
-
   function handleSessionClick(session: ScheduleSession) {
-    if (session.status === 'available' || session.status === 'completed') {
+    const learnHref = learnHrefForSession(session);
+    if (learnHref) {
+      router.push(learnHref);
+      return;
+    }
+    if (session.status === 'completed') {
       router.push(routeForSession(session, subjects));
       return;
     }
-    alert(getLockedMessage());
+    setLockedNotice(getLockedMessage(session.lock_reason));
   }
 
   return (
     <div className="page-enter">
-      <div className="week-bar">
-        {WEEK_DAYS.map((day) => (
-          <div
-            key={day}
-            onClick={() => setSelected(day)}
-            className={[
-              'day-btn',
-              day === todayName ? 'today' : '',
-              'has-class',
-              day === selected ? 'selected' : '',
-            ]
-              .join(' ')
-              .trim()}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="day-name">{DAY_ABBR[day]}</div>
-            <div className="day-num">{weekDates[day]?.getDate()}</div>
-          </div>
-        ))}
-      </div>
-
       <div className="g-left">
         <div>
-          <SectionHeader title={heading} subtitle="Tap a lesson to start learning" />
-
-          <div className="schedule-session-list">
-            {sessions.length === 0 ? (
-              <div className="card-sub">No sessions today</div>
-            ) : null}
-            {sessions.map((session, idx) => {
-              const meta = getSubjectMeta(session.subject, subjects);
+          <div className="schedule-timetable">
+            {WEEK_DAYS.map((day) => {
+              const sessions = getSessionsForDayFromApi(day, apiWeek);
+              const isToday = day === todayName;
               return (
-                <TimetableCard
-                  key={`${session.id}-${idx}`}
-                  title={session.title}
-                  subject={session.subject}
-                  icon={<SubjectIcon subject={session.subject} emoji={meta.icon} size={20} />}
-                  iconBg={meta.bg}
-                  accentColor={meta.color}
-                  status={session.status}
-                  statusLabel={statusLabel(session.status)}
-                  active={session.status === 'available'}
-                  onClick={() => handleSessionClick(session)}
-                />
+                <div
+                  key={day}
+                  className={`schedule-timetable-row${isToday ? ' schedule-timetable-row--today' : ''}`}
+                >
+                  <div className="schedule-timetable-daycell">
+                    <span className="schedule-timetable-daycell__name">{day}</span>
+                    {weekDates[day] ? (
+                      <span className="schedule-timetable-daycell__date">{weekDates[day].getDate()}</span>
+                    ) : null}
+                  </div>
+                  <div className="schedule-timetable-cells">
+                    {sessions.length === 0 ? (
+                      <div className="schedule-timetable-empty">No sessions</div>
+                    ) : (
+                      sessions.map((session, idx) => {
+                        const meta = getSubjectMeta(session.subject, subjects);
+                        const timeLabel = formatSessionTimeRange(session.start_time, session.end_time);
+                        const [startLabel, endLabel] = (timeLabel ?? '').split(' – ');
+                        return (
+                          <button
+                            key={`${session.id}-${idx}`}
+                            type="button"
+                            className={`schedule-box schedule-box--${session.status}`}
+                            style={{ '--schedule-box-accent': meta.color } as React.CSSProperties}
+                            onClick={() => handleSessionClick(session)}
+                          >
+                            {startLabel ? (
+                              <div className="schedule-box__time">
+                                <span>{startLabel}</span>
+                                {endLabel ? <span>{endLabel}</span> : null}
+                              </div>
+                            ) : null}
+                            <div className="schedule-box__body">
+                              <div className="schedule-box__subject">{session.subject}</div>
+                              <div className="schedule-box__title">{session.title}</div>
+                            </div>
+                            <div className="schedule-box__footer">{displayStatusLabel(session)}</div>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -173,12 +121,7 @@ export default function SchedulePage() {
             <div className="schedule-week-active">Weekly schedule active</div>
             <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
               {WEEK_DAYS.map((day) => (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => setSelected(day)}
-                  className={`schedule-week-row${day === selected ? ' schedule-week-row--selected' : ''}`}
-                >
+                <div key={day} className="schedule-week-row">
                   <span
                     className="schedule-week-row__day"
                     style={{ color: day === todayName ? 'var(--vl)' : 'var(--g2)' }}
@@ -189,7 +132,7 @@ export default function SchedulePage() {
                   <span className="schedule-week-row__count">
                     {(apiWeek[day]?.length ?? 0)} sessions
                   </span>
-                </button>
+                </div>
               ))}
             </div>
           </DashboardWidget>
@@ -219,6 +162,12 @@ export default function SchedulePage() {
           </DashboardWidget>
         </div>
       </div>
+
+      <LockedLessonNotice
+        open={Boolean(lockedNotice)}
+        message={lockedNotice ?? ''}
+        onClose={() => setLockedNotice(null)}
+      />
     </div>
   );
 }

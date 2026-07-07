@@ -180,8 +180,22 @@ export function visibilityStatusLabel(book: BookRecord | null): string {
   return 'Hidden from Students';
 }
 
-export function processingStatusLabel(book: BookRecord | null): string {
+import type { BookRecord, RagProgress } from './admin-api';
+
+export function processingStatusLabel(
+  book: BookRecord | null,
+  ragProgress?: RagProgress | null,
+): string {
   if (!book) return '';
+  if (book.status === 'processing' && ragProgress?.detail) {
+    return ragProgress.detail;
+  }
+  if (book.status === 'processing' && ragProgress?.stage_label) {
+    return ragProgress.stage_label;
+  }
+  if (book.status === 'failed' && ragProgress?.error_message) {
+    return `Failed — ${ragProgress.error_message}`;
+  }
   return book.status.charAt(0).toUpperCase() + book.status.slice(1);
 }
 

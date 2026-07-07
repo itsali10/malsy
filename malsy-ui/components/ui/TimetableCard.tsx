@@ -60,7 +60,10 @@ export default function TimetableCard({
           onClick?.();
         }
       }}
-      style={{ '--timetable-accent': accentColor } as React.CSSProperties}
+      style={{
+        ...({ '--timetable-accent': accentColor } as React.CSSProperties),
+        cursor: onClick ? 'pointer' : undefined,
+      }}
     >
       {time ? <div className="timetable-card__time">{time}</div> : null}
 

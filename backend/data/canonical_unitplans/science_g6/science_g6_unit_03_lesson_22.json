@@ -1,0 +1,67 @@
+{
+  "unit_title": "Food Chains",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "energy flow",
+        "organisms"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "vocab",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "food chains",
+        "predator",
+        "prey",
+        "producer",
+        "consumer"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": [
+        "food chain diagram"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "building a food chain model",
+        "observing a local food chain"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "wrap_up",
+      "title": "Summary/Wrap-up",
+      "must_cover": true,
+      "keywords": [
+        "balance in ecosystems"
+      ]
+    },
+    {
+      "id": "6",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": [
+        "identify trophic levels",
+        "explain the role of decomposers"
+      ]
+    }
+  ]
+}

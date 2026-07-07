@@ -1,0 +1,160 @@
+{
+  "unit_title": "Unit 1: Bridges and Tunnels",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Opening",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "overview"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Vocabulary Section",
+      "must_cover": true,
+      "keywords": [
+        "new words",
+        "word study",
+        "listening",
+        "sentences",
+        "activities",
+        "matching",
+        "opposites",
+        "verbs",
+        "adjectives"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Reading Section: Sam and David at Black Water River",
+      "must_cover": true,
+      "keywords": [
+        "authors purpose",
+        "short story",
+        "train tracks",
+        "bridge",
+        "danger",
+        "questions",
+        "fantasy story",
+        "village",
+        "imagination"
+      ]
+    },
+    {
+      "id": "reading_2",
+      "type": "reading",
+      "title": "Reading Section: The Earthworm and the Spider",
+      "must_cover": true,
+      "keywords": [
+        "trust",
+        "villagers",
+        "bridge",
+        "tunnel",
+        "stranger",
+        "gift",
+        "comprehension",
+        "questions"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar Section",
+      "must_cover": true,
+      "keywords": [
+        "future continuous",
+        "actions in progress",
+        "future time",
+        "sentence correction",
+        "chart creation"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening Section",
+      "must_cover": true,
+      "keywords": [
+        "importance of bridges and tunnels",
+        "listening activities",
+        "comprehension questions",
+        "key words",
+        "speaking",
+        "correcting someone"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking Section",
+      "must_cover": true,
+      "keywords": [
+        "polite expressions",
+        "correcting mistakes"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing Study",
+      "must_cover": true,
+      "keywords": [
+        "prefixes",
+        "paragraph breaks",
+        "sentence writing",
+        "organizing ideas"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Wrap Up",
+      "must_cover": true,
+      "keywords": [
+        "review",
+        "summary"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "bridges",
+        "tunnels",
+        "importance",
+        "daily life"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "pictures",
+        "illustrations",
+        "charts"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "listening comprehension",
+        "sentence completion",
+        "sentence correction",
+        "chart creation",
+        "writing practice"
+      ]
+    }
+  ]
+}

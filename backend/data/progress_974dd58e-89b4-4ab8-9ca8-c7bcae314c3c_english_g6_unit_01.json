@@ -1,0 +1,133 @@
+{
+  "student_id": "974dd58e-89b4-4ab8-9ca8-c7bcae314c3c",
+  "chapter_id": "english_g6:unit_01",
+  "current_item_index": 4,
+  "done_items": [
+    "unit_opening",
+    "vocab",
+    "reading_1",
+    "grammar"
+  ],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [
+    {
+      "ts": "2026-07-05T01:46:41.312139Z",
+      "item_id": "unit_opening",
+      "quiz_question": "Why did the villagers of Koi decide to build a bridge and a tunnel?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-05T01:49:06.565347Z",
+      "item_id": "vocab",
+      "quiz_question": "What does the word 'hazardous' mean?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T05:13:14.302456Z",
+      "item_id": "reading_1",
+      "quiz_question": "Why do people build bridges and tunnels according to the teacher's lesson?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T05:17:00.418019Z",
+      "item_id": "grammar",
+      "quiz_question": "Why do people build bridges and tunnels according to the lesson?",
+      "correct": true,
+      "hint_count_before": 0,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T05:17:43.405019Z",
+      "item_id": "listening",
+      "quiz_question": "Is it better to be safe or take risks? Why?",
+      "correct": false,
+      "hint_count_before": 0,
+      "hint_count_after": 1,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T05:18:17.055916Z",
+      "item_id": "listening",
+      "quiz_question": "Is it better to be safe or take risks? Why?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T05:18:34.406010Z",
+      "item_id": "listening",
+      "quiz_question": "What are some benefits of meeting new people?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T05:18:48.635082Z",
+      "item_id": "listening",
+      "quiz_question": "Does the first speaker use a bridge or a tunnel to get home?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T05:19:08.172598Z",
+      "item_id": "listening",
+      "quiz_question": "What kinds of vehicles use bridges and tunnels?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T05:19:21.789767Z",
+      "item_id": "listening",
+      "quiz_question": "What is the author’s purpose? How do you know?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T05:19:36.891072Z",
+      "item_id": "listening",
+      "quiz_question": "Why was the grandfather afraid for his people?",
+      "correct": true,
+      "hint_count_before": 1,
+      "hint_count_after": 0,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T05:19:45.772089Z",
+      "item_id": "listening",
+      "quiz_question": "What prevented the villagers from leaving Koi?",
+      "correct": false,
+      "hint_count_before": 1,
+      "hint_count_after": 2,
+      "remediation_used": false
+    },
+    {
+      "ts": "2026-07-06T05:20:21.261502Z",
+      "item_id": "listening",
+      "quiz_question": "What prevented the villagers from leaving Koi?",
+      "correct": true,
+      "hint_count_before": 2,
+      "hint_count_after": 0,
+      "remediation_used": false
+    }
+  ],
+  "listening_question_index": 0
+}

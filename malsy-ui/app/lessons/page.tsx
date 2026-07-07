@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api, MySubjectRead, ContentUnit } from '../../lib/api';
-import { learningConfig } from '../../lib/learning-config';
+import { api } from '../../lib/api';
 import {
-  filterAppSubjects,
-  getTodaySubjects,
-  isSubjectUnlocked,
-} from '../../lib/studentSchedule';
+  usePortalSubjects,
+  routeForPortalSubject,
+  type PortalSubject,
+} from '../../lib/studentPortalSubjects';
+import { getSubjectMeta } from '../../lib/studentSchedule';
 
 const SUBJ_META: Record<string, { icon: string; color: string; bg: string }> = {
   english: { icon: '📖', color: 'var(--sky)',   bg: 'linear-gradient(135deg,rgba(59,191,255,.12),rgba(91,33,245,.06))' },
@@ -16,80 +16,61 @@ const SUBJ_META: Record<string, { icon: string; color: string; bg: string }> = {
   history: { icon: '🏛️', color: 'var(--amber)', bg: 'linear-gradient(135deg,rgba(255,184,48,.1),rgba(200,130,0,.06))' },
 };
 
-const FALLBACK_SUBJECTS: MySubjectRead[] = [
-  { subject_id: '1', subject_name: 'English', subject_code: 'ENG', enrolled_sessions_count: 12 },
-  { subject_id: '2', subject_name: 'Science', subject_code: 'SCI', enrolled_sessions_count: 10 },
-  { subject_id: '3', subject_name: 'History', subject_code: 'HIS', enrolled_sessions_count: 9  },
-];
-
-function subjMeta(name: string) {
+function subjMeta(name: string, subjects: PortalSubject[]) {
+  const fromPortal = getSubjectMeta(name, subjects);
   const key = name.toLowerCase().split(' ')[0];
-  return SUBJ_META[key] ?? { icon: '📖', color: 'var(--vl)', bg: 'rgba(91,33,245,.12)' };
+  const fallback = SUBJ_META[key];
+  if (fromPortal.icon !== '📖' || fallback) {
+    return { icon: fromPortal.icon, color: fallback?.color ?? fromPortal.color, bg: fallback?.bg ?? fromPortal.bg };
+  }
+  return fromPortal;
 }
 
 interface Chapter { id: string; title: string; desc: string }
 
-const DEFAULT_CHAPTERS: Record<string, Chapter[]> = {
-  english: [
-    { id: 'english:unit_01', title: 'Reading & Comprehension', desc: 'Passages · vocabulary · inference' },
-    { id: 'english:unit_02', title: 'Grammar & Writing',       desc: 'Sentences · punctuation · essays' },
-    { id: 'english:unit_03', title: 'Listening & Speaking',    desc: 'Pronunciation · expression' },
-    { id: 'english:unit_04', title: 'Literature & Poetry',     desc: 'Analysis · themes · devices' },
-    { id: 'english:unit_05', title: 'Revision & Assessment',   desc: 'Review all topics' },
-  ],
-  science: [
-    { id: 'science:unit_01', title: 'Living Organisms',        desc: 'Cells · biology · ecosystems' },
-    { id: 'science:unit_02', title: 'Matter & Materials',      desc: 'States · properties · changes' },
-    { id: 'science:unit_03', title: 'Forces & Energy',         desc: 'Motion · work · power' },
-    { id: 'science:unit_04', title: 'Earth & Space',           desc: 'Geography · atmosphere · universe' },
-    { id: 'science:unit_05', title: 'Experiments & Methods',   desc: 'Scientific reasoning · lab skills' },
-  ],
-  history: [
-    { id: 'history:unit_01', title: 'Ancient Civilisations',   desc: 'Egypt · Greece · Rome' },
-    { id: 'history:unit_02', title: 'The Middle Ages',         desc: 'Medieval Europe · trade routes' },
-    { id: 'history:unit_03', title: 'The Modern World',        desc: 'Industrial Revolution · empires' },
-    { id: 'history:unit_04', title: 'World Wars',              desc: 'WW1 · WW2 · causes & effects' },
-    { id: 'history:unit_05', title: 'Contemporary History',    desc: 'Post-1945 · politics · today' },
-  ],
-};
-
-// ── Jassmine avatar (used in bottom banner) ───────────────────────
-
-function JassmineAvatar({ size = 56 }: { size?: number }) {
-  return (
-    <div style={{ width: size, height: size, borderRadius: '50%', background: 'linear-gradient(135deg,#3D1FA8,#5B21F5)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '2px solid rgba(255,255,255,.1)', flexShrink: 0 }}>
-      <svg width={size * 0.9} height={size * 0.9} viewBox="0 0 220 220" fill="none">
-        <path d="M58 210 Q54 175 62 158 Q72 140 110 136 Q148 140 158 158 Q166 175 162 210Z" fill="#3D1FA8" />
-        <rect x="100" y="126" width="20" height="18" rx="6" fill="#F4C5A0" />
-        <ellipse cx="110" cy="102" rx="36" ry="38" fill="#F4C5A0" />
-        <path d="M74 88 Q72 60 84 50 Q94 40 110 38 Q126 40 136 50 Q148 60 146 88 Q142 70 136 64 Q128 55 110 54 Q92 55 84 64 Q78 70 74 88Z" fill="#1A0A3C" />
-        <ellipse cx="97" cy="95" rx="8" ry="7" fill="white" /><ellipse cx="123" cy="95" rx="8" ry="7" fill="white" />
-        <circle cx="97" cy="95" r="4.5" fill="#5B21F5" /><circle cx="123" cy="95" r="4.5" fill="#5B21F5" />
-        <circle cx="97" cy="95" r="2.2" fill="#1A0A3C" /><circle cx="123" cy="95" r="2.2" fill="#1A0A3C" />
-        <path d="M100 114 Q110 122 120 114" stroke="#D4845A" strokeWidth="2" fill="none" strokeLinecap="round" />
-        <ellipse cx="74" cy="100" rx="6" ry="9" fill="#F4C5A0" /><ellipse cx="146" cy="100" rx="6" ry="9" fill="#F4C5A0" />
-      </svg>
-    </div>
-  );
-}
-
 // ── Chapter-picker modal ──────────────────────────────────────────
 
-function LessonModal({ subject, units, onClose }: { subject: MySubjectRead; units: ContentUnit[]; onClose: () => void }) {
+function LessonModal({ subject, onClose }: { subject: PortalSubject; onClose: () => void }) {
   const router = useRouter();
-  const meta = subjMeta(subject.subject_name);
-  const subjectKey = subject.subject_name.toLowerCase().split(' ')[0];
+  const meta = subjMeta(subject.subject_name, [subject]);
+  const [chapterList, setChapterList] = useState<Chapter[]>([]);
+  const [chaptersLoading, setChaptersLoading] = useState(true);
+  const [chapterId, setChapterId] = useState('');
 
-  const relevantUnits = units.filter(u =>
-    u.book_id?.toLowerCase().includes(subjectKey) ||
-    u.title?.toLowerCase().includes(subjectKey) ||
-    u.subject?.toLowerCase().includes(subjectKey)
-  );
-  const chapterList: Chapter[] = relevantUnits.length > 0
-    ? relevantUnits.map((u, i) => ({ id: u.unit_id, title: u.title ?? `Unit ${i + 1}`, desc: '' }))
-    : (DEFAULT_CHAPTERS[subjectKey] ?? [{ id: subject.subject_code.toLowerCase(), title: subject.subject_name, desc: '' }]);
-
-  const [chapterId, setChapterId] = useState(chapterList[0]?.id ?? '');
+  useEffect(() => {
+    let cancelled = false;
+    const bookId = subject.primary_book_id;
+    if (!bookId) {
+      setChapterList([]);
+      setChaptersLoading(false);
+      return;
+    }
+    setChaptersLoading(true);
+    api.books
+      .lessons(bookId)
+      .then((data) => {
+        if (cancelled) return;
+        const chapters = (data.lessons ?? []).map((lesson) => ({
+          id: lesson.id,
+          title: lesson.title,
+          desc: lesson.shortDescription || '',
+        }));
+        setChapterList(chapters);
+        setChapterId(chapters[0]?.id ?? '');
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setChapterList([]);
+          setChapterId('');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setChaptersLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [subject.primary_book_id, subject.subject_key]);
 
   function startLesson() {
     onClose();
@@ -135,6 +116,13 @@ function LessonModal({ subject, units, onClose }: { subject: MySubjectRead; unit
               Choose a chapter
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 8, maxHeight: 220, overflowY: 'auto' }}>
+              {chaptersLoading ? (
+                <div style={{ gridColumn: '1 / -1', fontSize: 12, color: 'var(--g3)', padding: 8 }}>Loading lessons…</div>
+              ) : chapterList.length === 0 ? (
+                <div style={{ gridColumn: '1 / -1', fontSize: 12, color: 'var(--g3)', padding: 8 }}>
+                  No published lessons yet for this subject.
+                </div>
+              ) : null}
               {chapterList.map((ch, idx) => {
                 const sel = chapterId === ch.id;
                 return (
@@ -169,38 +157,24 @@ function LessonModal({ subject, units, onClose }: { subject: MySubjectRead; unit
 
 export default function LessonsPage() {
   const router = useRouter();
-  const [subjects, setSubjects] = useState<MySubjectRead[]>([]);
-  const [units,    setUnits]    = useState<ContentUnit[]>([]);
-  const [activeSubject, setActiveSubject] = useState<MySubjectRead | null>(null);
-  const [loading, setLoading]   = useState(true);
-  const [filter,  setFilter]    = useState('All');
+  const { subjects, loading } = usePortalSubjects();
+  const [activeSubject, setActiveSubject] = useState<PortalSubject | null>(null);
+  const [filter, setFilter] = useState('All');
 
-  useEffect(() => {
-    Promise.all([
-      api.dashboard.subjects().catch(() => []),
-      api.units.list().catch(() => ({ units: [] })),
-    ]).then(([s, u]) => {
-      const filtered = Array.isArray(s) ? filterAppSubjects(s) : [];
-      setSubjects(filtered.length ? filtered : FALLBACK_SUBJECTS);
-      setUnits(u?.units ?? []);
-    }).finally(() => setLoading(false));
-  }, []);
-
-  function openSubject(s: MySubjectRead) {
-    const key = s.subject_name.toLowerCase().split(' ')[0];
-    if (learningConfig[key]) {
-      router.push(`/lessons/subject/${key}`);
-    } else {
-      setActiveSubject(s);
+  function openSubject(s: PortalSubject) {
+    if (s.route) {
+      router.push(routeForPortalSubject(s));
+      return;
     }
+    setActiveSubject(s);
   }
 
-  const todaySubjects = getTodaySubjects();
-  const scheduledSubjects = subjects.filter(s => isSubjectUnlocked(s.subject_name));
-  const filters = ['All', ...todaySubjects];
-  const visible = filter === 'All'
-    ? scheduledSubjects
-    : scheduledSubjects.filter(s => s.subject_name === filter);
+  const todaySubjectNames = subjects.filter((s) => s.scheduled_today).map((s) => s.subject_name);
+  const filters = ['All', ...todaySubjectNames];
+  const visible =
+    filter === 'All'
+      ? subjects
+      : subjects.filter((s) => s.subject_name === filter);
 
   return (
     <div className="page-enter">
@@ -208,7 +182,11 @@ export default function LessonsPage() {
         <div>
           <div className="card-title" style={{ fontSize: 18 }}>All Lessons</div>
           <div style={{ fontSize: 12, color: 'var(--g3)', marginTop: 3 }}>
-            {loading ? 'Loading…' : `Today: ${getTodaySubjects().join(' · ')}`}
+            {loading
+              ? 'Loading…'
+              : subjects.length
+                ? `Today: ${todaySubjectNames.length ? todaySubjectNames.join(' · ') : 'no lessons scheduled'}`
+                : 'No published subjects yet'}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -221,8 +199,13 @@ export default function LessonsPage() {
       </div>
 
       <div className="lesson-grid">
-        {visible.map(s => {
-          const m = subjMeta(s.subject_name);
+        {!loading && visible.length === 0 && (
+          <div className="card" style={{ padding: 24, color: 'var(--g3)', fontSize: 14, lineHeight: 1.6 }}>
+            No subjects are published for your account yet. Check back after your teacher publishes lesson content.
+          </div>
+        )}
+        {visible.map((s) => {
+          const m = subjMeta(s.subject_name, subjects);
           return (
             <div
               key={s.subject_id}
@@ -240,7 +223,11 @@ export default function LessonsPage() {
               <div className="lc-thumb" style={{ background: m.bg }}>{m.icon}</div>
               <div className="lc-body">
                 <div className="lc-subject" style={{ color: m.color }}>{s.subject_name}</div>
-                <div className="lc-title">{s.enrolled_sessions_count} sessions enrolled</div>
+                <div className="lc-title">
+                  {(s.available_lessons_count ?? s.enrolled_sessions_count ?? 0) > 0
+                    ? `${s.available_lessons_count ?? s.enrolled_sessions_count} lessons available`
+                    : 'Lessons available'}
+                </div>
                 <div className="lc-meta">
                   <span className="lc-time">AI-guided · Jassmine</span>
                   <span className="pill pill-s">▶ Start</span>
@@ -251,30 +238,9 @@ export default function LessonsPage() {
         })}
       </div>
 
-      <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 24, background: 'linear-gradient(135deg,var(--navym),#130d40)', marginTop: 24 }}>
-        <div style={{ background: 'linear-gradient(135deg,var(--navys),#1a1060)', borderRadius: 16, width: 88, height: 88, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <JassmineAvatar size={72} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <div className="card-title" style={{ fontSize: 16 }}>AI Tutor — Jassmine</div>
-          <div style={{ fontSize: 12, color: 'var(--g3)', margin: '4px 0 12px' }}>
-            Jassmine reads the textbook with you, explains every topic — vocabulary, grammar, reading passages, and exercises — then quizzes you with hints and re-explanations if you need them.
-          </div>
-        </div>
-        {subjects.find(s => isSubjectUnlocked(s.subject_name)) && (
-          <button
-            className="btn btn-v"
-            onClick={() => {
-              const first = subjects.find(s => isSubjectUnlocked(s.subject_name));
-              if (first) openSubject(first);
-            }}
-          >
-            ▶ Start Now
-          </button>
-        )}
-      </div>
-
-      {activeSubject && <LessonModal subject={activeSubject} units={units} onClose={() => setActiveSubject(null)} />}
+      {activeSubject ? (
+        <LessonModal subject={activeSubject} onClose={() => setActiveSubject(null)} />
+      ) : null}
     </div>
   );
 }

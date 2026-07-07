@@ -1,8 +1,40 @@
 import { adminAuth } from './admin-auth';
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+const BASE = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000').replace(/\/$/, '');
 
-async function adminRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+function isNetworkFailure(err: unknown): boolean {
+  if (err instanceof TypeError) return true;
+  if (err instanceof Error) {
+    const m = err.message.toLowerCase();
+    return m === 'failed to fetch' || m.includes('network') || m.includes('load failed');
+  }
+  return false;
+}
+
+function formatAdminErrorDetail(detail: unknown, fallback: string): string {
+  if (Array.isArray(detail)) {
+    return detail.map((d: { msg?: string }) => d.msg ?? JSON.stringify(d)).join('; ');
+  }
+  if (typeof detail === 'string' && detail.trim()) return detail;
+  if (detail != null) return JSON.stringify(detail);
+  return fallback;
+}
+
+async function readResponseBody(res: Response): Promise<unknown> {
+  const text = await res.text();
+  if (!text) return { detail: res.statusText };
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return { detail: text };
+  }
+}
+
+async function adminRequest<T>(
+  path: string,
+  init: RequestInit = {},
+  opts: { noCache?: boolean } = {},
+): Promise<T> {
   const isLoginRequest = path === '/admin/login';
   const token = isLoginRequest ? null : adminAuth.getToken();
   const headers: Record<string, string> = {
@@ -11,16 +43,37 @@ async function adminRequest<T>(path: string, init: RequestInit = {}): Promise<T>
     ...((init.headers as Record<string, string>) ?? {}),
   };
 
-  const res = await fetch(`${BASE}${path}`, { ...init, headers });
+  const url = `${BASE}${path}`;
+  const method = (init.method ?? 'GET').toUpperCase();
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      ...init,
+      headers,
+      cache: opts.noCache ? 'no-store' : init.cache,
+    });
+  } catch (err) {
+    console.error('[admin-api] network error', { url, method, error: err });
+    if (isNetworkFailure(err)) {
+      throw new Error(
+        `Could not reach the admin API at ${BASE}. Make sure the backend is running on port 8000.`,
+      );
+    }
+    throw err;
+  }
+
+  const body = await readResponseBody(res);
+  const detail = (body as { detail?: unknown }).detail;
+
   if (res.status === 401) {
+    console.warn('[admin-api] unauthorized', { url, method, status: res.status, body });
     if (!isLoginRequest) {
       adminAuth.clear();
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin/login')) {
         window.location.replace('/admin/login?expired=1');
       }
     }
-    const body = await res.json().catch(() => ({ detail: res.statusText }));
-    const detail = (body as { detail?: unknown }).detail;
     const msg = typeof detail === 'string'
       ? detail
       : isLoginRequest
@@ -28,20 +81,15 @@ async function adminRequest<T>(path: string, init: RequestInit = {}): Promise<T>
         : 'Admin session expired. Please sign in again.';
     throw new Error(msg);
   }
+
   if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: res.statusText }));
-    const detail = (body as { detail?: unknown }).detail;
-    const msg = Array.isArray(detail)
-      ? detail.map((d: { msg?: string }) => d.msg ?? JSON.stringify(d)).join('; ')
-      : typeof detail === 'string'
-        ? detail
-        : detail != null
-          ? JSON.stringify(detail)
-          : 'Request failed';
-    throw new Error(msg);
+    const msg = formatAdminErrorDetail(detail, res.statusText || 'Request failed');
+    console.error('[admin-api] request failed', { url, method, status: res.status, body });
+    throw new Error(`${msg} (${method} ${path} → ${res.status})`);
   }
+
   if (res.status === 204) return undefined as T;
-  return res.json() as Promise<T>;
+  return body as T;
 }
 
 export interface AdminToken { access_token: string; token_type: string; }
@@ -89,6 +137,28 @@ export interface BookRecord {
   structure_detection_method?: string | null;
   structure_extracted_at?: string | null;
   structure_approved_at?: string | null;
+}
+
+export interface BookProcessingStatus {
+  book_id: string;
+  status: string;
+  job_running: boolean;
+  stale: boolean;
+  error_message?: string | null;
+  rag_progress?: RagProgress | null;
+}
+
+export interface RagProgress {
+  stage: string;
+  stage_label: string;
+  current: number;
+  total: number;
+  batch_current: number;
+  batch_total: number;
+  detail: string;
+  error_message?: string | null;
+  started_at?: string;
+  updated_at?: string;
 }
 
 export interface BookStructureUnit {
@@ -276,7 +346,8 @@ export interface StudentSession {
   quiz_score?: number | null;
   chapter_id?: string | null;
   schedule_id?: string | null;
-  attendance_id?: string | null;
+  progress_percent?: number | null;
+  last_activity_at?: string | null;
 }
 
 export interface AdminLessonPart {
@@ -380,6 +451,7 @@ export interface AdminLessonContent {
   };
   generated_content: {
     explanation_items: unknown[];
+    objectives?: unknown[];
     vocabulary: unknown[];
     concepts?: unknown[];
     activities?: unknown[];
@@ -550,6 +622,12 @@ export const adminApi = {
       adminRequest<BookRecord>('/admin/books/upload', { method: 'POST', body: form }),
     process: (id: string) =>
       adminRequest<BookRecord>(`/admin/books/${encodeURIComponent(id)}/process`, { method: 'POST' }),
+    reprocess: (id: string) =>
+      adminRequest<BookRecord>(`/admin/books/${encodeURIComponent(id)}/reprocess`, { method: 'POST' }),
+    processingStatus: (id: string) =>
+      adminRequest<BookProcessingStatus>(
+        `/admin/books/${encodeURIComponent(id)}/processing-status`,
+      ),
     setVisibility: (id: string, visible: boolean) =>
       adminRequest<BookRecord>(`/admin/books/${encodeURIComponent(id)}/visibility`, {
         method: 'PATCH',
@@ -587,11 +665,15 @@ export const adminApi = {
   },
 
   students: {
-    list: () => adminRequest<StudentSummary[]>('/admin/students'),
-    get: (id: string) => adminRequest<StudentOverview>(`/admin/students/${encodeURIComponent(id)}`),
-    parents: (id: string) => adminRequest<StudentParentInfo>(`/admin/students/${encodeURIComponent(id)}/parents`),
-    schedule: (id: string) => adminRequest<StudentSession[]>(`/admin/students/${encodeURIComponent(id)}/schedule`),
-    attendance: (id: string) => adminRequest<StudentSession[]>(`/admin/students/${encodeURIComponent(id)}/attendance`),
+    list: () => adminRequest<StudentSummary[]>('/admin/students', {}, { noCache: true }),
+    get: (id: string) =>
+      adminRequest<StudentOverview>(`/admin/students/${encodeURIComponent(id)}`, {}, { noCache: true }),
+    parents: (id: string) =>
+      adminRequest<StudentParentInfo>(`/admin/students/${encodeURIComponent(id)}/parents`, {}, { noCache: true }),
+    schedule: (id: string) =>
+      adminRequest<StudentSession[]>(`/admin/students/${encodeURIComponent(id)}/schedule`, {}, { noCache: true }),
+    attendance: (id: string) =>
+      adminRequest<StudentSession[]>(`/admin/students/${encodeURIComponent(id)}/attendance`, {}, { noCache: true }),
     deactivate: (id: string) =>
       adminRequest<{ user_id: string; account_status: string }>(`/admin/students/${encodeURIComponent(id)}/deactivate`, {
         method: 'PATCH',

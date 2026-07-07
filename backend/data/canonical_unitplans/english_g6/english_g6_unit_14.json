@@ -1,0 +1,126 @@
+{
+  "unit_title": "Bird Brains",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Opening",
+      "must_cover": true,
+      "keywords": [
+        "Get Ready"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Word Study",
+      "must_cover": true,
+      "keywords": [
+        "Greek Roots",
+        "phon",
+        "anti",
+        "cipate",
+        "micro",
+        "caco",
+        "bacterial",
+        "dote",
+        "sym",
+        "pathy"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing Study",
+      "must_cover": true,
+      "keywords": [
+        "Simile",
+        "Comparison using like or as"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Before You Read",
+      "must_cover": true,
+      "keywords": [
+        "Analyzing Texts",
+        "Differentiating bird species based on habitat"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar in Use",
+      "must_cover": true,
+      "keywords": [
+        "Passive Voice in Present Perfect, Past Perfect, Future",
+        "Active to Passive Voice Conversion"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening",
+      "must_cover": true,
+      "keywords": [
+        "Imitating sounds",
+        "Artificial vs. Natural sounds"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking",
+      "must_cover": true,
+      "keywords": [
+        "Discussing bird intelligence"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "Vocabulary matching",
+        "Grammar practice",
+        "Listening fill-in-the-blank",
+        "Speaking practice"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Units 13 and 14 Wrap Up",
+      "must_cover": true,
+      "keywords": [
+        "Action Plan for Bird Conservation",
+        "Writing an Action Plan",
+        "Presenting Action Plan to Class"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "Opinions on bird intelligence",
+        "Changing opinions about birds",
+        "Fear and phobias"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "Illustrations of bird habitats",
+        "Pictures of tool-making birds",
+        "Charts showing bird behaviors"
+      ]
+    }
+  ]
+}

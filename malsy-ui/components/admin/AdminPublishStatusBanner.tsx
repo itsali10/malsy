@@ -1,21 +1,26 @@
 'use client';
 
-import type { BookRecord } from '../../lib/admin-api';
+import type { BookPlan, BookRecord } from '../../lib/admin-api';
+import { isPlanGenerating, resolvePlanStatus } from '../../lib/admin-book-workflow';
 
 export function AdminPublishStatusBanner({
   book,
+  plan,
   busy,
   onToggle,
 }: {
   book: BookRecord;
+  plan?: BookPlan | null;
   busy?: boolean;
   onToggle: () => void;
 }) {
   const published = Boolean(book.visible_to_students) && !book.archived;
+  const planGenerating = isPlanGenerating(book, plan);
+  const planStatus = resolvePlanStatus(book, plan);
   const canPublish =
     book.status === 'processed' &&
     !book.archived &&
-    (book.plan_status === 'approved' || book.processing?.plan_approved);
+    (planStatus === 'approved' || book.processing?.plan_approved);
 
   return (
     <div
@@ -42,7 +47,12 @@ export function AdminPublishStatusBanner({
         <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--w)' }}>
           {published ? '🟢 Published to Students' : '⚪ Hidden from Students'}
         </div>
-        {!canPublish && !published && book.status === 'processed' && book.plan_status !== 'approved' && (
+        {planGenerating && (
+          <div style={{ fontSize: 12, color: '#6eb5ff', marginTop: 6 }}>
+            Lesson plans are being generated — publishing is temporarily disabled.
+          </div>
+        )}
+        {!planGenerating && !canPublish && !published && book.status === 'processed' && planStatus !== 'approved' && (
           <div style={{ fontSize: 12, color: 'var(--amber)', marginTop: 6 }}>
             Approve the lesson plan before publishing.
           </div>
@@ -52,7 +62,7 @@ export function AdminPublishStatusBanner({
         <button
           type="button"
           className={published ? 'btn btn-o' : 'btn btn-p'}
-          disabled={busy || (!published && !canPublish)}
+          disabled={busy || planGenerating || (!published && !canPublish)}
           onClick={onToggle}
         >
           {busy ? 'Updating…' : published ? 'Hide from Students' : 'Publish to Students'}

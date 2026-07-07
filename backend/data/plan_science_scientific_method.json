@@ -1,0 +1,31 @@
+{
+  "objectives": [
+    "Understand the steps of the scientific method",
+    "Learn how to form a testable question",
+    "Develop a hypothesis based on observations",
+    "Understand the importance of controlled experiments"
+  ],
+  "units": [
+    {
+      "unit_id": "u1",
+      "title": "Introduction to the Scientific Method",
+      "keywords": [
+        "scientific method",
+        "steps",
+        "question",
+        "hypothesis"
+      ],
+      "minutes": 90
+    },
+    {
+      "unit_id": "u2",
+      "title": "Controlled Experiments",
+      "keywords": [
+        "controlled experiments",
+        "variables",
+        "observations"
+      ],
+      "minutes": 90
+    }
+  ]
+}

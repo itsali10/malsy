@@ -1,0 +1,19 @@
+{
+  "book_id": "science",
+  "lessons": {
+    "science:unit_01": {
+      "lesson_id": "science:unit_01",
+      "unit_id": "unit_01",
+      "title": "Introduction to the Scientific Method",
+      "unit": "Unit 1",
+      "start_page": 0,
+      "end_page": 0,
+      "chunk_ids": [],
+      "chunk_count": 0,
+      "source": "mapping_pending",
+      "updated_at": "2026-07-06T02:38:56.768899+00:00"
+    }
+  },
+  "synced_at": "2026-07-06T02:38:53.496513+00:00",
+  "updated_at": "2026-07-06T02:38:56.768899+00:00"
+}

@@ -1,0 +1,132 @@
+{
+  "unit_title": "Grade 6 Basic Life Science",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction",
+      "must_cover": true,
+      "keywords": [
+        "overview",
+        "science",
+        "semester",
+        "scientific method",
+        "experimentation",
+        "cell structure",
+        "cell division",
+        "plant structure",
+        "photosynthesis",
+        "soil and nutrients",
+        "classification of living things",
+        "ecology",
+        "global climate change",
+        "human nutrition",
+        "human body structures"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Unit 1–The Basics",
+      "must_cover": true,
+      "keywords": [
+        "science",
+        "scientific method",
+        "experimentation"
+      ]
+    },
+    {
+      "id": "reading_2",
+      "type": "reading",
+      "title": "Unit II—Green Plants and Other Organisms",
+      "must_cover": true,
+      "keywords": [
+        "green plants",
+        "seed",
+        "soil and nutrients",
+        "photosynthesis",
+        "flowers",
+        "cell division",
+        "living things",
+        "plant kingdom"
+      ]
+    },
+    {
+      "id": "reading_3",
+      "type": "reading",
+      "title": "Unit III—Animals in Our Environment",
+      "must_cover": true,
+      "keywords": [
+        "animal kingdom",
+        "animal phyla",
+        "vertebrates",
+        "animal life cycles",
+        "food chains",
+        "ecology",
+        "populations",
+        "balance of nature"
+      ]
+    },
+    {
+      "id": "reading_4",
+      "type": "reading",
+      "title": "Unit IV—The Human Body",
+      "must_cover": true,
+      "keywords": [
+        "human life",
+        "nutrition",
+        "digestive system",
+        "respiratory system",
+        "circulatory system",
+        "skeletal system",
+        "muscular system",
+        "nervous system",
+        "senses"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "class activities",
+        "discussion",
+        "questions"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "pictures",
+        "illustrations",
+        "diagrams",
+        "charts",
+        "visual content"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "practice tasks",
+        "writing prompts",
+        "workbook activities"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Final Projects",
+      "must_cover": true,
+      "keywords": [
+        "final projects"
+      ]
+    }
+  ]
+}

@@ -15,7 +15,9 @@ from .prompts import (
     COVERAGE_GUARD_PROMPT,
     QUIZ_PROMPT,
     MCQ_QUIZ_PROMPT,
+    MCQ_QUIZ_BANK_PROMPT,
     ENGLISH_MCQ_QUIZ_PROMPT,
+    ENGLISH_MCQ_QUIZ_BANK_PROMPT,
     SPEAKING_TASK_PROMPT,
     EVAL_PROMPT,
     HINT_PROMPT,
@@ -44,10 +46,9 @@ from .session_config import SESSION_UNIT_MINUTES, SESSION_HALVES_PER_UNIT
 llm = get_teacher_llm()
 embedder = get_embedder(device="cpu")
 
-INSUFFICIENT_TEXTBOOK_MESSAGE = (
-    "I need more textbook content for this lesson before I can teach it properly. "
-    "Please make sure this book has been processed and published, then try again."
-)
+from .lesson_content_mapping import LESSON_EXTRACTION_FAILED_MESSAGE
+
+INSUFFICIENT_TEXTBOOK_MESSAGE = LESSON_EXTRACTION_FAILED_MESSAGE
 
 
 # -------------------------
@@ -80,7 +81,11 @@ class LessonState(TypedDict):
     done: bool
     listening: Optional[Dict[str, Any]]
     listening_more_questions: bool
+    lesson_more_questions: bool
     listening_phase: bool
+
+
+LESSON_MCQ_COUNT = 3
 
 
 # -------------------------
@@ -650,45 +655,56 @@ def ensure_unit_plan(state: LessonState):
         state["unit_plan"] = filter_unit_plan_for_subject(plan, subject_key) or plan
         return state
 
-    # Build plan from book - use unit_id for retrieval if available
-    # IMPORTANT: Always use the specific unit_id, never fallback to chapter_id
-    # This ensures each unit gets its own unique content
+    # Build plan from lesson-scoped textbook pages only (never whole-book retrieval).
     retrieve_id = unit_id if unit_id != state["chapter_id"] else state["chapter_id"]
-    chunks = retrieve_for_item(
-        retrieve_id,
-        "reading vocabulary grammar listening speaking writing wrap up",
-        k=12
+    from .lesson_content_mapping import (
+        build_lesson_plan_context,
+        forbidden_lesson_titles,
+        retrieve_lesson_pages_for_plan,
+        validate_plan_lesson_scope,
     )
-    
-    # Only fallback to chapter_id if we don't have a specific unit_id
-    # This prevents different units from getting the same content
-    if (not chunks or len(chunks) == 0) and retrieve_id == state["chapter_id"]:
-        # Only if we're already using chapter_id, we can't do better
-        pass
-    elif (not chunks or len(chunks) == 0) and retrieve_id != state["chapter_id"]:
-        # If we have a specific unit_id but no chunks, try a broader search
-        # but still within the unit context - don't use generic chapter_id
-        print(f"[WARNING] No chunks found for unit {retrieve_id}, but keeping unit-specific context")
-    
-    if not chunks or len(chunks) == 0:
-        # No book content — ask the LLM to generate the unit plan from the lesson title/keywords.
-        # This produces proper item types (speaking, grammar, vocab, etc.) instead of a
-        # generic "other" fallback, which is critical for subjects not yet ingested into Chroma.
-        print(f"[DEBUG] No chunks for {retrieve_id} — generating unit plan from lesson metadata")
-        unit_title_fb = current_unit.get("title") or "Unit Content"
-        keywords_fb = current_unit.get("keywords", [])
-        context = (
-            f"Lesson title: {unit_title_fb}\n"
-            + (f"Key concepts: {', '.join(keywords_fb)}\n" if keywords_fb else "")
-            + "There is no textbook excerpt available. Plan the items for this lesson based on the title and concepts above. "
-            "Include realistic item types (speaking, grammar, vocab, reading, writing, etc.) that match the lesson topic."
+    from .unit_detection import normalize_manifest_unit_id
+
+    plan_unit = dict(current_unit)
+    short = normalize_manifest_unit_id(
+        plan_unit.get("unit_id") or retrieve_id.split(":")[-1],
+        book_id,
+    )
+    plan_unit.setdefault("unit_id", short)
+    plan_unit.setdefault("real_unit_id", retrieve_id)
+
+    chunks, mapping = retrieve_lesson_pages_for_plan(
+        retrieve_id,
+        book_id=book_id,
+        plan_unit=plan_unit,
+        max_chunks=24,
+    )
+    unit_title_fb = current_unit.get("title") or mapping.get("title") or "Unit Content"
+    start_page = int(mapping.get("start_page") or plan_unit.get("start_page") or 0)
+    end_page = int(mapping.get("end_page") or plan_unit.get("end_page") or start_page)
+    forbidden = forbidden_lesson_titles(book_id, short)
+
+    if not chunks:
+        print(f"[DEBUG] No page-scoped chunks for {retrieve_id} — planning from lesson metadata only")
+        context = build_lesson_plan_context(
+            title=unit_title_fb,
+            start_page=start_page,
+            end_page=end_page,
+            chunks=[],
+            subject_key=subject_key,
         )
     else:
-        context = "\n\n".join(c["text"] for c in chunks)
+        context = build_lesson_plan_context(
+            title=unit_title_fb,
+            start_page=start_page,
+            end_page=end_page,
+            chunks=chunks,
+            subject_key=subject_key,
+        )
 
     msg = llm.invoke([
         {"role": "system", "content": UNIT_PLAN_PROMPT},
-        {"role": "user", "content": f"Unit text:\n{context}"}
+        {"role": "user", "content": context},
     ])
 
     try:
@@ -701,6 +717,11 @@ def ensure_unit_plan(state: LessonState):
         }
     print(f"[DEBUG] ensure_unit_plan: Saving new plan for {plan_key} with {len(plan.get('items', []))} items")
     plan = filter_unit_plan_for_subject(plan, subject_key) or plan
+    plan = validate_plan_lesson_scope(
+        plan,
+        lesson_title=unit_title_fb,
+        forbidden_titles=forbidden,
+    )
     save_unit_plan(state["student_id"], plan_key, plan)
     state["unit_plan"] = plan
     return state
@@ -861,13 +882,19 @@ def teach_item(state: LessonState):
     
     print(f"[DEBUG] teach_item: Using unit_id={unit_id} for teaching (chapter_id={state['chapter_id']})")
     
-    # Page range for this part — first/second half of the current lesson only.
+    # Page range / section context for this teaching turn.
     from .language_lesson_sections import part_page_range
 
     start_page = int(unit_pages.get("start_page") or 0) if unit_pages else 0
     end_page = int(unit_pages.get("end_page") or 0) if unit_pages else 0
 
-    if start_page > 0 and end_page >= start_page:
+    if uses_language_sections(book_id):
+        sec_title = section_title_for_index(int(unit_part))
+        if start_page > 0 and end_page >= start_page:
+            pages_desc = f"{sec_title} section (lesson pages {start_page}–{end_page})"
+        else:
+            pages_desc = f"{sec_title} section of this lesson"
+    elif start_page > 0 and end_page >= start_page:
         part_start, part_end = part_page_range(start_page, end_page, int(unit_part))
         pages_desc = f"pages {part_start} to {part_end} ({'first' if unit_part == 0 else 'second'} half of this lesson)"
     else:
@@ -966,6 +993,27 @@ def teach_item(state: LessonState):
         return state
 
     textbook_chars = sum(len(str(c.get("text") or "")) for c in chunks)
+    extraction_validation = lesson_mapping.get("extraction_validation") or {}
+    section_validation = lesson_mapping.get("section_validation") or {}
+    if not is_history_unit and section_validation and not section_validation.get("ok"):
+        print(
+            f"[lesson-generation] English section validation failed for {unit_id}: "
+            f"{section_validation.get('errors')}"
+        )
+        state["lesson_source"] = "insufficient_textbook"
+        state["teacher_text"] = INSUFFICIENT_TEXTBOOK_MESSAGE
+        state["quiz"] = {}
+        return state
+    if not is_history_unit and extraction_validation and not extraction_validation.get("ok"):
+        print(
+            f"[lesson-generation] extraction validation failed for {unit_id}: "
+            f"{extraction_validation.get('errors')}"
+        )
+        state["lesson_source"] = "insufficient_textbook"
+        state["teacher_text"] = INSUFFICIENT_TEXTBOOK_MESSAGE
+        state["quiz"] = {}
+        return state
+
     if not chunks or (textbook_chars < 80 and not has_mapped_chunks):
         print(
             f"[lesson-generation] insufficient textbook content for {unit_id} "
@@ -1067,18 +1115,54 @@ def teach_item(state: LessonState):
                     generated_text = msg_retry.content
 
         if unit_title and not is_history:
+            from .lesson_content_mapping import (
+                forbidden_lesson_titles,
+                validate_generated_teaching_text,
+            )
+            from .unit_detection import normalize_manifest_unit_id
+
+            next_lesson = (current_unit.get("lesson_info") or {}).get("next_lesson") or {}
+            next_title = str(next_lesson.get("title") or "")
+            source_text = "\n".join(str(c.get("text") or "") for c in chunks)
+            gen_validation = validate_generated_teaching_text(
+                generated_text,
+                lesson_title=unit_title,
+                source_text=source_text,
+                next_lesson_title=next_title,
+            )
+            if not gen_validation.get("ok"):
+                print(
+                    f"[lesson-generation] generated text validation failed for {unit_id}: "
+                    f"{gen_validation.get('errors')}"
+                )
+                user_content_retry = _build_textbook_teaching_prompt(
+                    unit_title=unit_title,
+                    item=item,
+                    context=context_body,
+                    unit_part=int(unit_part or 0),
+                    history_scope=(
+                        "REGENERATE. Your previous answer failed validation:\n- "
+                        + "\n- ".join(gen_validation.get("errors") or [])
+                        + f"\n\nTeach ONLY: {unit_title}. Use ONLY the textbook excerpts."
+                    ),
+                )
+                msg_retry = llm.invoke([
+                    {"role": "system", "content": TEACH_ITEM_PROMPT},
+                    {"role": "user", "content": user_content_retry},
+                ])
+                if msg_retry and msg_retry.content:
+                    generated_text = msg_retry.content
+
             generated_lower = generated_text.lower()
             unit_title_lower = unit_title.lower()
-            wrong_titles = [
-                "why do we build bridges and tunnels",
-                "why we build bridges and tunnels",
-                "bridges and tunnels",
-                "the earthworm and the spider",
-                "earthworm and spider",
-            ]
-            for wrong_title in wrong_titles:
-                if wrong_title in generated_lower and wrong_title not in unit_title_lower:
-                    if f"**{wrong_title}" in generated_lower or f"# {wrong_title}" in generated_lower:
+            short_unit = normalize_manifest_unit_id(
+                str(current_unit.get("unit_id") or unit_id.split(":")[-1]),
+                book_id,
+            )
+            for forbidden_title in forbidden_lesson_titles(book_id, short_unit):
+                ft_lower = forbidden_title.lower()
+                if ft_lower in generated_lower and ft_lower not in unit_title_lower:
+                    if f"**{ft_lower}" in generated_lower or f"# {ft_lower}" in generated_lower:
                         user_content_retry = _build_textbook_teaching_prompt(
                             unit_title=unit_title,
                             item=item,
@@ -1094,6 +1178,7 @@ def teach_item(state: LessonState):
                             {"role": "user", "content": user_content_retry},
                         ])
                         generated_text = msg_retry.content if msg_retry and msg_retry.content else generated_text
+                        break
 
         if is_history:
             state["teacher_text"] = _format_teacher_for_speech(_polish_history_teacher_text(generated_text))
@@ -1192,6 +1277,84 @@ def _quiz_has_mcq_options(quiz: Dict[str, Any]) -> bool:
     return isinstance(opts, list) and len([o for o in opts if str(o).strip()]) >= 2
 
 
+def _word_overlap_score(a: str, b: str) -> int:
+    wa = set(_norm_mcq_text(a).split())
+    wb = set(_norm_mcq_text(b).split())
+    if not wa or not wb:
+        return 0
+    return len(wa & wb)
+
+
+def _resolve_correct_option(
+    options: List[str],
+    correct_answer: str,
+    *,
+    source_quote: str = "",
+) -> Optional[str]:
+    """Map LLM correct_answer text to one of the MCQ options."""
+    correct = str(correct_answer or "").strip()
+    if not options:
+        return None
+
+    if correct:
+        for opt in options:
+            if _norm_mcq_text(opt) == _norm_mcq_text(correct):
+                return opt
+
+        cn = _norm_mcq_text(correct)
+        for opt in options:
+            on = _norm_mcq_text(opt)
+            if cn and (cn in on or on in cn):
+                return opt
+
+    quote = str(source_quote or "").strip()
+    if quote:
+        best: Optional[str] = None
+        best_score = 0
+        for opt in options:
+            score = _word_overlap_score(quote, opt)
+            if score > best_score:
+                best_score = score
+                best = opt
+        if best is not None and best_score >= 2:
+            return best
+
+    if correct:
+        best = None
+        best_score = 0
+        for opt in options:
+            score = _word_overlap_score(correct, opt)
+            if score > best_score:
+                best_score = score
+                best = opt
+        if best is not None and best_score >= 2:
+            return best
+
+    return None
+
+
+def _best_option_fallback(
+    options: List[str],
+    correct_answer: str,
+    source_quote: str,
+) -> str:
+    """Last-resort pick when exact resolution fails — never blindly use index 0."""
+    scored = [
+        (
+            max(
+                _word_overlap_score(correct_answer, opt),
+                _word_overlap_score(source_quote, opt),
+            ),
+            opt,
+        )
+        for opt in options
+    ]
+    scored.sort(key=lambda row: row[0], reverse=True)
+    if scored and scored[0][0] > 0:
+        return scored[0][1]
+    return options[0]
+
+
 def ensure_mcq_integrity(quiz_data: Dict[str, Any], *, shuffle: bool = True) -> Dict[str, Any]:
     import random as _random
 
@@ -1200,22 +1363,32 @@ def ensure_mcq_integrity(quiz_data: Dict[str, Any], *, shuffle: bool = True) -> 
     if len(options) < 2:
         return quiz
 
+    stored_index = quiz.get("correct_index")
+    if not shuffle and stored_index is not None:
+        idx = int(stored_index)
+        if 0 <= idx < len(options):
+            quiz["options"] = options
+            quiz["correct_answer"] = options[idx]
+            quiz["correct_index"] = idx
+            return quiz
+
     correct = str(quiz.get("correct_answer", "")).strip()
-    correct_opt = None
-    if correct:
-        for opt in options:
-            if _norm_mcq_text(opt) == _norm_mcq_text(correct):
-                correct_opt = opt
-                break
+    source_quote = str(quiz.get("source_quote") or "").strip()
+    correct_opt = _resolve_correct_option(options, correct, source_quote=source_quote)
     if not correct_opt:
-        correct_opt = options[0]
+        print(
+            f"[WARN] MCQ correct_answer not in options — using overlap fallback. "
+            f"correct_answer={correct!r} options={options!r} source_quote={source_quote!r}"
+        )
+        correct_opt = _best_option_fallback(options, correct, source_quote)
 
     if shuffle:
         _random.shuffle(options)
     quiz["options"] = options
-    for opt in options:
+    for i, opt in enumerate(options):
         if _norm_mcq_text(opt) == _norm_mcq_text(correct_opt):
             quiz["correct_answer"] = opt
+            quiz["correct_index"] = i
             break
     return quiz
 
@@ -1227,7 +1400,19 @@ def grade_mcq_answer(
 ) -> Dict[str, Any]:
     q = ensure_mcq_integrity(quiz, shuffle=False)
     options = [str(o).strip() for o in (q.get("options") or []) if str(o).strip()]
-    correct = str(q.get("correct_answer", "")).strip()
+    correct_idx = q.get("correct_index")
+
+    correct_opt: Optional[str] = None
+    if correct_idx is not None and 0 <= int(correct_idx) < len(options):
+        correct_opt = options[int(correct_idx)]
+    else:
+        correct = str(q.get("correct_answer", "")).strip()
+        correct_opt = _resolve_correct_option(options, correct, source_quote=str(q.get("source_quote") or ""))
+        if not correct_opt:
+            correct_opt = next(
+                (opt for opt in options if _norm_mcq_text(opt) == _norm_mcq_text(correct)),
+                correct or (options[0] if options else ""),
+            )
 
     selected: Optional[str] = None
     if option_index is not None and 0 <= int(option_index) < len(options):
@@ -1238,11 +1423,20 @@ def grade_mcq_answer(
                 selected = opt
                 break
 
-    correct_opt = next(
-        (opt for opt in options if _norm_mcq_text(opt) == _norm_mcq_text(correct)),
-        correct,
-    )
-    is_correct = bool(selected and _norm_mcq_text(selected) == _norm_mcq_text(correct_opt))
+    if (
+        option_index is not None
+        and correct_idx is not None
+        and 0 <= int(option_index) < len(options)
+        and 0 <= int(correct_idx) < len(options)
+    ):
+        is_correct = int(option_index) == int(correct_idx)
+    else:
+        is_correct = bool(
+            selected
+            and correct_opt
+            and _norm_mcq_text(selected) == _norm_mcq_text(correct_opt)
+        )
+
     if is_correct:
         feedback = f"That's correct! \"{correct_opt}\" is the right answer."
     else:
@@ -1252,7 +1446,7 @@ def grade_mcq_answer(
     return {
         "correct": is_correct,
         "feedback": feedback,
-        "missing": [] if is_correct else [correct_opt],
+        "missing": [] if is_correct else [correct_opt or ""],
         "quiz": q,
     }
 
@@ -1297,6 +1491,86 @@ def _get_book_context_for_quiz(state: LessonState) -> str:
     if chunks:
         return _format_textbook_context(chunks[:8])
     return ""
+
+
+def lesson_question_to_quiz(question: Dict[str, Any], index: int, total: int) -> Dict[str, Any]:
+    q = ensure_mcq_integrity(dict(question), shuffle=False) if _quiz_has_mcq_options(question) else dict(question)
+    q["lesson_question_index"] = index
+    q["lesson_question_total"] = total
+    return q
+
+
+def _parse_mcq_bank(raw: Any, count: int = LESSON_MCQ_COUNT) -> List[Dict[str, Any]]:
+    if isinstance(raw, dict):
+        items = raw.get("questions") or raw.get("items") or []
+    elif isinstance(raw, list):
+        items = raw
+    else:
+        items = []
+    bank: List[Dict[str, Any]] = []
+    for item in items:
+        if not isinstance(item, dict) or not _quiz_has_mcq_options(item):
+            continue
+        bank.append(ensure_mcq_integrity(item, shuffle=True))
+        if len(bank) >= count:
+            break
+    return bank
+
+
+def _invoke_mcq_bank(system_prompt: str, user_content: str) -> List[Dict[str, Any]]:
+    bank: List[Dict[str, Any]] = []
+    for _ in range(2):
+        msg = llm.invoke([
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_content},
+        ])
+        parsed = json_safe(msg.content) if msg and msg.content else {}
+        bank = _parse_mcq_bank(parsed, LESSON_MCQ_COUNT)
+        if len(bank) >= LESSON_MCQ_COUNT:
+            break
+    return bank[:LESSON_MCQ_COUNT]
+
+
+def _serve_lesson_mcq_from_progress(state: LessonState, item_id: str) -> bool:
+    p = state["progress"]
+    bank = p.get("lesson_questions")
+    stored_item = p.get("lesson_questions_item_id")
+    if not bank or not isinstance(bank, list) or not bank:
+        return False
+    if stored_item and item_id and stored_item != item_id:
+        return False
+    idx = max(0, min(int(p.get("lesson_question_index", 0) or 0), len(bank) - 1))
+    state["quiz"] = lesson_question_to_quiz(bank[idx], idx, len(bank))
+    return True
+
+
+def _store_lesson_mcq_bank(state: LessonState, item_id: str, bank: List[Dict[str, Any]]) -> None:
+    p = state["progress"]
+    p["lesson_questions"] = bank
+    p["lesson_question_index"] = 0
+    p["lesson_questions_item_id"] = item_id
+    save_unit_progress(state["student_id"], state["chapter_id"], p)
+    state["quiz"] = lesson_question_to_quiz(bank[0], 0, len(bank))
+
+
+def _generate_and_store_lesson_mcq_bank(
+    state: LessonState,
+    item_id: str,
+    system_prompt: str,
+    user_content: str,
+    *,
+    fallback_question: str,
+) -> None:
+    if _serve_lesson_mcq_from_progress(state, item_id):
+        return
+    bank = _invoke_mcq_bank(system_prompt, user_content)
+    if bank:
+        _store_lesson_mcq_bank(state, item_id, bank)
+        return
+    state["quiz"] = {
+        "question": fallback_question,
+        "expected_points": ["Understanding of the main concepts"],
+    }
 
 
 def make_quiz(state: LessonState):
@@ -1379,14 +1653,14 @@ def make_quiz(state: LessonState):
                 else:
                     state["quiz"] = {
                         "type": "speaking",
-                        "sentence": "Please read the following sentence out loud.",
-                        "instructions": "Read this sentence out loud clearly.",
+                        "sentence": "pronunciation",
+                        "instructions": "Say this word out loud clearly.",
                     }
             else:
                 state["quiz"] = {
                     "type": "speaking",
-                    "sentence": "Please read the following sentence out loud.",
-                    "instructions": "Read this sentence out loud clearly.",
+                    "sentence": "pronunciation",
+                    "instructions": "Say this word out loud clearly.",
                 }
             return state
         elif use_mcq:
@@ -1419,24 +1693,14 @@ TEXTBOOK CONTENT (ground truth — use ONLY this):
 TEACHER LESSON (this part only — quiz must test ownedTopics for this part):
 {teacher_text[:4000]}
 """
-            msg = llm.invoke([
-                {"role": "system", "content": MCQ_QUIZ_PROMPT},
-                {"role": "user", "content": user_content},
-            ])
-            if msg and msg.content:
-                quiz_data = json_safe(msg.content)
-                if _quiz_has_mcq_options(quiz_data):
-                    state["quiz"] = ensure_mcq_integrity(quiz_data, shuffle=True)
-                else:
-                    state["quiz"] = {
-                        "question": "Please summarize what you learned from this history lesson.",
-                        "expected_points": ["Understanding of the main concepts"],
-                    }
-            else:
-                state["quiz"] = {
-                    "question": "Please summarize what you learned from this history lesson.",
-                    "expected_points": ["Understanding of the main concepts"],
-                }
+            item_id = str(current_item.get("id") or f"{uid}:part{quiz_part}")
+            _generate_and_store_lesson_mcq_bank(
+                state,
+                item_id,
+                MCQ_QUIZ_BANK_PROMPT,
+                user_content,
+                fallback_question="Please summarize what you learned from this history lesson.",
+            )
         else:
             book_context = _get_book_context_for_quiz(state)
             book_id = chapter_id.split(":")[0] if ":" in chapter_id else chapter_id
@@ -1463,24 +1727,14 @@ TEACHER LESSON (this part only — quiz must test ownedTopics for this part):
 TEACHER LESSON (this section only — quiz must test THIS content only):
 {teacher_text[:4000]}
 """
-            msg = llm.invoke([
-                {"role": "system", "content": ENGLISH_MCQ_QUIZ_PROMPT},
-                {"role": "user", "content": english_user_content},
-            ])
-            if msg and msg.content:
-                quiz_data = json_safe(msg.content)
-                if _quiz_has_mcq_options(quiz_data):
-                    state["quiz"] = ensure_mcq_integrity(quiz_data, shuffle=True)
-                else:
-                    state["quiz"] = {
-                        "question": "Please summarize what you learned from this lesson.",
-                        "expected_points": ["Understanding of the main concepts"],
-                    }
-            else:
-                state["quiz"] = {
-                    "question": "Please summarize what you learned from this lesson.",
-                    "expected_points": ["Understanding of the main concepts"],
-                }
+            item_id = str(current_item.get("id") or f"{book_id}:part{unit_part}")
+            _generate_and_store_lesson_mcq_bank(
+                state,
+                item_id,
+                ENGLISH_MCQ_QUIZ_BANK_PROMPT,
+                english_user_content,
+                fallback_question="Please summarize what you learned from this lesson.",
+            )
     except Exception as e:
         import traceback
         print(f"[ERROR] Failed to generate quiz: {e}")
@@ -1607,6 +1861,54 @@ Student answer:
             p["listening_question_index"] = 0
             p["listening_completed"] = True
 
+        elif (
+            quiz_type not in ("listening", "speaking")
+            and _quiz_has_mcq_options(state.get("quiz", {}))
+        ):
+            bank = p.get("lesson_questions") or []
+            idx = int(p.get("lesson_question_index", 0) or 0)
+            if bank and idx + 1 < len(bank):
+                p["lesson_question_index"] = idx + 1
+                save_unit_progress(state["student_id"], state["chapter_id"], p)
+                state["quiz"] = lesson_question_to_quiz(bank[idx + 1], idx + 1, len(bank))
+                state["lesson_more_questions"] = True
+                state["advance_text"] = state["evaluation"].get("feedback", "Correct! Next question.")
+                state["hint_text"] = ""
+                state["remediation_text"] = ""
+                state["hint_count"] = 0
+                attempt["hint_count_after"] = 0
+                hist = p.get("attempt_history", [])
+                if not isinstance(hist, list):
+                    hist = []
+                hist.append(attempt)
+                p["attempt_history"] = hist[-200:]
+                save_unit_progress(state["student_id"], state["chapter_id"], p)
+                record_quiz_attempt(
+                    student_id=state["student_id"],
+                    unit_id=unit_id,
+                    item_id=attempt.get("item_id"),
+                    quiz_question=attempt.get("quiz_question"),
+                    correct=True,
+                    hint_count_before=int(attempt.get("hint_count_before", 0) or 0),
+                    hint_count_after=0,
+                    remediation_used=False,
+                    tutor_quality_signals=state.get("tutor_quality") if isinstance(state.get("tutor_quality"), dict) else None,
+                )
+                state["evaluation_summary"] = eval_summary(state["student_id"])
+                state["recommendations"] = build_recommendations(
+                    latest_attempt={
+                        "correct": True,
+                        "hint_count_after": 0,
+                        "remediation_used": False,
+                    },
+                    evaluation_summary=state["evaluation_summary"],
+                    unit_part=unit_part,
+                )
+                return state
+            p.pop("lesson_questions", None)
+            p.pop("lesson_questions_item_id", None)
+            p["lesson_question_index"] = 0
+
         # mark item done
         if "current_item" in state and state["current_item"]:
             p["done_items"].append(state["current_item"].get("id", ""))
@@ -1630,22 +1932,40 @@ Student answer:
         state["remediation_text"] = ""
         state["hint_count"] = 0
     else:
-        # Get current hint count from progress (default to 0)
-        hint_count = p.get("hint_count", 0)
-        
-        if hint_count < 2:
-            hint_number = hint_count + 1
-            is_history_mcq = (
-                _is_history_chapter(state.get("chapter_id", ""))
-                and _quiz_has_mcq_options(state.get("quiz", {}))
+        quiz_type = (state.get("quiz") or {}).get("type")
+        if quiz_type == "speaking":
+            # Pronunciation is threshold-scored (see above), not multiple-choice —
+            # there's no "question" to hint about, and student_answer here is just
+            # the stringified score. Surface the percentage feedback evaluate_answer
+            # already built instead of asking the LLM to hint on an empty question.
+            state["hint_text"] = state["evaluation"].get(
+                "feedback", "Keep practicing your pronunciation and try again."
             )
-            if is_history_mcq:
-                hint_user = f"""Question: {state["quiz"].get("question", "")}
+            state["remediation_text"] = ""
+            attempt["hint_count_after"] = attempt.get("hint_count_before", 0)
+            hist = p.get("attempt_history", [])
+            if not isinstance(hist, list):
+                hist = []
+            hist.append(attempt)
+            p["attempt_history"] = hist[-200:]
+            save_unit_progress(state["student_id"], state["chapter_id"], p)
+        else:
+            # Get current hint count from progress (default to 0)
+            hint_count = p.get("hint_count", 0)
+
+            if hint_count < 2:
+                hint_number = hint_count + 1
+                is_history_mcq = (
+                    _is_history_chapter(state.get("chapter_id", ""))
+                    and _quiz_has_mcq_options(state.get("quiz", {}))
+                )
+                if is_history_mcq:
+                    hint_user = f"""Question: {state["quiz"].get("question", "")}
 Options: {", ".join(state["quiz"].get("options", []))}
 Student's wrong answer: {state.get("student_answer", "")}
 Hint number: {hint_number} of 2"""
-            else:
-                hint_user = f"""
+                else:
+                    hint_user = f"""
 Teacher explanation:
 {state["teacher_text"]}
 
@@ -1657,28 +1977,28 @@ Student's incorrect answer:
 
 This is hint number {hint_number} of 2.
 """
-            hint = llm.invoke([
-                {"role": "system", "content": HINT_PROMPT.format(hint_number=hint_number)},
-                {"role": "user", "content": hint_user},
-            ])
-            state["hint_text"] = hint.content
-            state["remediation_text"] = ""  # No remediation yet
-            state["hint_count"] = hint_number
-            
-            # Update progress with new hint count
-            p["hint_count"] = hint_number
-            attempt["hint_count_after"] = hint_number
-            hist = p.get("attempt_history", [])
-            if not isinstance(hist, list):
-                hist = []
-            hist.append(attempt)
-            p["attempt_history"] = hist[-200:]
-            save_unit_progress(state["student_id"], state["chapter_id"], p)
-        else:
-            # 3rd incorrect answer - provide full remediation
-            rem = llm.invoke([
-                {"role": "system", "content": REMEDIAL_PROMPT},
-                {"role": "user", "content": f"""
+                hint = llm.invoke([
+                    {"role": "system", "content": HINT_PROMPT.format(hint_number=hint_number)},
+                    {"role": "user", "content": hint_user},
+                ])
+                state["hint_text"] = hint.content
+                state["remediation_text"] = ""  # No remediation yet
+                state["hint_count"] = hint_number
+
+                # Update progress with new hint count
+                p["hint_count"] = hint_number
+                attempt["hint_count_after"] = hint_number
+                hist = p.get("attempt_history", [])
+                if not isinstance(hist, list):
+                    hist = []
+                hist.append(attempt)
+                p["attempt_history"] = hist[-200:]
+                save_unit_progress(state["student_id"], state["chapter_id"], p)
+            else:
+                # 3rd incorrect answer - provide full remediation
+                rem = llm.invoke([
+                    {"role": "system", "content": REMEDIAL_PROMPT},
+                    {"role": "user", "content": f"""
 Teacher explanation:
 {state["teacher_text"]}
 
@@ -1690,21 +2010,21 @@ Student's incorrect answer (3rd attempt):
 
 The student has already received 2 hints. Now provide a comprehensive re-explanation.
 """}
-            ])
-            state["hint_text"] = ""  # No more hints
-            state["remediation_text"] = rem.content
-            state["hint_count"] = 2  # Keep at 2 (max)
-            
-            # Reset hint count for next question
-            p["hint_count"] = 0
-            attempt["hint_count_after"] = 0
-            attempt["remediation_used"] = True
-            hist = p.get("attempt_history", [])
-            if not isinstance(hist, list):
-                hist = []
-            hist.append(attempt)
-            p["attempt_history"] = hist[-200:]
-            save_unit_progress(state["student_id"], state["chapter_id"], p)
+                ])
+                state["hint_text"] = ""  # No more hints
+                state["remediation_text"] = rem.content
+                state["hint_count"] = 2  # Keep at 2 (max)
+
+                # Reset hint count for next question
+                p["hint_count"] = 0
+                attempt["hint_count_after"] = 0
+                attempt["remediation_used"] = True
+                hist = p.get("attempt_history", [])
+                if not isinstance(hist, list):
+                    hist = []
+                hist.append(attempt)
+                p["attempt_history"] = hist[-200:]
+                save_unit_progress(state["student_id"], state["chapter_id"], p)
 
         # Keep the same quiz for retry (don't generate new one)
         # The quiz stays the same until they get it correct

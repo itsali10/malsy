@@ -1,0 +1,75 @@
+{
+  "unit_title": "Biology",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson explanation",
+      "must_cover": true,
+      "keywords": [
+        "Science",
+        "Scientific Method",
+        "Observation",
+        "Conclusions"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning objectives",
+      "must_cover": true,
+      "keywords": [
+        "Controlled experiments",
+        "Hypothesis formation"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "other",
+      "title": "Key scientific concepts",
+      "must_cover": true,
+      "keywords": [
+        "Variable"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "vocab",
+      "title": "Scientific vocabulary",
+      "must_cover": true,
+      "keywords": [
+        "Procedure"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "visual",
+      "title": "Diagrams/images",
+      "must_cover": true,
+      "keywords": [
+        "Caffeine experiment"
+      ]
+    },
+    {
+      "id": "6",
+      "type": "exercises",
+      "title": "Experiments or activities",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "7",
+      "type": "wrap_up",
+      "title": "Summary",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "8",
+      "type": "exercises",
+      "title": "Quiz or review questions",
+      "must_cover": true,
+      "keywords": []
+    }
+  ]
+}

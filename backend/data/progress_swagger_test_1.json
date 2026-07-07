@@ -1,0 +1,26 @@
+{
+  "student_id": "swagger_test_1",
+  "chapter_id": "history_g6",
+  "unit_index": 0,
+  "unit_part": 0,
+  "max_unlocked_part": 0,
+  "lesson_chapter_id": "history_g6:unit_01",
+  "lesson_title": null,
+  "section_statuses": [
+    {
+      "index": 0,
+      "key": "part_0",
+      "title": "Part 1",
+      "completed": false,
+      "active": true
+    },
+    {
+      "index": 1,
+      "key": "part_1",
+      "title": "Part 2",
+      "completed": false,
+      "active": false
+    }
+  ],
+  "updated_at": "2026-07-07T20:35:36.082630Z"
+}

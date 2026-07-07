@@ -1,0 +1,95 @@
+{
+  "unit_title": "Why Stories Matter",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Unit Introduction",
+      "must_cover": true,
+      "keywords": [
+        "overview",
+        "importance of stories"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Vocabulary: Storytelling",
+      "must_cover": true,
+      "keywords": [
+        "storytelling",
+        "imagination",
+        "novelist",
+        "recount",
+        "intricate",
+        "purely"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Reading: Persuasion",
+      "must_cover": true,
+      "keywords": [
+        "opinion article",
+        "persuasion"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar in Use",
+      "must_cover": true,
+      "keywords": [
+        "future forms",
+        "going to",
+        "will",
+        "present continuous"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening",
+      "must_cover": true,
+      "keywords": [
+        "interview",
+        "fill in the blanks"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking",
+      "must_cover": true,
+      "keywords": [
+        "talking about opinions",
+        "encouragement"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing",
+      "must_cover": true,
+      "keywords": [
+        "writing a story",
+        "setting",
+        "conflict",
+        "resolution",
+        "story completion",
+        "presentation"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "heteronyms",
+        "using numerals"
+      ]
+    }
+  ]
+}

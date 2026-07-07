@@ -1,0 +1,74 @@
+{
+  "unit_title": "Other Types of Living Organisms",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "overview",
+        "different types of organisms"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "exercises",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "identify different types of living organisms",
+        "understand their characteristics"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "vocab",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "unicellular",
+        "multicellular",
+        "autotrophs",
+        "heterotrophs"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": [
+        "cell structure comparison",
+        "organisms examples"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "exercises",
+      "title": "Experiments or Activities",
+      "must_cover": true,
+      "keywords": [
+        "classification activity"
+      ]
+    },
+    {
+      "id": "6",
+      "type": "wrap_up",
+      "title": "Summary",
+      "must_cover": true,
+      "keywords": [
+        "importance of diversity"
+      ]
+    },
+    {
+      "id": "7",
+      "type": "exercises",
+      "title": "Quiz or Review Questions",
+      "must_cover": true,
+      "keywords": [
+        "classification of organisms"
+      ]
+    }
+  ]
+}

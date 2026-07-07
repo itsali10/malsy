@@ -1,0 +1,66 @@
+{
+  "unit_title": "The Muscular System",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "muscular system",
+        "muscles",
+        "movement"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "muscle types",
+        "muscle functions",
+        "muscle structure"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "vocab",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "skeletal muscle",
+        "smooth muscle",
+        "cardiac muscle"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "5",
+      "type": "exercises",
+      "title": "Experiments or Activities",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "6",
+      "type": "wrap_up",
+      "title": "Summary",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "7",
+      "type": "exercises",
+      "title": "Quiz or Review Questions",
+      "must_cover": true,
+      "keywords": []
+    }
+  ]
+}

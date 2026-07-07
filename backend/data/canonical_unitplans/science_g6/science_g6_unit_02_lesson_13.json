@@ -1,0 +1,79 @@
+{
+  "unit_title": "Groups of Living Things",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "classification",
+        "organisms",
+        "similarities",
+        "differences"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "understand different groups of living things"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "other",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "taxonomy"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "vocab",
+      "title": "Scientific Vocabulary",
+      "must_cover": true,
+      "keywords": [
+        "kingdom",
+        "phylum",
+        "order",
+        "family",
+        "genus",
+        "species"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "6",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "7",
+      "type": "wrap_up",
+      "title": "Summary/Wrap-up",
+      "must_cover": true,
+      "keywords": [
+        "review of groups of living things"
+      ]
+    },
+    {
+      "id": "8",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": []
+    }
+  ]
+}

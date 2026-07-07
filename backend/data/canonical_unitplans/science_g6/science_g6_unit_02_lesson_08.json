@@ -1,0 +1,73 @@
+{
+  "unit_title": "Stems and Transportation",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "structure of stems",
+        "transportation in plants"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "identify different types of stems",
+        "understand how plants transport water and nutrients"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "other",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "xylem and phloem",
+        "transpiration",
+        "capillary action"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "vocab",
+      "title": "Scientific Vocabulary",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "5",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "6",
+      "type": "exercises",
+      "title": "Experiments or Activities",
+      "must_cover": true,
+      "keywords": [
+        "observe stem cross-sections under a microscope"
+      ]
+    },
+    {
+      "id": "7",
+      "type": "wrap_up",
+      "title": "Summary / Wrap-up",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "8",
+      "type": "exercises",
+      "title": "Quiz or Review Questions",
+      "must_cover": true,
+      "keywords": []
+    }
+  ]
+}

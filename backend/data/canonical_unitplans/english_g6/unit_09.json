@@ -1,0 +1,126 @@
+{
+  "unit_title": "How do we use language?",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Get Ready",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "words"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Words",
+      "must_cover": true,
+      "keywords": [
+        "gestures",
+        "refusal",
+        "disapproval",
+        "grouping",
+        "lacked",
+        "enabled",
+        "invaluable",
+        "consists",
+        "distress",
+        "concealed",
+        "transmit"
+      ]
+    },
+    {
+      "id": "reading_2",
+      "type": "reading",
+      "title": "Languages Around the World",
+      "must_cover": true,
+      "keywords": [
+        "languages",
+        "communication",
+        "language family",
+        "Indo-European",
+        "sign language"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar in Use",
+      "must_cover": true,
+      "keywords": [
+        "nondefining relative clauses",
+        "extra information",
+        "writing",
+        "speech"
+      ]
+    },
+    {
+      "id": "vocabulary",
+      "type": "vocab",
+      "title": "Word Study",
+      "must_cover": true,
+      "keywords": [
+        "Latin roots",
+        "biology",
+        "confident",
+        "cept",
+        "risk",
+        "include",
+        "occur",
+        "nomer",
+        "physics"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening",
+      "must_cover": true,
+      "keywords": [
+        "voice modulation",
+        "expressing emotions",
+        "speakers",
+        "excitement",
+        "anger",
+        "sadness"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking",
+      "must_cover": true,
+      "keywords": [
+        "partner",
+        "agreement",
+        "plans"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "main idea and details",
+        "word study",
+        "grammar in use",
+        "listening comprehension",
+        "speaking practice",
+        "connectors"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Wrap Up",
+      "must_cover": true,
+      "keywords": [
+        "big question",
+        "language usage",
+        "expressing feelings"
+      ]
+    }
+  ]
+}

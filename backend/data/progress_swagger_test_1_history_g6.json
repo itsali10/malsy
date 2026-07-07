@@ -1,0 +1,9 @@
+{
+  "student_id": "swagger_test_1",
+  "book_id": "history_g6",
+  "max_unlocked_lesson_index": 1,
+  "completed_lesson_numbers": [
+    1
+  ],
+  "updated_at": "2026-07-07T20:33:16.436041Z"
+}

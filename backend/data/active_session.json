@@ -1,51 +1,73 @@
 {
-  "student_id": "f8f6c31e-fac0-4821-80fa-4143c0be800e",
+  "student_id": "5607932b-c1c8-4d65-930d-f53ec0261278",
   "chapter_id": "history_g6:unit_02",
   "book_id": "history_g6",
   "graph_chapter_id": "history_g6:unit_02",
   "session_units": [
     {
       "unit_id": "unit_02",
+      "real_unit_id": "history_g6:unit_02",
       "title": "Religion and Gods of Ancient Egypt",
       "keywords": [],
-      "minutes": 90,
-      "real_unit_id": "history_g6:unit_02"
+      "start_page": 5,
+      "end_page": 5,
+      "lesson_mapping": {
+        "lesson_id": "history_g6:unit_02",
+        "unit_id": "unit_02",
+        "title": "Religion and Gods of Ancient Egypt",
+        "unit": "Unit 2",
+        "start_page": 5,
+        "end_page": 5,
+        "chunk_ids": [
+          "history_g6:unit_02:part_1:p4:c0",
+          "history_g6:unit_02:part_1:p4:c1"
+        ],
+        "chunk_count": 2,
+        "source": "chromadb_sync",
+        "updated_at": "2026-07-06T17:09:33.310966+00:00"
+      }
     }
   ],
   "current_pos": 0,
   "unit_part": 0,
-  "last_quiz": {
-    "question": "Which Egyptian god was known as the King of the Gods and was even more powerful when combined with Ra?",
-    "options": [
-      "Amun with the head of a ram",
-      "Hathor with the head of a cow",
-      "Thoth with the head of a bird",
-      "Sekmet with the head of a lioness"
-    ],
-    "correct_answer": "Amun with the head of a ram",
-    "expected_points": [
-      "Amun was known as the King of the Gods and was even more powerful when combined with Ra."
-    ],
-    "source_quote": "Amun King of the Gods. When Amun was combined with Ra he was even more powerful."
-  },
-  "last_teacher_text": "Alright, class, let's dive into the fascinating world of Ancient Egyptian gods and their religion! Imagine a world where there were over 2,000 gods and goddesses worshipped by the Ancient Egyptians. These gods were often depicted with human bodies but with the heads of animals or birds. Can you picture that? It's like having a human body with a bird's head!\n\nThe most important god in Ancient Egypt was Ra, the sun god. Ra was often shown with a falcon head, wearing a sun disc on his head encircled by a sacred cobra. He sailed across the sky in a special boat called the Barque of Millions of Years. Every day, Ra was believed to die at sunset, traveling through the underworld, while the Moon lit up the world above. Isn't that a fascinating story?\n\nLet's meet some of these intriguing Egyptian gods and goddesses. Amun, known as the King of the Gods, was even more powerful when combined with Ra. He was symbolized with the head of a ram. Anubis, the god of mummification, had the head of a jackal. Priests often wore masks resembling Anubis during ceremonies. Bastet, associated with protection and household entertainment, had the head of a cat. Can you imagine having a cat-headed goddess looking after your home?\n\nGeb, the earth god, was believed to cause earthquakes when he laughed. He was depicted with the head of a goose. Hathor, the goddess of love, joy, music, and dance, had the head of a cow. Sekhmet, the goddess of war and battle, was represented with the head of a lioness. Horus, the god of the sky, had the head of a falcon. Heket, the goddess of childbirth, was shown with the head of a frog. Tefnut, the goddess of rain, had the head of a lioness. Thoth, the god of wisdom, writing, and knowledge, was depicted with the head of a bird. Lastly, Sobek, the god of the Nile, was symbolized with the head of a crocodile. \n\nEach of these gods represented different aspects of life and nature, and they were linked to various animals, symbolizing their powers and characteristics. It's like having a team of powerful beings watching over different parts of the world, isn't it?\n\nNow, think about this: if you had to choose an animal to represent you as a god or goddess, which animal would you pick and why? It's fun to imagine ourselves as part of this ancient pantheon of gods and goddesses, each with unique traits and responsibilities.\n\nTo wrap up, Ancient Egyptian gods were not just mystical beings but also symbols of the forces of nature and aspects of human life. They were worshipped for their powers and guidance in different areas of life. Next time, we'll explore more about the intriguing world of Ancient Egyptian beliefs. So, get ready to uncover more mysteries of this ancient civilization in our next lesson!",
   "part_cache": {
     "0": {
-      "teacher_text": "Alright, class, let's dive into the fascinating world of Ancient Egyptian gods and their religion! Imagine a world where there were over 2,000 gods and goddesses worshipped by the Ancient Egyptians. These gods were often depicted with human bodies but with the heads of animals or birds. Can you picture that? It's like having a human body with a bird's head!\n\nThe most important god in Ancient Egypt was Ra, the sun god. Ra was often shown with a falcon head, wearing a sun disc on his head encircled by a sacred cobra. He sailed across the sky in a special boat called the Barque of Millions of Years. Every day, Ra was believed to die at sunset, traveling through the underworld, while the Moon lit up the world above. Isn't that a fascinating story?\n\nLet's meet some of these intriguing Egyptian gods and goddesses. Amun, known as the King of the Gods, was even more powerful when combined with Ra. He was symbolized with the head of a ram. Anubis, the god of mummification, had the head of a jackal. Priests often wore masks resembling Anubis during ceremonies. Bastet, associated with protection and household entertainment, had the head of a cat. Can you imagine having a cat-headed goddess looking after your home?\n\nGeb, the earth god, was believed to cause earthquakes when he laughed. He was depicted with the head of a goose. Hathor, the goddess of love, joy, music, and dance, had the head of a cow. Sekhmet, the goddess of war and battle, was represented with the head of a lioness. Horus, the god of the sky, had the head of a falcon. Heket, the goddess of childbirth, was shown with the head of a frog. Tefnut, the goddess of rain, had the head of a lioness. Thoth, the god of wisdom, writing, and knowledge, was depicted with the head of a bird. Lastly, Sobek, the god of the Nile, was symbolized with the head of a crocodile. \n\nEach of these gods represented different aspects of life and nature, and they were linked to various animals, symbolizing their powers and characteristics. It's like having a team of powerful beings watching over different parts of the world, isn't it?\n\nNow, think about this: if you had to choose an animal to represent you as a god or goddess, which animal would you pick and why? It's fun to imagine ourselves as part of this ancient pantheon of gods and goddesses, each with unique traits and responsibilities.\n\nTo wrap up, Ancient Egyptian gods were not just mystical beings but also symbols of the forces of nature and aspects of human life. They were worshipped for their powers and guidance in different areas of life. Next time, we'll explore more about the intriguing world of Ancient Egyptian beliefs. So, get ready to uncover more mysteries of this ancient civilization in our next lesson!",
+      "teacher_text": "How religious were the Ancient Egyptians? Ancient Egypt had over 2,000 names of Gods. These gods and goddesses were depicted with human bodies and the heads of birds or animals.\n\nEach animal symbolized a particular power of the god they represented. One of the most significant gods was Ra, the God of the sun, often shown with a falcon head and associated with the sun disc and a sacred cobra. Ra's journey across the heavens in a boat called the Barque of Millions of Years was a central belief.\n\nAt night, it was thought that Ra died, traveling through the underworld, while the Moon illuminated the world above.\n\nRa was not the only deity in the Egyptian pantheon. There were many others, each with unique characteristics and roles. For example, Amun, known as the King of the Gods, became even more powerful when combined with Ra.\n\nAnubis, the God of mummification, was represented with the head of a jackal, and priests often wore masks during ceremonies. Bastet, associated with protection and household entertainment, had the head of a cat. Geb, the earth God, was believed to cause earthquakes through his laughter and was depicted with the head of a goose.\n\nThe Egyptian gods and goddesses were not just figures of worship but also representations of various aspects of life and nature. Hathor, the Goddess of love and joy, music, and dance, had the head of a cow. Sekhmet, the Goddess of war and battle, was depicted with the head of a lioness, symbolizing strength and ferocity.\n\nHorus, the God of the sky, was shown with the head of a falcon, representing power and protection. Heket, the Goddess of childbirth, was depicted with the head of a frog, symbolizing fertility and rebirth.\n\nThe Ancient Egyptians believed in a rich and diverse pantheon of gods and goddesses, each with specific attributes and responsibilities. These deities were not only objects of worship but also played crucial roles in daily life, influencing various aspects of society and culture. The intricate mythology and religious beliefs of Ancient Egypt shaped their worldview and practices, emphasizing the interconnectedness of the natural and supernatural realms.",
       "quiz": {
-        "question": "Which Egyptian god was known as the King of the Gods and was even more powerful when combined with Ra?",
+        "question": "Which Egyptian god was known as the King of the Gods and gained more power when combined with Ra?",
         "options": [
           "Amun with the head of a ram",
-          "Hathor with the head of a cow",
-          "Thoth with the head of a bird",
-          "Sekmet with the head of a lioness"
+          "Bastet with the head of a cat",
+          "Geb with the head of a goose",
+          "Anubis with the head of a jackal"
         ],
         "correct_answer": "Amun with the head of a ram",
         "expected_points": [
-          "Amun was known as the King of the Gods and was even more powerful when combined with Ra."
+          "Amun was known as the King of the Gods and gained more power when combined with Ra."
         ],
-        "source_quote": "Amun King of the Gods. When Amun was combined with Ra he was even more powerful."
+        "source_quote": "Amun, King of the Gods. When Amun was combined with Ra he was even more powerful.",
+        "correct_index": 0,
+        "lesson_question_index": 0,
+        "lesson_question_total": 3
       }
     }
-  }
+  },
+  "last_quiz": {
+    "question": "Which Egyptian god was known as the King of the Gods and gained more power when combined with Ra?",
+    "options": [
+      "Amun with the head of a ram",
+      "Bastet with the head of a cat",
+      "Geb with the head of a goose",
+      "Anubis with the head of a jackal"
+    ],
+    "correct_answer": "Amun with the head of a ram",
+    "expected_points": [
+      "Amun was known as the King of the Gods and gained more power when combined with Ra."
+    ],
+    "source_quote": "Amun, King of the Gods. When Amun was combined with Ra he was even more powerful.",
+    "correct_index": 0,
+    "lesson_question_index": 0,
+    "lesson_question_total": 3
+  },
+  "last_teacher_text": "How religious were the Ancient Egyptians? Ancient Egypt had over 2,000 names of Gods. These gods and goddesses were depicted with human bodies and the heads of birds or animals.\n\nEach animal symbolized a particular power of the god they represented. One of the most significant gods was Ra, the God of the sun, often shown with a falcon head and associated with the sun disc and a sacred cobra. Ra's journey across the heavens in a boat called the Barque of Millions of Years was a central belief.\n\nAt night, it was thought that Ra died, traveling through the underworld, while the Moon illuminated the world above.\n\nRa was not the only deity in the Egyptian pantheon. There were many others, each with unique characteristics and roles. For example, Amun, known as the King of the Gods, became even more powerful when combined with Ra.\n\nAnubis, the God of mummification, was represented with the head of a jackal, and priests often wore masks during ceremonies. Bastet, associated with protection and household entertainment, had the head of a cat. Geb, the earth God, was believed to cause earthquakes through his laughter and was depicted with the head of a goose.\n\nThe Egyptian gods and goddesses were not just figures of worship but also representations of various aspects of life and nature. Hathor, the Goddess of love and joy, music, and dance, had the head of a cow. Sekhmet, the Goddess of war and battle, was depicted with the head of a lioness, symbolizing strength and ferocity.\n\nHorus, the God of the sky, was shown with the head of a falcon, representing power and protection. Heket, the Goddess of childbirth, was depicted with the head of a frog, symbolizing fertility and rebirth.\n\nThe Ancient Egyptians believed in a rich and diverse pantheon of gods and goddesses, each with specific attributes and responsibilities. These deities were not only objects of worship but also played crucial roles in daily life, influencing various aspects of society and culture. The intricate mythology and religious beliefs of Ancient Egypt shaped their worldview and practices, emphasizing the interconnectedness of the natural and supernatural realms."
 }

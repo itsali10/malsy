@@ -1,0 +1,69 @@
+{
+  "unit_title": "Where and Who Were the Ancient Egyptians?",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Introduction to Ancient Egyptians Research Project",
+      "must_cover": true,
+      "keywords": [
+        "research project",
+        "Ancient Egyptians"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Where and who were the Ancient Egyptians?",
+      "must_cover": true,
+      "keywords": [
+        "Egypt",
+        "River Nile",
+        "civilization",
+        "monuments",
+        "Pharaohs",
+        "Nile valley",
+        "King Narmer",
+        "Menes",
+        "Memphis",
+        "Two Lands"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "similarities",
+        "differences",
+        "Ancient Egyptian life",
+        "life today"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "maps",
+        "illustrations",
+        "diagrams",
+        "charts"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Reading Comprehension Questions",
+      "must_cover": true,
+      "keywords": [
+        "comprehension",
+        "Ancient Egyptian life",
+        "River Nile",
+        "Pharaohs"
+      ]
+    }
+  ]
+}

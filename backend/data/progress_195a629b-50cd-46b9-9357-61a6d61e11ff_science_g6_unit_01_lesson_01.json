@@ -1,0 +1,58 @@
+{
+  "student_id": "195a629b-50cd-46b9-9357-61a6d61e11ff",
+  "chapter_id": "science_g6:unit_01_lesson_01",
+  "current_item_index": 0,
+  "done_items": [],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [],
+  "lesson_questions": [
+    {
+      "question": "What is the purpose of coming up with a hypothesis in the scientific method?",
+      "options": [
+        "To make a prediction about what we think will happen",
+        "To conduct an experiment",
+        "To collect data during the experiment",
+        "To analyze the data gathered"
+      ],
+      "correct_answer": "To make a prediction about what we think will happen",
+      "expected_points": [
+        "The hypothesis in the scientific method is like a prediction about the expected outcome based on our observations and research."
+      ],
+      "section_skill": "reading",
+      "correct_index": 0
+    },
+    {
+      "question": "What step comes after conducting an experiment in the scientific method?",
+      "options": [
+        "To do some research",
+        "To analyze the data gathered",
+        "To come up with a hypothesis",
+        "To make an observation or ask a question"
+      ],
+      "correct_answer": "To analyze the data gathered",
+      "expected_points": [
+        "After conducting an experiment, scientists analyze the data collected to draw conclusions."
+      ],
+      "section_skill": "reading",
+      "correct_index": 1
+    },
+    {
+      "question": "How does the scientific method help us understand different things?",
+      "options": [
+        "By collecting data",
+        "By conducting research",
+        "Through experimentation",
+        "By making observations"
+      ],
+      "correct_answer": "Through experimentation",
+      "expected_points": [
+        "The scientific method helps us investigate and understand different things through experimentation."
+      ],
+      "section_skill": "grammar",
+      "correct_index": 2
+    }
+  ],
+  "lesson_question_index": 0,
+  "lesson_questions_item_id": "1"
+}

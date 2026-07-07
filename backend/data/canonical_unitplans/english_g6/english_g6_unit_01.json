@@ -1,0 +1,99 @@
+{
+  "unit_title": "Why do we build bridges and tunnels?",
+  "items": [
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Word Study",
+      "must_cover": true,
+      "keywords": [
+        "Vocabulary: Verbs and Adjectives",
+        "Prefixes bi- and tri-"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing Study",
+      "must_cover": true,
+      "keywords": [
+        "Paragraph Breaks"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Reading: Author's Purpose",
+      "must_cover": true,
+      "keywords": [
+        "Author's Purpose",
+        "The Earthworm and the Spider"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar in Use",
+      "must_cover": true,
+      "keywords": [
+        "Future Continuous Forms"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening",
+      "must_cover": true,
+      "keywords": [
+        "Listening to speakers using bridges and tunnels",
+        "Correcting Someone"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking",
+      "must_cover": true,
+      "keywords": []
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "Paragraph Writing exercise"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "Comprehension",
+      "must_cover": true,
+      "keywords": [
+        "Comprehension questions",
+        "Words in Context"
+      ]
+    },
+    {
+      "id": "discussion_questions",
+      "type": "discussion",
+      "title": "Discussion Questions",
+      "must_cover": true,
+      "keywords": [
+        "Trusting strangers",
+        "Building bridges and tunnels"
+      ]
+    },
+    {
+      "id": "visual_elements",
+      "type": "visual",
+      "title": "Visual Elements",
+      "must_cover": true,
+      "keywords": [
+        "Illustrations of bridges and tunnels",
+        "Maps of Koi village"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "unit_title": "Why are stories important?",
+  "items": [
+    {
+      "id": "unit_opening",
+      "type": "unit_opening",
+      "title": "Get Ready",
+      "must_cover": true,
+      "keywords": [
+        "introduction",
+        "listening",
+        "words"
+      ]
+    },
+    {
+      "id": "vocab",
+      "type": "vocab",
+      "title": "Word Study",
+      "must_cover": true,
+      "keywords": [
+        "adjectives",
+        "adverbs",
+        "word meanings",
+        "context"
+      ]
+    },
+    {
+      "id": "writing",
+      "type": "writing",
+      "title": "Writing Study",
+      "must_cover": true,
+      "keywords": [
+        "suffix -less",
+        "reporting verbs",
+        "writing practice"
+      ]
+    },
+    {
+      "id": "reading_1",
+      "type": "reading",
+      "title": "Before You Read",
+      "must_cover": true,
+      "keywords": [
+        "theme",
+        "moral",
+        "lesson"
+      ]
+    },
+    {
+      "id": "reading_2",
+      "type": "reading",
+      "title": "Reading: Theme Unit17 173",
+      "must_cover": true,
+      "keywords": [
+        "adventure story",
+        "encounter",
+        "characters",
+        "exciting events",
+        "danger"
+      ]
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar in Use",
+      "must_cover": true,
+      "keywords": [
+        "present tense",
+        "past tense",
+        "present perfect",
+        "past perfect",
+        "tenses review"
+      ]
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening",
+      "must_cover": true,
+      "keywords": [
+        "main idea"
+      ]
+    },
+    {
+      "id": "speaking",
+      "type": "speaking",
+      "title": "Speaking",
+      "must_cover": true,
+      "keywords": [
+        "clarifying speech",
+        "discussion topics",
+        "partner interaction"
+      ]
+    },
+    {
+      "id": "exercises",
+      "type": "exercises",
+      "title": "Exercises",
+      "must_cover": true,
+      "keywords": [
+        "word transformation",
+        "sentence writing"
+      ]
+    },
+    {
+      "id": "wrap_up",
+      "type": "wrap_up",
+      "title": "BIG QUESTION (9) Stories can entertain us and teach lessons. Why are stories important? What are some other ways that stories are important?",
+      "must_cover": true,
+      "keywords": [
+        "importance of stories",
+        "entertainment"
+      ]
+    }
+  ]
+}

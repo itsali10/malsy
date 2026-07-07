@@ -1,0 +1,72 @@
+{
+  "unit_title": "The Lymphatic and Endocrine Systems",
+  "items": [
+    {
+      "id": "1",
+      "type": "other",
+      "title": "Lesson Explanation",
+      "must_cover": true,
+      "keywords": [
+        "Introduction to the Lymphatic and Endocrine Systems"
+      ]
+    },
+    {
+      "id": "2",
+      "type": "other",
+      "title": "Learning Objectives",
+      "must_cover": true,
+      "keywords": [
+        "Understand the functions of the lymphatic system",
+        "Explain the role of the endocrine system in hormone regulation"
+      ]
+    },
+    {
+      "id": "3",
+      "type": "vocab",
+      "title": "Key Scientific Concepts",
+      "must_cover": true,
+      "keywords": [
+        "Hormones",
+        "Immune response"
+      ]
+    },
+    {
+      "id": "4",
+      "type": "visual",
+      "title": "Diagrams/Images",
+      "must_cover": true,
+      "keywords": [
+        "Diagram of the lymphatic system",
+        "Chart showing hormone regulation in the endocrine system"
+      ]
+    },
+    {
+      "id": "5",
+      "type": "exercises",
+      "title": "Experiments/Activities",
+      "must_cover": true,
+      "keywords": [
+        "Hands-on activity to demonstrate lymphatic circulation",
+        "Experiment to observe hormone effects on a target organ"
+      ]
+    },
+    {
+      "id": "6",
+      "type": "wrap_up",
+      "title": "Summary/Wrap-up",
+      "must_cover": true,
+      "keywords": [
+        "Recap of the main functions of the lymphatic and endocrine systems"
+      ]
+    },
+    {
+      "id": "7",
+      "type": "exercises",
+      "title": "Quiz/Review Questions",
+      "must_cover": true,
+      "keywords": [
+        "What is the primary function of the lymphatic system?"
+      ]
+    }
+  ]
+}

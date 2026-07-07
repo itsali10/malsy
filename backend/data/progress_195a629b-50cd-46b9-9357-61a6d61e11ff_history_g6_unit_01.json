@@ -1,0 +1,58 @@
+{
+  "student_id": "195a629b-50cd-46b9-9357-61a6d61e11ff",
+  "chapter_id": "history_g6:unit_01",
+  "current_item_index": 0,
+  "done_items": [],
+  "last_quiz": null,
+  "hint_count": 0,
+  "attempt_history": [],
+  "lesson_questions": [
+    {
+      "question": "What was the significance of the River Nile for the Ancient Egyptians?",
+      "options": [
+        "It was used for irrigation purposes.",
+        "It provided water, food, and transportation.",
+        "It was a barrier against invasions.",
+        "It was a sacred river for religious ceremonies."
+      ],
+      "correct_answer": "It provided water, food, and transportation.",
+      "expected_points": [
+        "The River Nile was crucial for water, food, and transportation for the Ancient Egyptians."
+      ],
+      "source_quote": "The Nile was crucial as Egypt mainly consisted of deserts with little rainfall, making the river a lifeline for the people.",
+      "correct_index": 1
+    },
+    {
+      "question": "Who united Upper and Lower Egypt into one kingdom?",
+      "options": [
+        "King Narmer or Menes",
+        "Pharaoh of the south",
+        "Pharaoh of the north",
+        "King Tutankhamun"
+      ],
+      "correct_answer": "King Narmer or Menes",
+      "expected_points": [
+        "King Narmer, also known as Menes, united Upper and Lower Egypt into one kingdom."
+      ],
+      "source_quote": "In 3200 BC, King Narmer, also known as Menes, united the two kingdoms, establishing a new capital called Memphis.",
+      "correct_index": 0
+    },
+    {
+      "question": "What was the significance of dividing Egypt into the red land and the black land?",
+      "options": [
+        "It marked the religious and non-religious areas.",
+        "The red land acted as a barrier against invasions, while the black land provided resources.",
+        "It separated the rich and poor populations.",
+        "It divided the kingdom into two rival factions."
+      ],
+      "correct_answer": "The red land acted as a barrier against invasions, while the black land provided resources.",
+      "expected_points": [
+        "The division into red and black lands served protective and resourceful purposes for the Ancient Egyptians."
+      ],
+      "source_quote": "The red land, the desert area surrounding Egypt, acted as a natural barrier against invasions. In contrast, the black land, close to the Nile, provided the necessary resources for sustenance.",
+      "correct_index": 1
+    }
+  ],
+  "lesson_question_index": 0,
+  "lesson_questions_item_id": "unit_opening"
+}

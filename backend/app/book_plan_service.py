@@ -15,10 +15,11 @@ from .canonical_plan_store import (
     save_canonical_unit_plan,
 )
 from .lesson_planner import build_chapter_plan
+from .plan_deduplication import dedupe_book_plan, dedupe_unit_plan
 from .llm import get_teacher_llm
 from .prompts import UNIT_PLAN_PROMPT
 from .session_config import SESSION_UNIT_MINUTES
-from .subject_registry import filter_unit_plan_for_subject, is_language_subject
+from .subject_registry import filter_unit_plan_for_subject, is_builtin_subject, is_language_subject
 
 llm = get_teacher_llm()
 
@@ -104,7 +105,7 @@ SUBJECT_PROFILES: Dict[str, Dict[str, Any]] = {
 }
 
 SCIENCE_UNIT_PLAN_PROMPT = """
-You are an expert science curriculum planner. Create a strict checklist for ONE science textbook unit.
+You are an expert science curriculum planner. Create a strict checklist for ONE science lesson.
 
 Return ONLY valid JSON:
 {
@@ -131,13 +132,15 @@ Required item categories (use clear titles from the book when possible):
 - Quiz or review questions
 
 Rules:
+- Plan ONLY from the lesson title and page-scoped excerpts provided.
 - Do NOT include listening, pronunciation, or speaking items.
+- Do NOT reference other units, future lessons, table of contents, or final projects.
 - Order items in a natural teaching sequence.
-- Every visible diagram, experiment, or activity in the unit text must appear in the checklist.
+- Every visible diagram, experiment, or activity in the lesson text must appear in the checklist.
 """
 
 HISTORY_UNIT_PLAN_PROMPT = """
-You are an expert history curriculum planner. Create a strict checklist for ONE history textbook unit.
+You are an expert history curriculum planner. Create a strict checklist for ONE history lesson.
 
 Return ONLY valid JSON:
 {
@@ -165,7 +168,9 @@ Required item categories (use clear titles from the book when possible):
 - Quiz or review questions
 
 Rules:
+- Plan ONLY from the lesson title and page-scoped excerpts provided.
 - Do NOT include listening or pronunciation items.
+- Do NOT reference other units, future lessons, table of contents, or final projects.
 - Order items in a natural teaching sequence.
 """
 
@@ -436,72 +441,33 @@ def load_approved_canonical_unit_plan(book_id: str, plan_key: str) -> Optional[D
     return load_canonical_unit_plan(book_id, plan_key)
 
 
-def _retrieve_book_sample(book_id: str, k: int = 16) -> str:
-    from .lesson_graph import retrieve_for_item
-
-    chunks = retrieve_for_item(book_id, "overview chapter units topics", k=k)
-    if not chunks:
-        return ""
-    return "\n\n".join(c["text"] for c in chunks[:k])
-
-
 def _enrich_chapter_plan(
     book_id: str,
     skeleton: Dict[str, Any],
     subject_key: str,
     book_title: str,
 ) -> Dict[str, Any]:
+    """Attach subject modules to the unit skeleton without whole-book LLM enrichment."""
     profile = subject_profile(subject_key)
     modules = profile["modules"]
     module_keys = [m["key"] for m in modules]
-    sample = _retrieve_book_sample(book_id)
     units_in = skeleton.get("units") or []
-    outline = {
-        "book_id": book_id,
-        "book_title": book_title,
-        "subject": subject_key,
-        "modules": modules,
+    objectives = skeleton.get("objectives") or [
+        f"Teach {len(units_in)} lessons from {book_title} in order"
+    ]
+
+    for i, u in enumerate(units_in):
+        u.setdefault("keywords", [])
+        u.setdefault("minutes", SESSION_UNIT_MINUTES)
+        if u.get("module_key") not in module_keys:
+            u["module_key"] = module_keys[i % len(module_keys)] if module_keys else "lessons"
+
+    return {
+        "objectives": objectives,
         "units": units_in,
+        "modules": modules,
+        "subject_key": subject_key,
     }
-    user = (
-        f"Book outline:\n{outline}\n\n"
-        f"Available module_key values: {', '.join(module_keys)}\n\n"
-        f"Textbook excerpts:\n{sample or '(no excerpts — use unit titles)'}"
-    )
-    try:
-        msg = llm.invoke(
-            [
-                {"role": "system", "content": ENRICH_PLAN_PROMPT},
-                {"role": "user", "content": user},
-            ]
-        )
-        enriched = _parse_llm_json(msg.content)
-        if not enriched.get("units"):
-            raise ValueError("empty units")
-        # Preserve real_unit_id from skeleton when LLM omits it.
-        by_id = {u.get("unit_id"): u for u in units_in}
-        for u in enriched.get("units", []):
-            uid = u.get("unit_id")
-            sk = by_id.get(uid) or {}
-            if sk.get("real_unit_id"):
-                u["real_unit_id"] = sk["real_unit_id"]
-            u.setdefault("minutes", SESSION_UNIT_MINUTES)
-            if u.get("module_key") not in module_keys:
-                u["module_key"] = module_keys[0]
-        enriched["modules"] = modules
-        enriched["subject_key"] = subject_key
-        return enriched
-    except Exception:
-        traceback.print_exc()
-        fallback = dict(skeleton)
-        keys = module_keys or ["lessons"]
-        for i, u in enumerate(fallback.get("units") or []):
-            u["module_key"] = keys[i % len(keys)]
-            u.setdefault("keywords", [])
-            u.setdefault("minutes", SESSION_UNIT_MINUTES)
-        fallback["modules"] = modules
-        fallback["subject_key"] = subject_key
-        return fallback
 
 
 def _generate_canonical_unit_plan(
@@ -509,35 +475,91 @@ def _generate_canonical_unit_plan(
     unit: Dict[str, Any],
     subject_key: str,
 ) -> Dict[str, Any]:
-    from .lesson_content_mapping import ensure_lesson_mapping, retrieve_chunks_for_lesson
+    from .lesson_content_mapping import (
+        build_lesson_plan_context,
+        detect_english_section_headings,
+        extract_headings_from_chunks,
+        filter_english_plan_to_detected_sections,
+        forbidden_lesson_titles,
+        retrieve_lesson_pages_for_plan,
+        resolve_lesson_for_planning,
+        validate_plan_lesson_scope,
+    )
     from .unit_detection import full_unit_id, normalize_manifest_unit_id
 
     profile = subject_profile(subject_key)
     short = normalize_manifest_unit_id(unit.get("unit_id") or unit.get("real_unit_id") or "unit_01", book_id)
     real_id = unit.get("real_unit_id") or full_unit_id(book_id, short)
-    if book_id in str(real_id) and real_id.count(":") > 1:
+    if book_id in str(real_id) and str(real_id).count(":") > 1:
         real_id = full_unit_id(book_id, short)
-    title = unit.get("title") or "Unit"
+
+    lesson_info = resolve_lesson_for_planning(book_id, real_id, unit)
+    title = lesson_info["title"]
     keywords = unit.get("keywords") or []
-    query = profile.get("retrieval_query") or "lesson concepts vocabulary quiz"
-    mapping = ensure_lesson_mapping(real_id, book_id=book_id, plan_unit=unit)
-    chunks, _src, _map = retrieve_chunks_for_lesson(
-        real_id, query, book_id=book_id, plan_unit=unit, k=12
+
+    plan_unit = dict(unit)
+    plan_unit.setdefault("unit_id", lesson_info["unit_id"])
+    plan_unit.setdefault("real_unit_id", lesson_info["lesson_id"])
+    plan_unit.setdefault("title", title)
+    plan_unit["start_page"] = lesson_info["start_page"]
+    plan_unit["end_page"] = lesson_info["end_page"]
+
+    chunks, mapping = retrieve_lesson_pages_for_plan(
+        lesson_info["lesson_id"],
+        book_id=book_id,
+        plan_unit=plan_unit,
+        max_chunks=24,
     )
-    if chunks:
-        context = "\n\n".join(c["text"] for c in chunks)
-    else:
-        context = (
-            f"Lesson title: {title}\n"
-            f"Key concepts: {', '.join(keywords) if keywords else 'N/A'}\n"
-            "No textbook excerpt available — plan items from the title and concepts."
+    if is_language_subject(subject_key):
+        from .english_section_segmentation import (
+            log_english_section_debug,
+            validate_english_section_assignment,
         )
+
+        section_validation = validate_english_section_assignment(
+            chunks,
+            lesson_title=title,
+            next_lesson=lesson_info.get("next_lesson"),
+            previous_lesson=lesson_info.get("previous_lesson"),
+        )
+        log_english_section_debug(
+            lesson_title=title,
+            chunks=chunks,
+            validation=section_validation,
+        )
+        if not section_validation.get("ok"):
+            raise ValueError(
+                "English section validation failed: "
+                + "; ".join(section_validation.get("errors") or [])
+            )
+    start_page = int(
+        mapping.get("start_page")
+        or lesson_info["start_page"]
+        or plan_unit.get("start_page")
+        or 0
+    )
+    end_page = int(
+        mapping.get("end_page")
+        or lesson_info["end_page"]
+        or plan_unit.get("end_page")
+        or start_page
+    )
+    forbidden = forbidden_lesson_titles(book_id, lesson_info["unit_id"])
+    detected_sections = extract_headings_from_chunks(chunks)
+    context = build_lesson_plan_context(
+        title=title,
+        start_page=start_page,
+        end_page=end_page,
+        chunks=chunks,
+        subject_key=subject_key,
+        detected_sections=detected_sections,
+    )
     system = _unit_plan_system_prompt(subject_key)
     try:
         msg = llm.invoke(
             [
                 {"role": "system", "content": system},
-                {"role": "user", "content": f"Unit text:\n{context}"},
+                {"role": "user", "content": context},
             ]
         )
         plan = _parse_llm_json(msg.content)
@@ -546,14 +568,40 @@ def _generate_canonical_unit_plan(
         if not items:
             raise ValueError("empty items")
         plan = filter_unit_plan_for_subject(plan, subject_key) or plan
+        plan = validate_plan_lesson_scope(
+            plan,
+            lesson_title=title,
+            forbidden_titles=forbidden,
+        )
+        if is_language_subject(subject_key):
+            plan = filter_english_plan_to_detected_sections(
+                plan,
+                detect_english_section_headings(chunks),
+            )
         return plan
     except Exception:
         traceback.print_exc()
-        return _fallback_unit_plan(subject_key, title, keywords)
+        fallback = _fallback_unit_plan(subject_key, title, keywords)
+        fallback = validate_plan_lesson_scope(
+            fallback,
+            lesson_title=title,
+            forbidden_titles=forbidden,
+        )
+        if is_language_subject(subject_key):
+            fallback = filter_english_plan_to_detected_sections(
+                fallback,
+                detect_english_section_headings(chunks),
+            )
+        return fallback
 
 
 def _sanitize_saved_unit_plan(plan: Dict[str, Any], subject_key: str) -> Dict[str, Any]:
-    return filter_unit_plan_for_subject(plan, subject_key) or plan
+    filtered = filter_unit_plan_for_subject(plan, subject_key) or plan
+    return dedupe_unit_plan(filtered)
+
+
+def _sanitize_saved_book_plan(plan: Dict[str, Any]) -> Dict[str, Any]:
+    return dedupe_book_plan(plan)
 
 
 def generate_book_lesson_plan(book_id: str, *, force: bool = False) -> Dict[str, Any]:
@@ -584,6 +632,7 @@ def generate_book_lesson_plan(book_id: str, *, force: bool = False) -> Dict[str,
     try:
         skeleton = build_chapter_plan(book_id)
         plan = _enrich_chapter_plan(book_id, skeleton, subject_key, book_title)
+        plan = _sanitize_saved_book_plan(plan)
         plan["plan_status"] = "draft"
         plan["generated_at"] = _now_iso()
         plan["book_id"] = book_id

@@ -1,0 +1,120 @@
+/* ── MALSY Pastel Theme Tokens ─────────────────────────────────── */
+:root {
+  /* Brand palette */
+  --color-bg:           #F7F8FF;
+  --color-bg-alt:       #EEF0FA;
+  --color-surface:      #FFFFFF;
+  --color-border:       #E6E8F2;
+
+  --color-primary:      #AFA8FF;
+  --color-primary-soft: #DCD7FF;
+  --color-primary-strong: #8F86F5;
+  --color-blue:         #BEE7FF;
+  --color-pink:         #FFD6E8;
+  --color-yellow:       #FFE9A7;
+  --color-green:        #C8F7DC;
+
+  --color-text:         #252A3D;
+  --color-text-secondary: #6B7280;
+  --color-text-muted:   #9CA3AF;
+
+  --color-error:        #FFB3B3;
+  --color-error-text:   #C45C5C;
+  --color-success:      #B8F2D8;
+  --color-success-text: #3D9B6E;
+
+  /* Lesson page palette (screenshot reference) */
+  --lesson-purple:   #8B6CFF;
+  --lesson-lavender: #E8E2FF;
+  --lesson-blue:     #EAF7FF;
+  --lesson-pink:     #FFEAF4;
+  --lesson-yellow:   #FFF2C6;
+
+  /* Legacy aliases (keep existing CSS working) */
+  --v:    var(--color-primary-strong);
+  --vl:   var(--color-primary);
+  --vp:   var(--color-primary-soft);
+  --mint: var(--color-success-text);
+  --mintd: #3D9B6E;
+  --coral: var(--color-error-text);
+  --amber: #D4A017;
+  --sky:  #5BAFD4;
+  --skyd: #3D8FB0;
+  --navy: var(--color-bg);
+  --navym: var(--color-surface);
+  --navys: var(--color-surface);
+  --w:    var(--color-text);
+  --off:  var(--color-bg-alt);
+  --g1:   var(--color-border);
+  --g2:   #CBD0E0;
+  --g3:   var(--color-text-secondary);
+  --g4:   var(--color-text-muted);
+  --g5:   var(--color-text-muted);
+
+  /* Typography */
+  --font-display: var(--font-nunito, 'Nunito'), sans-serif;
+  --font-body:    var(--font-quicksand, 'Quicksand'), sans-serif;
+  --fd: var(--font-display);
+  --fb: var(--font-body);
+
+  /* Spacing & shape */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-2xl: 48px;
+
+  --radius-sm:  12px;
+  --radius-md:  16px;
+  --radius-lg:  20px;
+  --radius-xl:  24px;
+  --radius-2xl: 28px;
+  --radius-full: 999px;
+  --r:  var(--radius-md);
+  --rl: var(--radius-xl);
+
+  /* Shadows */
+  --shadow-sm:  0 2px 8px rgba(37, 42, 61, 0.06);
+  --shadow-md:  0 4px 16px rgba(37, 42, 61, 0.08);
+  --shadow-lg:  0 8px 32px rgba(37, 42, 61, 0.10);
+  --shadow-card: 0 4px 20px rgba(175, 168, 255, 0.12);
+
+  /* Motion */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-soft: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Softer dark mode — still accessible, not harsh black */
+[data-theme="dark"] {
+  --color-bg:           #1E2235;
+  --color-bg-alt:       #252A3D;
+  --color-surface:      #2D3348;
+  --color-border:       #3D4460;
+
+  --color-primary:      #B8B2FF;
+  --color-primary-soft: #3D3866;
+  --color-primary-strong: #AFA8FF;
+
+  --color-text:         #F0F2FA;
+  --color-text-secondary: #A8AEC4;
+  --color-text-muted:   #7B8199;
+
+  --color-error:        #5C3535;
+  --color-error-text:   #FFB3B3;
+  --color-success:      #2A4A3A;
+  --color-success-text: #B8F2D8;
+
+  --navy:  var(--color-bg);
+  --navym: var(--color-surface);
+  --navys: var(--color-bg-alt);
+  --w:     var(--color-text);
+  --g3:    var(--color-text-secondary);
+  --g5:    var(--color-text-muted);
+
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.25);
+  --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.2);
+}

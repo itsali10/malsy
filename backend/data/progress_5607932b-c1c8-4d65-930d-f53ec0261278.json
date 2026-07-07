@@ -1,0 +1,26 @@
+{
+  "student_id": "5607932b-c1c8-4d65-930d-f53ec0261278",
+  "chapter_id": "history_g6",
+  "unit_index": 1,
+  "unit_part": 0,
+  "max_unlocked_part": 0,
+  "lesson_chapter_id": "history_g6:unit_02",
+  "lesson_title": "Religion and Gods of Ancient Egypt",
+  "section_statuses": [
+    {
+      "index": 0,
+      "key": "part_0",
+      "title": "Part 1",
+      "completed": false,
+      "active": true
+    },
+    {
+      "index": 1,
+      "key": "part_1",
+      "title": "Part 2",
+      "completed": false,
+      "active": false
+    }
+  ],
+  "updated_at": "2026-07-07T23:09:17.502918Z"
+}

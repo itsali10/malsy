@@ -186,8 +186,8 @@ def validate_weekly_plan(
             errors.append(f"{day} must have 0 sessions")
 
     active_days = sum(1 for d in LEARNING_DAYS if plan.get(d))
-    if active_days < 4 or active_days > 5:
-        errors.append(f"active_days={active_days} (expected 4–5 within Sun–Thu)")
+    if active_days != 5:
+        errors.append(f"active_days={active_days} (expected 5 within Sun–Thu)")
 
     for day in DAY_ORDER:
         if len(plan.get(day, [])) > 3:
@@ -238,7 +238,7 @@ def generate_weekly_plan(
     rng = random.Random(seed)
 
     for _ in range(max_attempts):
-        active_count = rng.choice([4, 5])
+        active_count = 5
         masks = _VALID_DAY_MASKS.get(active_count, _VALID_DAY_MASKS[5])
         mask = list(rng.choice(masks))
         # Enforce fixed Fri/Sat rest regardless of mask content.
